@@ -1,0 +1,8 @@
+.form-findCLient__h1{
+    text-align: center;
+    text-transform: capitalize;
+    color: #EAEAEA;
+    margin-top: .1em;
+    margin-bottom: .5em;
+    font-size: clamp(1.5rem, 1.5vw, 2rem);
+}
