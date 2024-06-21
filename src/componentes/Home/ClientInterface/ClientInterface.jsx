@@ -6,6 +6,7 @@ import ProductModal from '../Modals/ProductModal';
 import EditProducts from './Modals/ActualizarProductos/EditProducts';
 import MakeDeliver from './Modals/HacerEntrega/MakeDelivery';
 import ViewDeliverys from '../Modals/ViewDeliverys';
+import MuchUsers from '../Modals/ToMuchUsers/MuchUsers';
 //Ant Design MODULES
 import { Button, message, Popconfirm, Spin, Flex } from 'antd';
 import Loader from "../../Loaders/Loader";
@@ -19,6 +20,7 @@ function ClientInterface() {
     const [showEditProductModal, setShowEditProductModal] = useState(false)
     const [showMakeDeliveryModal, setShowMakeDeliveryModal] = useState(false)
     const [showDeliveryRegister, setShowDeliveryRegister] = useState(false)
+    const [showMuchUsers, setShowMuchUsers] = useState(false)
 
     const handleEditModal = () => setShowEditDataClientModal(true);
     const closeEditModal = () => setShowEditDataClientModal(false);
@@ -27,6 +29,7 @@ function ClientInterface() {
     const closeMakeDeliveryModal = () => setShowMakeDeliveryModal(false)
     const closeEditProductModal = () => setShowEditProductModal(false)
     const closeShowDeliveryRegister = () => setShowDeliveryRegister(false)
+    const closeShowMuchUsersModal = () => setShowMuchUsers(false)
 
     const closeClientDebts = () => {
         setShowSectionDebt(false);
@@ -34,6 +37,15 @@ function ClientInterface() {
 
     };
 
+    const openModalMuchUsers = () =>{
+        setShowMuchUsers(true)
+    }
+
+    useEffect(()=>{
+        if (clientData.length > 1) {
+            openModalMuchUsers()
+        }
+    },[clientData])
     const processingDeliverData = () => {
         if (deliverData.length === 0) {
             return { last: 0, saldoRestante: 0 }
@@ -162,6 +174,8 @@ function ClientInterface() {
             {showMakeDeliveryModal && <MakeDeliver closeModal={closeMakeDeliveryModal} dataClient={clientData} saldo_restante={totalGeneral - saldoRestante} />}
 
             {showDeliveryRegister && <ViewDeliverys closeModal={closeShowDeliveryRegister} total_entregas={saldoRestante} />}
+
+            {showMuchUsers && <MuchUsers closeModal={closeShowMuchUsersModal}/>}
 
             {showSectionDebt && !fetchingData && <button className='clientInterface__map-btn-showData' onClick={closeClientDebts}>Cerrar</button>}
             {fetchingData && <Loader />}

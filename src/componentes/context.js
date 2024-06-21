@@ -66,9 +66,6 @@ export const AppContextProvider = ({ children }) => {
     }
   }
   const [isCreating, setIsCreating] = useState(false)
-  const [isCreated, setIsCreated] = useState(false)
-  const [isError, setIsError] = useState(false)
-  const [userExist, setUserExist] = useState(false)
   const createUser = async (values) => {
     setIsCreating(true);
     try {
@@ -83,33 +80,26 @@ export const AppContextProvider = ({ children }) => {
       }
 
       if (dataDni.length > 0) {
-        setUserExist(true);
-        console.log("dNI?", dataDni)
-        setTimeout(() => {
-          setUserExist(false);
-        }, 1500);
-        return; // Salir si el usuario ya existe por DNI
+        message.error("Ya existe un usuario con ese DNI")
+        
+        return; 
       }
 
-      // Verificar si el usuario existe por nombre completo
-      let { data: dataFullName, error: errorFullName } = await supabase
-        .from('users')
-        .select()
-        .eq('nombre_completo', values.fullName);
+      // let { data: dataFullName, error: errorFullName } = await supabase
+      //   .from('users')
+      //   .select()
+      //   .eq('nombre_completo', values.fullName);
 
-      if (errorFullName) {
-        throw errorFullName;
-      }
+      // if (errorFullName) {
+      //   throw errorFullName;
+      // }
 
-      if (dataFullName.length > 0) {
-        setUserExist(true);
-        setTimeout(() => {
-          setUserExist(false);
-        }, 1500);
-        return; // Salir si el usuario ya existe por nombre completo
-      }
+      // if (dataFullName.length > 0) {
+      //   message.error("Ya existe un usuario con ese nombre")
 
-      // Insertar los datos del nuevo usuario
+      //   return; 
+      // }
+
       const { error } = await supabase
         .from('users')
         .insert({
@@ -122,19 +112,15 @@ export const AppContextProvider = ({ children }) => {
         });
 
       if (error) {
+        message.error("Error al crear el usuario, por favor intente nuevamente")
+
         throw error;
+
       } else {
-        setIsCreated(true);
-        setTimeout(() => {
-          setIsCreated(false);
-        }, 2000);
+        message.success("Usuario creado con exito")
       }
     } catch (error) {
-      console.error('Error en la consulta:', error);
-      setIsError(true);
-      setTimeout(() => {
-        setIsError(false);
-      }, 2000);
+      message.error("Error al crear el usuario, por favor intente nuevamente")
     } finally {
       setIsCreating(false);
     }
@@ -142,7 +128,6 @@ export const AppContextProvider = ({ children }) => {
 
   const [searching, setSearching] = useState(false)
   const [clientData, setClientData] = useState([])
-  const [userNotExist, setUserNotExist] = useState(false)
   const findUser = async (values) => {
     setSearching(true)
     try {
@@ -155,10 +140,7 @@ export const AppContextProvider = ({ children }) => {
         if (data.length > 0) {
           setClientData(data)
         } else {
-          setUserNotExist(true)
-          setTimeout(() => {
-            setUserNotExist(false)
-          }, 1500);
+          message.error("No existe un cliente con esos datos")
         }
       }
       if (!values.fullName && values.dni) {
@@ -167,11 +149,10 @@ export const AppContextProvider = ({ children }) => {
           .select()
           .eq('dni', values.dni)
         setSearching(false)
-        console.log(data)
       }
 
     } catch (error) {
-
+      message.error("Hubo un error, por favor intente nuevamente")
     } finally {
       setSearching(false)
     }
@@ -179,9 +160,11 @@ export const AppContextProvider = ({ children }) => {
 
   const [userUUID, setUserUUID] = useState(null)
   useEffect(() => {
-    clientData && clientData.forEach(element => {
-      setUserUUID(element.uuid)
-    })
+    if (Array.isArray(clientData)) {
+      clientData && clientData.forEach(element => {
+        setUserUUID(element.uuid)
+      })
+    }
   }, [clientData])
 
 
@@ -218,8 +201,7 @@ export const AppContextProvider = ({ children }) => {
     }
   }
   const [addingDebt, setIsAddingDebt] = useState(false)
-  const [debtError, setDebtError] = useState(false)
-  const [debtSuccess, setDebtSuccess] = useState(false)
+
   const addDebt = async (values) => {
     setIsAddingDebt(true)
     try {
@@ -238,24 +220,18 @@ export const AppContextProvider = ({ children }) => {
         })
       if (error) {
         console.log(error)
-        setDebtError(true)
-        setTimeout(() => {
-          setDebtError(false)
-        }, 2000);
+        message.error("Error al añadir la deuda, por favor intente nuevamente")
       } else {
-        setDebtSuccess(true)
+        message.success("Deuda añadida correctamente!")
         setTimeout(() => {
-          setDebtSuccess(false)
           showDebtUser()
           fetchRegisterDeliverys()
 
         }, 1000);
       }
     } catch (error) {
-      setDebtError(true)
-      setTimeout(() => {
-        setDebtError(false)
-      }, 2000);
+      message.error("Error al añadir la deuda, por favor intente nuevamente")
+
     } finally {
       setIsAddingDebt()
 
@@ -401,10 +377,10 @@ export const AppContextProvider = ({ children }) => {
     <AppContext.Provider value={{
       loginAdmin, invalidUser, loading,
       closeSession, isClossing,
-      createUser, isCreating, isCreated, isError, userExist,
-      findUser, searching, clientData, userNotExist,
+      createUser, isCreating, 
+      findUser, searching, clientData,setClientData,
       updateDataClient, isUpdating,
-      addDebt, addingDebt, debtError, debtSuccess,
+      addDebt, addingDebt, 
       showDebtUser, fetchingData, DebtData, setDebtData,
       deleteProduct, isDeleting, userUUID,
       updateProduct,isUpdatingProduct,
