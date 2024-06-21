@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal } from 'antd';
 import { useAppContext } from '../../context';
-
+import { message } from 'antd';
 import "./productModal.css"
 import BackTop from 'antd/es/float-button/BackTop';
 const ProductModal = ({ closeModal }) => {
@@ -24,7 +24,7 @@ const ProductModal = ({ closeModal }) => {
     nameProduct: "",
     quantity: "",
     price: "",
-    change: "",
+    change: "ars",
     buyDate: fechaActual.toISOString().split("T")[0],
     nombre_cliente: firstClient.nombre_completo,
     apellido_cliente: firstClient.apellido,
@@ -37,16 +37,12 @@ const ProductModal = ({ closeModal }) => {
       [name]: value
     }))
   }
-  const [showAlert, setShowAlert] = useState(false)
   const validateForm = (ev) => {
     ev.preventDefault()
-    if ("") {
-      setShowAlert(true)
-      setTimeout(() => {
-        setShowAlert(false)
-      }, 2500)
+    if (!values.nameProduct || !values.change || !values.price || !values.quantity) {
+      message.error("Todos los campos son requeridos")
     } else {
-      setShowAlert(false)
+      message.success("Producto añadido!")
       addDebt(values)
     }
   }
@@ -81,7 +77,6 @@ const ProductModal = ({ closeModal }) => {
 
             <label className='form-addProduct-label'>Moneda:
               <select name="change" onChange={handleInputChange} className='selector'>
-                <option value="">Seleccione la moneda</option>
                 <option value="ars">Pesos</option>
                 <option value="usd">Usd</option>
               </select>
@@ -91,7 +86,6 @@ const ProductModal = ({ closeModal }) => {
               <input type="text" name='quantity' value={values.quantity} onChange={handleInputChange} className='form-addProduct-input' />
             </label>
           </form>
-          {debtSuccess ? <p style={{color:"green"}}>Producto añadido al fichero</p> : ""}
           <button className='form-addProduct-btn' type='submit' disabled={addingDebt} style={{cursor: addingDebt ? "not-allowed" : ""}} onClick={validateForm}>{addingDebt ? "Aguarde...": "Añadir al fichero"}</button>
         </div>
 
