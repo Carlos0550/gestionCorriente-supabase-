@@ -2,11 +2,13 @@ import React, { useState } from 'react'
 import "./FindClient.css"
 import ClientInterface from '../../ClientInterface/ClientInterface'
 import { useAppContext } from '../../../context'
+import { Button, LinearProgress } from '@mui/material'
 function FindClient() {
   const { findUser, searching, clientData, userNotExist } = useAppContext()
   const [values, setValues] = useState({
     fullName: "",
     dni: "",
+    apellido: "",
   })
   const handleInputChange = (e) => {
     const { value, name } = e.target
@@ -19,13 +21,14 @@ function FindClient() {
   const [onlyOneData, setOnlyOneData] = useState(false)
   const validateForm = (ev) => {
     ev.preventDefault()
-    if (values.fullName && values.dni) {
+    if (values.fullName && values.dni && values.apellido) {
       setOnlyOneData(true)
       setTimeout(() => {
         setOnlyOneData(false)
-      }, 1500);
+      }, 3000);
+      return
     }
-    if (values.fullName || values.dni) {
+    if (values.fullName || values.dni || values.apellido) {
       findUser(values)
       setValues({
         fullName: "",
@@ -35,35 +38,52 @@ function FindClient() {
       setShowAlert(true)
       setTimeout(() => {
         setShowAlert(false)
-      }, 1500)
+      }, 3000)
     }
   }
   return (
-    <div className='form-CreateClient__wrapper'>
-      <h1 className='form-findCLient__h1'>Busque al cliente con su nombre o DNI</h1>
-      <form className='form-createCLient' onSubmit={validateForm}>
-        <label className='form-createCLient__label'>
-          <p>Nombre Completo:</p>
-          <input type="text"
-            name='fullName'
-            value={values.fullName}
-            className='form-createCLient__input'
-            onChange={handleInputChange} />
-        </label>
-        <label className='form-createCLient__label'>
-          <p>Dni:</p>
-          <input type="text"
-            name='dni' value={values.dni}
-            className='form-createCLient__input'
-            onChange={handleInputChange} />
-        </label>
-        {showAlert ? <p style={{ color: "red", textShadow: "0 0 5px red", fontSize: "clamp(1.2rem,1.5vw,1.7rem)" }}>Debe introducir un nombre o DNI</p> : ""}
-        {onlyOneData ? <p style={{ color: "blue", textShadow: "0 0 5px blue", fontSize: "clamp(1.2rem,1.5vw,1.7rem)" }}>Introduzca solo un dato!</p> : ""}
-        {userNotExist ? <p style={{ color: "red", textShadow: "0 0 5px red", fontSize: "clamp(1.2rem,1.5vw,1.7rem)" }}>EL usuario no existe!</p> : ""}
-        <button className='form-createCLient__btn' type='submit' disabled={searching} style={{ backgroundColor: searching ? "grey" : "" }}>{searching ? "Aguarde..." : "Buscar Cliente"}</button>
-      </form>
-      {clientData && clientData.length > 0 ? <ClientInterface datosDelCliente={clientData}/> : ""}
+    <>
+    <div className='container'>
+      <div className="columns">
+        <div className="column">
+          <h1 className='title is-color-white is-size-4'>Buscar fichero del cliente</h1>
+          <form className='form-findCLient' onSubmit={validateForm}>
+            <div className="label is-color-white">Buscar por nombre
+              <input type="text"
+                name='fullName'
+                value={values.fullName}
+                className='input'
+                onChange={handleInputChange} />
+            </div>
+            <div className="label is-color-white">Buscar por DNI
+              <input type="text"
+                name='dni' value={values.dni}
+                className='input'
+                onChange={handleInputChange} />
+            </div>
+            <div className="label is-color-white">Buscar por apellido:
+              <input type="text"
+                name='apellido' value={values.apellido}
+                className='input'
+                onChange={handleInputChange} />
+            </div>
+            {showAlert ? <div className="custom__tag-container">
+              <span className='tag is-danger'>Debe introducir algún parametro de búsqueda</span>
+            </div> : ""}
+            {onlyOneData ? <div className="custom__tag-container">
+              <span className='tag is-info'>Introduzca solo un dato!</span>
+            </div> : ""}
+            {userNotExist ? <div className='custom__tag-container'>
+              <span className='tag is-warning'><p className='title is-size-6'>No se encontro un cliente con esos parámetros de búsqueda</p></span>
+            </div> : ""}
+            {!searching && <Button type='submit' disabled={searching}>Buscar Cliente</Button>}
+            {searching ? <LinearProgress /> : ""}
+          </form>
+          {clientData && clientData.length > 0 ? <ClientInterface datosDelCliente={clientData} /> : ""}
+        </div>
+      </div>
     </div>
+    </>
   )
 }
 

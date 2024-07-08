@@ -20,11 +20,30 @@ export const useAppContext = () => {
 export const AppContextProvider = ({ children }) => {
   const navigate = useNavigate()
 
+  const [progress, setProgress] = useState(0)
+
+  const activateLoader = () => {
+    const timer = setInterval(() => {
+      setProgress((prevProgress) => {
+        if (prevProgress >= 100) {
+          clearInterval(timer);
+          return 100;
+        }
+        return prevProgress + 10
+      })
+
+      return () => {
+        clearInterval(timer)
+      }
+    }, 1000);
+  }
+
 
   const [invalidUser, setInvalidUser] = useState(false)
   const [loading, setLoading] = useState(false)
   const loginAdmin = async (logValues) => {
     setLoading(true)
+    activateLoader()
     try {
 
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -35,7 +54,7 @@ export const AppContextProvider = ({ children }) => {
         setInvalidUser(true)
         setTimeout(() => {
           setInvalidUser(false)
-        }, 2000)
+        }, 3000)
       } else {
         navigate("/home")
       }
@@ -43,9 +62,8 @@ export const AppContextProvider = ({ children }) => {
     } catch (error) {
       console.log(error)
     } finally {
-      setTimeout(() => {
-        setLoading(false)
-      }, 1000);
+      setLoading(false)
+      setProgress(0)
     }
   }
 
@@ -81,24 +99,24 @@ export const AppContextProvider = ({ children }) => {
 
       if (dataDni.length > 0) {
         message.error("Ya existe un usuario con ese DNI")
-        
-        return; 
+
+        return;
       }
 
-      // let { data: dataFullName, error: errorFullName } = await supabase
-      //   .from('users')
-      //   .select()
-      //   .eq('nombre_completo', values.fullName);
+      let { data: dataFullName, error: errorFullName } = await supabase
+        .from('users')
+        .select()
+        .eq('nombre_completo', values.fullName);
 
-      // if (errorFullName) {
-      //   throw errorFullName;
-      // }
+      if (errorFullName) {
+        throw errorFullName;
+      }
 
-      // if (dataFullName.length > 0) {
-      //   message.error("Ya existe un usuario con ese nombre")
+      if (dataFullName.length > 0) {
+        message.error("Ya existe un usuario con ese nombre")
 
-      //   return; 
-      // }
+        return; 
+      }
 
       const { error } = await supabase
         .from('users')
@@ -127,6 +145,7 @@ export const AppContextProvider = ({ children }) => {
   };
 
   const [searching, setSearching] = useState(false)
+  const [userNotExist, setUserNotExist] = useState(false)
   const [clientData, setClientData] = useState([])
   const findUser = async (values) => {
     setSearching(true)
@@ -141,6 +160,10 @@ export const AppContextProvider = ({ children }) => {
           setClientData(data)
         } else {
           message.error("No existe un cliente con esos datos")
+          setUserNotExist(true)
+          setTimeout(() => {
+            setUserNotExist(false)
+          }, 3000)
         }
       }
       if (!values.fullName && values.dni) {
@@ -149,6 +172,32 @@ export const AppContextProvider = ({ children }) => {
           .select()
           .eq('dni', values.dni)
         setSearching(false)
+        if (data.length > 0) {
+          setClientData(data)
+        } else {
+          message.error("No existe un cliente con esos datos")
+          setUserNotExist(true)
+          setTimeout(() => {
+            setUserNotExist(false)
+          }, 3000)
+        }
+      }
+
+      if (values.apellido) {
+        const { data, error } = await supabase
+          .from('users')
+          .select()
+          .eq('apellido', values.apellido)
+        setSearching(false)
+        if (data.length > 0) {
+          setClientData(data)
+        } else {
+          message.error("No existe un cliente con esos datos")
+          setUserNotExist(true)
+          setTimeout(() => {
+            setUserNotExist(false)
+          }, 3000)
+        }
       }
 
     } catch (error) {
@@ -291,7 +340,7 @@ export const AppContextProvider = ({ children }) => {
     } catch (error) {
       console.log(error)
       message.error("Error, intente de nuevo!")
-    }finally{
+    } finally {
       setIsUpdatingProduct(false)
     }
   }
@@ -377,15 +426,17 @@ export const AppContextProvider = ({ children }) => {
     <AppContext.Provider value={{
       loginAdmin, invalidUser, loading,
       closeSession, isClossing,
-      createUser, isCreating, 
-      findUser, searching, clientData,setClientData,
+      createUser, isCreating,
+      findUser, searching, clientData, setClientData, userNotExist,
       updateDataClient, isUpdating,
-      addDebt, addingDebt, 
+      addDebt, addingDebt,
       showDebtUser, fetchingData, DebtData, setDebtData,
       deleteProduct, isDeleting, userUUID,
-      updateProduct,isUpdatingProduct,
+      updateProduct, isUpdatingProduct,
       insertDebtTables, isInserting,
-      fetchRegisterDeliverys, deliverData, fetchingDeliverys
+      fetchRegisterDeliverys, deliverData, fetchingDeliverys,
+
+      activateLoader, progress
     }}>
       {children}
     </AppContext.Provider>

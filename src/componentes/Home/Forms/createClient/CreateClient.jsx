@@ -2,91 +2,108 @@ import React, { useState } from 'react'
 import "./CreateClient.css"
 
 import { useAppContext } from '../../../context'
+import { Alert, Button } from '@mui/material'
 function CreateClient() {
-  const {createUser,isCreating, isCreated, isError,userExist} = useAppContext()
+  const { createUser, isCreating} = useAppContext()
   const [values, setValues] = useState({
     fullName: "",
     surname: "",
-    dni:"",
+    dni: "",
     phone: "",
     street: ""
   })
-  const handleInputChange = (e) =>{
-    const {value, name} = e.target
-    setValues((prevState)=>({
+  const handleInputChange = (e) => {
+    const { value, name } = e.target
+    setValues((prevState) => ({
       ...prevState,
-      [name]:value
+      [name]: value
     }))
   }
   const [showAlert, setShowAlert] = useState(false)
-  const validateForm = (ev) =>{
+  const validateForm = (ev) => {
     ev.preventDefault()
-    if (!values.fullName || !values.phone || !values.surname ) {
+    if (!values.fullName || !values.phone || !values.surname || !values.dni || !values.street) {
       setShowAlert(true)
-      setTimeout(()=>{
+      setTimeout(() => {
         setShowAlert(false)
-      },1500)
-    }else{
+      }, 3000)
+    } else {
       setShowAlert(false)
       createUser(values)
     }
   }
   return (
-    <div className='form-CreateClient__wrapper'>
-      <h1 className='form-createCLient__h1'>Crear Un usuario</h1>
-      <form className='form-createCLient' onSubmit={validateForm}>
-        <label className='form-createCLient__label'>
-          <p>Nombre Completo:</p>
-          <p style={{ color: "red" }}>*Obligatorio*</p>
-          <input type="text" 
-          name='fullName'
-          value={values.fullName}
-          className='form-createCLient__input'
-          onChange={handleInputChange} />
-        </label>
+    <div className='container custom__container-createUser'>
+      <div className="columns">
+        <div className="column">
+        <h1 className='title has-text-centered is-color-white'>Crear ficha de cliente</h1>
+      <form onSubmit={validateForm} className='form-createClient'>
+        <div className="field">
+          <div className="label is-color-white">Nombre completo:
+            <input type="text"
+              name='fullName'
+              value={values.fullName}
+              className='input'
+              onChange={handleInputChange} />
+            <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span>
+          </div>
+        </div>
 
-        <label className='form-createCLient__label'>
-          <p>Apellido:</p>
-          <p style={{ color: "red" }}>*Obligatorio*</p>
-          <input type="text" 
-          name='surname' 
-          value={values.surname} 
-          className='form-createCLient__input'
-          onChange={handleInputChange} />
-        </label>
+        <div className="field">
+          <div className="label is-color-white">Apellido:
+            <input type="text"
+              name='surname'
+              value={values.surname}
+              className='input'
+              onChange={handleInputChange} />
+            <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span>
 
-        <label className='form-createCLient__label'>
-          <p>Dni:</p>
-          <input type="text" 
-          name='dni' value={values.dni} 
-          className='form-createCLient__input'
-          onChange={handleInputChange} />
-        </label>
+          </div>
+        </div>
 
-        <label className='form-createCLient__label'>
-          <p>Teléfono:</p>
-          <p style={{ color: "red" }}>*Obligatorio*</p>
-          <input type="text" 
-          name='phone' 
-          value={values.phone} 
-          className='form-createCLient__input'
-          onChange={handleInputChange} />
-        </label>
+        <div className="field">
+          <div className="label is-color-white">DNI:
+            <input type="text"
+              name='dni' value={values.dni}
+              className='input'
+              onChange={handleInputChange} />
+            <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span>
 
-        <label className='form-createCLient__label'>
-          <p>Dirección:</p>
-          <input type="text" 
-          name='street' 
-          value={values.street} 
-          className='form-createCLient__input'
-          onChange={handleInputChange} />
-        </label>
-        {showAlert ? <p style={{color: "red", textShadow: "0 0 5px red"}}>Debe completar los campos que sean <strong>obligatorios</strong></p>:""}
-        {isCreated ? <p style={{color: "green", textShadow: "0 0 5px green"}}>Usuario creado con exito!</p>:""}
-        {isError ? <p style={{color: "red", textShadow: "0 0 5px red"}}>Hubo un error, reintente nuevamente y verifique su conexión</p>:""}
-        {userExist ? <p style={{color: "red", textShadow: "0 0 5px red"}}>Ya existe un usuario con esos datos!</p>:""}
-    <button className='form-createCLient__btn' type='submit' disabled={isCreating} style={{backgroundColor: isCreating ? "grey" : ""}}>{isCreating ? "Aguarde..." : "Guardar Cliente" }</button>
+          </div>
+        </div>
+
+        <div className="field">
+          <div className="label is-color-white">Teléfono:
+            <input type="text"
+              name='phone'
+              value={values.phone}
+              className='input'
+              onChange={handleInputChange} />
+            <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span>
+
+          </div>
+        </div>
+
+        <div className="field">
+          <div className="label is-color-white">Dirección:
+            <input type="text"
+              name='street'
+              value={values.street}
+              className='input'
+              onChange={handleInputChange} />
+            <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span>
+
+          </div>
+        </div>
+
+        <div className="field">
+          {showAlert ? <Alert severity='error'>Debe completar los campos que sean <strong className='subtitle has-text-weigth-bold has-text-danger is-size-6'>obligatorios</strong></Alert> : ""}
+        </div>
+        
+        <Button variant='outlined' disabled={isCreating} type='submit' style={{ backgroundColor: isCreating ? "grey" : "" }}>{isCreating ? "Aguarde..." : "Guardar Cliente"}</Button>
       </form>
+        </div>
+      </div>
     </div>
   )
 }

@@ -1,57 +1,7 @@
-.muchUsers__container{
-    display: flex;
-    flex-direction: column;
-    padding: .5rem;
-    background-color: #2F2F2F;
-    border-radius: 10px;
-    margin-bottom: .5rem;
-}
-.muchUsers__label{
-    background-color: #3E3E3E;
+.custom__container-muchUsers{
+    border: 2px solid rgba(0, 0, 0, 0.13);
     padding: 1rem;
+    margin: .5rem;
     border-radius: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-
-}
-.muchUsers__label p{
-    color: #000000;
-    font-size: 1.5rem;
-    background-color: #B0B0B0;
-    border-radius: 15px;
-    padding: 1rem;
-}
-.muchUsers__btn{
-    border: none;
-    padding: 1rem;
-    width: 40%;
-    margin: 0 auto;
-    border-radius: 10px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: all 300ms ease-in-out;
-    margin-top: .5rem;
-    margin-bottom: .5rem;
-}
-.muchUsers__btn:hover{
-    transform: scale(1.05);
-    box-shadow: 0 0 10px white;
-}
-
-@media(max-width:768px){
-    .muchUsers__label{
-        padding: .5rem;
-    }
-    .muchUsers__label p{
-        font-size: clamp(1rem,1.5vw,2rem);
-
-    }
-    .muchUsers__h1{
-        font-size: clamp(1rem,1.5vw,2rem);
-    }
-    .muchUsers__btn{
-        font-size: clamp(1rem,1.5vw,2rem);
-
-    }
+    box-shadow: 10px 15px 15px rgba(0, 0, 0, 0.336);
 }

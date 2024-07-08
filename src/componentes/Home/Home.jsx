@@ -1,50 +1,51 @@
 import React, { useState } from 'react';
-import Navbar from '../Navbar/Navbar'; // Assuming Navbar is in the same directory
-import "./Home.css";
+import Navbar from '../Navbar/Navbar'; // Asumiendo que Navbar está en el mismo directorio
+import "./Home.css"; // Importa tus estilos CSS
 
+import CreateClient from "./Forms/createClient/CreateClient";
+import FindClient from "./Forms/FindUsers/FindClient";
 
-import CreateClient from "./Forms/createClient/CreateClient"
-import FindClient from "./Forms/FindUsers/FindClient"
 function Home() {
   const [selectedOption, setSelectedOption] = useState('');
 
   const handleChangeOptions = (event) => {
     setSelectedOption(event.target.value);
-
   };
-  // const getGreeting = () => {
-  //   const userName = "Claudia"
-  //   const currentHour = new Date().getHours()
-  //   if (currentHour > 0 && currentHour < 12) {
-  //     return `Buenos días, ${userName}`
-  //   } else if (currentHour > 12 && currentHour < 19) {
-  //     return `Buenas Tardes, ${userName}`
-  //   } else {
-  //     return `Buenas noches, ${userName}`
-  //   }
-  // }
+
   return (
     <>
-      <div className="home__wrapper">
+      <div className="container home__wrapper">
         <Navbar />
-        <section id="home__option-selector">
-            {/* <h1>{getGreeting()}</h1> */}
-            <h1 className='home__h1'>Bienvenido/a a Gestión Corriente</h1>
-            <select value={selectedOption} onChange={handleChangeOptions} className='selector'>
-              <option value="">Selecciona una opción</option>
-              <option value="agregarCliente">Crear un Cliente</option>
-              <option value="añadirDeuda">Añadir una Deuda</option>
-            </select>
-
-          </section>
-
+        <div className="columns">
+          <div className="column">
+            <section id="home__option-selector">
+              <h1 className='title is-color-white'>Seleccione una opción</h1>
+              <div className="select is-info is-rounded is-normal">
+                <select value={selectedOption} onChange={handleChangeOptions} className='is-hovered'>
+                  <option value="">Selecciona una opción</option>
+                  <option value="agregarCliente">Crear un Cliente</option>
+                  <option value="añadirDeuda">Añadir una Deuda</option>
+                </select>
+              </div>
+            </section>
+          </div>
+        </div>
+        <div className="columns">
+          <div className="column">
+            {selectedOption === "agregarCliente" && (
+              <div className="animated-component slide-component">
+                <CreateClient />
+              </div>
+            )}
+            {selectedOption === "añadirDeuda" && (
+              <div className="animated-component slide-component">
+                <FindClient />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-      {selectedOption !== "" && <div className='componentHome'>
-        {selectedOption === "agregarCliente" && <CreateClient /> || selectedOption === "añadirDeuda" && <FindClient />}
-
-      </div>}
     </>
   );
 }
-
 export default Home;

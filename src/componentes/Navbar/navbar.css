@@ -9,12 +9,14 @@ a{
     left: auto;
     right: 0;
     width: 100%;
-    padding: 1em;
+    max-width: 100%;
+    padding: .5em;
     display: flex;
     background-color: #060920;
     justify-content: space-between;
     align-items: center;
     z-index: 100;
+
 }
 .logo{
     font-size: clamp(1.5rem, 2vw , 2rem);
@@ -24,24 +26,15 @@ a{
     display: flex;
     gap: 1rem;
     align-items: center;
+    justify-content: center;
+    width: min-content;
+    
+    max-width: 100%;
+    background-color: #060920;
+
 }
-.closeSession-desktop{
-    background-color: rgb(255, 0, 0);
-    font-size: clamp(1rem , 1vw , 1.5rem);
-    width: 100%;
-    margin: 0 auto;
-    border: none;
-    border-radius: 15px;
-    padding: 1rem;
-    margin-left: 1rem;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 300ms ease-in-out;
-}
-.closeSession-desktop:hover{
-    box-shadow: 0 0 15px red;
-    transform: scale(1.05);
+.custom__button-logout{
+    background-color: red;
 }
 .navbar a{
    font-size: clamp(1.5rem , 2vw , 2rem); 
@@ -66,25 +59,9 @@ a{
 .navbar a:hover::before{
     width: 100%;
 }
-/* #mobile-menu{
-    display: none;
-}
-#btn-menu{
-    display: none;
-} */
+
 @media(max-width:768px){
-    /* .navbar{
-        display: none;
-    }
-    #mobile-menu{
-        display: block;
-    } */
-    .header{
-        position: sticky;
-        top: 0;
-        border-radius: 0 0 0 15px;
-        margin-top: 0;
-    }
+
     .closeSession{
         background-color: rgb(255, 0, 0);
         font-size: clamp(1.5rem , 2vw , 2.5rem);
@@ -111,6 +88,7 @@ a{
         background-color: rgba(255,255,255);
         padding: .25em;
         cursor: pointer;
+        
     }
     #mobile-menu input[type="checkbox"]:checked ~ nav{
         animation: slideIn 500ms ease-in-out 1 forwards;
@@ -126,7 +104,7 @@ a{
         gap: 1rem;
         padding: 1rem 0;
         background-color: #060920;
-        width: 100vw;
+        width: 100%;
         text-align: center;
         justify-content: center;
         transform: translateX(110vw);

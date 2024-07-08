@@ -29,6 +29,8 @@ function EditProducts({ closeModal, dataProduct }) {
     if (!hookProduct.nameProduct || !hookProduct.price || !hookProduct.change || !hookProduct.quantity) {
       message.error("Hay campos vacios, complételos")
       return
+    }else if(hookProduct.quantity < 1){
+      message.error("La cantidad insertada no puede ser menor a 1")
     }else{
       updateProduct(hookProduct)
     }
@@ -50,27 +52,30 @@ function EditProducts({ closeModal, dataProduct }) {
       >
         <div className='EditProduct__wrapper'>
           <form className='form-addProduct' >
-            <label className='form-addProduct-label'>Nombre producto:
-              <input type="text" name='nameProduct' value={hookProduct.nameProduct} onChange={handleInputChange} className='form-addProduct-input' />
+            <h1 className='title'>Editando: {hookProduct.nameProduct}</h1>
+            <label className='label box'>Nombre producto:
+              <input type="text" name='nameProduct' value={hookProduct.nameProduct} onChange={handleInputChange} className='input' />
             </label>
 
-            <label className='form-addProduct-label'>Precio Unitario:
-              <input type="text" name='price' value={hookProduct.price} onChange={handleInputChange} className='form-addProduct-input' />
+            <label className='label box'>Precio Unitario:
+              <input type="number" name='price' value={hookProduct.price} onChange={handleInputChange} className='input' />
             </label>
 
-            <label className='form-addProduct-label'>Moneda:
-              <select name="change" value={hookProduct.change} onChange={handleInputChange} className='selector'>
+            <label className='label box'>Moneda:
+              <div className="select is-hovered is-rounded is-normal ml-3">
+              <select name="change" value={hookProduct.change} onChange={handleInputChange} className='is-rounded'>
                 <option value="">Seleccione la moneda</option>
                 <option value="ars">Pesos</option>
                 <option value="usd">Usd</option>
               </select>
+              </div>
             </label>
 
-            <label className='form-addProduct-label'>Cantidad:
-              <input type="text" name='quantity' value={hookProduct.quantity} onChange={handleInputChange} className='form-addProduct-input' />
+            <label className='label box'>Cantidad:
+              <input type="number" name='quantity' value={hookProduct.quantity} onChange={handleInputChange} className='input' />
             </label>
+            <button className='button is-warning m-1' type='submit' onClick={validateForm}>{isUpdatingProduct ? <Loader/> : "Actualizar"}</button>
           </form>
-          <button className='form-addProduct-btn' type='submit' onClick={validateForm}>{isUpdatingProduct ? <Loader/> : "Actualizar"}</button>
         </div>
       </Modal>
     </>

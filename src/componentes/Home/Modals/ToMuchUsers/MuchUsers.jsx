@@ -36,19 +36,24 @@ const MuchUsers = ({ closeModal }) => {
                     </Button>,
                 ]}
             >
-                <h1 className='muchUsers__h1'>Se encontró más de un cliente con el mismo nombre, deberá elegir uno:</h1>
+                <h1 className='title is-color-black'>Se encontraron más de 1 cliente con el mismo parámetro de busqueda: </h1>
                 {clientData && clientData.map((item, index) => {
                     return (
-                        <div key={index} className='muchUsers__container'>
-                            <label className='muchUsers__label'>
-                                <p>Nombre: {item.nombre_completo}</p>
-                                <p>Apellido: {item.apellido}</p>
-                                <p>Dni: {item.dni}</p>
-                                <p>Dirección: {item.direccion}</p>
-                                <p>Teléfono: {item.telefono}</p>
+                        <div key={index} className='container custom__container-muchUsers'>
+                            <label className='label'>
+                                <div className="box"><p className='subtitle has-text-weight-bold'>#{index + 1} Coincidencia</p></div>
+                                <div className="field">
+                                <div className="box"><p>Nombre: {item.nombre_completo}</p></div>
+                                <div className="box"><p>Apellido: {item.apellido}</p></div>
+                                <div className="box"><p>Dni: {item.dni}</p></div>
+                                <div className="box"><p>Dirección: {item.direccion}</p></div>
+                                <div className="box"><p>Teléfono: {item.telefono}</p></div>
+                                </div>
                             </label>
-                            <button className='muchUsers__btn' onClick={() => selectedOption(index)}>Seleccionar este cliente</button>
+                            <div className="control">
+                            <button className='button is-info m-5' onClick={() => selectedOption(index)}>Seleccionar este cliente</button>
 
+                            </div>
                         </div>
                     )
                 })}

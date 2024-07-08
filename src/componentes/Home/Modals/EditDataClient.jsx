@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Modal } from 'antd';
 import { useAppContext } from '../../context';
 import NotificationError from '../Notifications/NotificationError';
+import "./editClient.css"
 const EditDataClient = ({ closeModal }) => {
   const {clientData, updateDataClient, isUpdating} = useAppContext()
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -71,64 +72,73 @@ const EditDataClient = ({ closeModal }) => {
             Cerrar
           </Button>,
         ]}
+        closeIcon={false}
       >
-        <form className='form-createCLient' onSubmit={validateForm}>
-        <label className='form-createCLient__label'>
-          <div className='form__createClient__p'>
+        <form className='container  ' onSubmit={validateForm}>
+        <label className='label is-color-black'>
+          <div className='box'>
           <p>Nombre Completo:</p>
-          <p style={{ color: "red" }}>*Obligatorio*</p>
-          </div>
+          <span className='tag is-danger mb-3 mt-1'>*Obligatorio*</span>
           <input type="text" 
           name='nombre_completo'
           value={hookCLientData.nombre_completo}
-          className='form-createCLient__input'
+          className='input'
           onChange={handleInputChange} />
+          </div>
         </label>
 
-        <label className='form-createCLient__label'>
-          <div className='form__createClient__p'>
+        <label className='label'>
+          <div className='box'>
           <p>Apellido:</p>
-          <p style={{ color: "red" }}>*Obligatorio*</p>
-          </div>
+          <span className='tag is-danger mb-3 mt-1'>*Obligatorio*</span>
+
           <input type="text" 
           name='apellido' 
           value={hookCLientData.apellido} 
-          className='form-createCLient__input'
+          className='input'
           onChange={handleInputChange} />
+          </div>
+          
         </label>
 
-        <label className='form-createCLient__label'>
+        <label className='label'>
+          <div className="box">
           <p>Dni:</p>
+          <span className='tag is-danger mb-3 mt-1'>*Obligatorio*</span>
+
           <input type="text" 
           name='dni' value={hookCLientData.dni} 
-          className='form-createCLient__input'
+          className='input'
           onChange={handleInputChange} />
+          </div>
         </label>
 
-        <label className='form-createCLient__label'>
-          <div className='form__createClient__p'>
+        <label className='label'>
+          <div className='box'>
           <p>Teléfono:</p>
-          <p style={{ color: "red" }}>*Obligatorio*</p>
-          
-          </div>
+          <span className='tag is-danger mb-3 mt-1'>*Obligatorio*</span>
           <input type="text" 
           name='telefono' 
           value={hookCLientData.telefono} 
-          className='form-createCLient__input'
+          className='input'
           onChange={handleInputChange} />
+          </div>
         </label>
 
-        <label className='form-createCLient__label'>
+        <label className='label'>
+          <div className="box">
           <p>Dirección:</p>
+          <span className='tag is-danger mb-3 mt-1'>*Obligatorio*</span>
           <input type="text" 
           name='direccion' 
           value={hookCLientData.direccion} 
-          className='form-createCLient__input'
+          className='input'
           onChange={handleInputChange} />
+          </div>
         </label>
         {showAlert && <NotificationError showAlert={showAlert} />}
         
-        <button className='form-createCLient__btn' type='submit' disabled={isUpdating} style={{cursor: isUpdating ? "not-allowed" : "pointer"}}>{isUpdating ? "Aguarde..." : "Actualizar"}</button>
+        <button className='button is-warning' type='submit' disabled={isUpdating} style={{cursor: isUpdating ? "not-allowed" : "pointer"}}>{isUpdating ? "Aguarde..." : "Actualizar"}</button>
       </form>
       </Modal>
     </>

@@ -9,7 +9,7 @@ const {closeSession,isClossing} = useAppContext()
         <h1 className='logo'>Gestión Corriente</h1>
         <nav className='navbar'>
           
-          <button className='closeSession-desktop' disabled={isClossing} style={{backgroundColor: isClossing ? "grey" : ""}} onClick={closeSession}>{isClossing ? "Aguarde...":"Cerrar Sesión"}</button>
+          <button className='button custom__button-logout' disabled={isClossing} style={{backgroundColor: isClossing ? "grey" : ""}} onClick={closeSession}>{isClossing ? "Aguarde...":"Cerrar Sesión"}</button>
         </nav>
 
         {/* <form id="mobile-menu">

@@ -33,91 +33,43 @@
 
 } */
 
+.custom__columns-login{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 .card {
-    width: 350px;
+    width: 100%;
+    max-width: 450px;
     margin: 0 auto;
-    margin-top: 50%;
     border-radius: 15px;
     padding: 1.9rem 1.2rem;
     text-align: center;
-    background: #2a2b38;
-   }
-   
-   /*Inputs*/
-   .field {
-    margin-top: .5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: .5em;
-    background-color: #1f2029;
-    border-radius: 4px;
-    padding: .5em 1em;
-    font-size: clamp(2rem, 2vw , 3rem);
+    background: #ffffff;
+    border: 2px solid #1f2029;
+    animation: slideLeft 900ms ease-in-out forwards;
+}
+
+
+@keyframes slideLeft {
+    0%{
+        transform: translateY(-300%);
+    }
+    100%{
+        transform: translateY(0);
+    }
+}
+
+@media(max-width:768px){
+    .custom__columns-login{
+        padding: 1rem;
+    }
 }
    
-   .input-icon {
-    height: 1em;
-    width: 1em;
-    fill: #ffeba7;
-   }
-   
-   .input-field {
-    background: none;
-    border: none;
-    outline: none;
-    width: 100%;
-    color: #acacac;
-    font-size: clamp(1.5rem, 1.5vw,2rem);
 
-   }
-   
-   /*Text*/
-   .title {
-    margin-bottom: 1rem;
-    font-size: 1.5em;
-    font-weight: 500;
-    color: #f5f5f5;
-   }
-   
-   /*Buttons*/
-   .btn {
-    margin: 1rem;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: clamp(1rem, 2vw, 2.5rem);
-    text-transform: uppercase;
-    padding: 0.6em 1.2em;
-    background-color: #ffeba7;
-    color: #5e6681;
-    box-shadow: 0 8px 24px 0 rgb(255 235 167 / 20%);
-    transition: all .3s ease-in-out;
-   }
-   
-   .btn-link {
-    color: #f5f5f5;
-    display: block;
-    font-size: .75em;
-    transition: color .3s ease-out;
-   }
-   
-   /*Hover & focus*/
-   .field input:focus::placeholder {
-    opacity: 0;
-    transition: opacity .3s;
-   }
-   
-   .btn:hover {
-    background-color: #5e6681;
-    color: #ffeba7;
-    box-shadow: 0 8px 24px 0 rgb(16 39 112 / 20%);
-   }
-   
-   .btn-link:hover {
-    color: #ffeba7;
-   }
-   
    @media(min-width:768px){
     .card{
         margin-top: calc(1em + 10%);
