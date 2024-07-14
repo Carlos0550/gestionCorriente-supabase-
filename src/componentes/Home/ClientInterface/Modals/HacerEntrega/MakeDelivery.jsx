@@ -6,7 +6,13 @@ import Loader from "../../../../Loaders/Loader";
 
 function MakeDeliver({ closeModal, dataClient, saldo_restante }) {
   const { insertDebtTables, isInserting } = useAppContext();
-  const date = new Date().toISOString().split("T")[0]
+  const date = new Date();
+
+  let año = date.getFullYear()
+  let mes = date.getMonth() + 1 
+  let dia = date.getDate()
+
+  const fullDate = `${dia}-${mes}-${año}`
   const [value, setValue] = useState(''); // Estado para almacenar el valor del input
 
   const handleOk = () => {
@@ -27,7 +33,7 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante }) {
       apellido: client.apellido,
       uuid_cliente: client.uuid,
       monto_entrega: value,
-      fecha_entrega: date
+      fecha_entrega: fullDate
     })
   }, [dataClient, value])
 

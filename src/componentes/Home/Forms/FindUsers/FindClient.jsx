@@ -8,7 +8,6 @@ function FindClient() {
   const [values, setValues] = useState({
     fullName: "",
     dni: "",
-    apellido: "",
   })
   const handleInputChange = (e) => {
     const { value, name } = e.target
@@ -21,14 +20,14 @@ function FindClient() {
   const [onlyOneData, setOnlyOneData] = useState(false)
   const validateForm = (ev) => {
     ev.preventDefault()
-    if (values.fullName && values.dni && values.apellido) {
+    if (values.fullName && values.dni ) {
       setOnlyOneData(true)
       setTimeout(() => {
         setOnlyOneData(false)
       }, 3000);
       return
     }
-    if (values.fullName || values.dni || values.apellido) {
+    if (values.fullName || values.dni) {
       findUser(values)
       setValues({
         fullName: "",
@@ -48,22 +47,16 @@ function FindClient() {
         <div className="column">
           <h1 className='title is-color-white is-size-4'>Buscar fichero del cliente</h1>
           <form className='form-findCLient' onSubmit={validateForm}>
-            <div className="label is-color-white">Buscar por nombre
+            <div className="label is-color-white is-size-4">Buscar por nombre completo:
               <input type="text"
                 name='fullName'
                 value={values.fullName}
                 className='input'
                 onChange={handleInputChange} />
             </div>
-            <div className="label is-color-white">Buscar por DNI
+            <div className="label is-color-white is-size-4">Buscar por DNI:
               <input type="text"
                 name='dni' value={values.dni}
-                className='input'
-                onChange={handleInputChange} />
-            </div>
-            <div className="label is-color-white">Buscar por apellido:
-              <input type="text"
-                name='apellido' value={values.apellido}
                 className='input'
                 onChange={handleInputChange} />
             </div>

@@ -20,6 +20,7 @@ const ProductModal = ({ closeModal }) => {
   //  Formulario
   const fechaActual = new Date();
   const firstClient = clientData[0]
+ 
   const [values, setValues] = useState({
     nameProduct: "",
     quantity: "",

@@ -29,3 +29,43 @@
    font-weight: bold;
    font-size: 1rem;
 }
+
+.custom__column-clientInterface {
+    background-color: #222;
+    color: #fff;
+}
+
+.table-container {
+    margin-top: 20px;
+}
+
+.table th, .table td {
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+}
+
+.button.is-background-white {
+    background-color: white;
+}
+
+.button.is-color-black {
+    color: black;
+}
+
+.m-1 {
+    margin: 1rem;
+}
+
+.m-2 {
+    margin: 2rem;
+}
+
+.title.is-size-5 {
+    font-size: 1.5rem;
+}
+
+.is-color-white {
+    color: white;
+}

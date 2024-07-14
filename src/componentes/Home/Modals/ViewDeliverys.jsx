@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Modal, message } from 'antd';
+import React, { useState } from 'react';
+import { Button, Modal } from 'antd';
 import { useAppContext } from '../../context';
 import Loader from '../../Loaders/Loader';
 import "./viewDeliverRegister.css"
+
 function ViewDeliverys({ closeModal, total_entregas }) {
   const { deliverData, fetchingDeliverys } = useAppContext();
-console.log(deliverData)
+
   const handleOk = () => {
     closeModal();
   };
 
-  const reverseDate = (date)=>{
-    const [year, month, day] = date.split("-")
-    return `${day}-${month}-${year}`
-  }
 
   return (
     <Modal
@@ -28,27 +25,41 @@ console.log(deliverData)
         </Button>,
       ]}
     >
-
       <div className='container'>
         <div className="columns">
           <div className="column">
             <label className='label box'>
-              <p>Total en entregas ${total_entregas}</p>
+              <p className='has-text-weight-bold is-size-4'>Total en entregas: ${total_entregas}</p>
             </label>
             {fetchingDeliverys ? (
               <Loader />
             ) : (
               deliverData.length > 0 ? (
-                deliverData
-                .slice() //copia de array para evitar mutaciones
-                .reverse()
-                .map((item, index) => (
-                  <div key={index} className='box'>
-                    <label className='label is-color-black'>
-                      <p>El día <strong className='has-text-weight-bold is-color-black'>{reverseDate(item.fecha_entrega)}</strong> se hizo una entrega de: <strong className='has-text-weight-bold is-color-black'>${item.monto_entrega}</strong></p>
-                    </label>
-                  </div>
-                ))
+                <div className="table-container">
+                  <table className="table is-fullwidth is-bordered is-hoverable">
+                    <thead>
+                      <tr>
+                        <th className='has-text-weight-bold is-size-4'>Fecha</th>
+                        <th className='has-text-weight-bold is-size-4'>Monto entregado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {deliverData
+                        // .slice() // copia de array para evitar mutaciones
+                        // .reverse()
+                        .map((item, index) => (
+                          <React.Fragment key={index}>
+                            <tr>
+                              <td className='has-text-weight-bold is-size-5'>{item.fecha_entrega}</td>
+                              <td className='has-text-weight-bold is-size-5'>${item.monto_entrega}
+                                {index === deliverData.length -1 ? <span className='tag is-danger is-size-6 ml-5 m-1'>Ultima entrega</span> : ""}
+                              </td>
+                            </tr>
+                          </React.Fragment>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
               ) : (
                 <p id='deliverRegister__p' className='box'>No hay entregas</p>
               )
@@ -56,7 +67,6 @@ console.log(deliverData)
           </div>
         </div>
       </div>
-
     </Modal>
   );
 }

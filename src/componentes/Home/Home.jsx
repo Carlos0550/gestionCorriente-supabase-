@@ -6,7 +6,7 @@ import CreateClient from "./Forms/createClient/CreateClient";
 import FindClient from "./Forms/FindUsers/FindClient";
 
 function Home() {
-  const [selectedOption, setSelectedOption] = useState('');
+  const [selectedOption, setSelectedOption] = useState('añadirDeuda');
 
   const handleChangeOptions = (event) => {
     setSelectedOption(event.target.value);
@@ -22,9 +22,8 @@ function Home() {
               <h1 className='title is-color-white'>Seleccione una opción</h1>
               <div className="select is-info is-rounded is-normal">
                 <select value={selectedOption} onChange={handleChangeOptions} className='is-hovered'>
-                  <option value="">Selecciona una opción</option>
-                  <option value="agregarCliente">Crear un Cliente</option>
-                  <option value="añadirDeuda">Añadir una Deuda</option>
+                   <option value="añadirDeuda">Buscar un cliente</option>
+                    <option value="agregarCliente">Crear un Cliente</option>
                 </select>
               </div>
             </section>

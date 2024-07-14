@@ -21,7 +21,13 @@ export const useAppContext = () => {
 
 export const AppContextProvider = ({ children }) => {
   const navigate = useNavigate()
+  const date = new Date();
+
+    let año = date.getFullYear()
+    let mes = date.getMonth() + 1 
+    let dia = date.getDate()
   
+    const fullDate = `${dia}-${mes}-${año}`
   const [progress, setProgress] = useState(0)
 
   const activateLoader = () => {
@@ -86,6 +92,7 @@ export const AppContextProvider = ({ children }) => {
     }
   }
   const [isCreating, setIsCreating] = useState(false)
+  const [userExists, setUserNotExists] = useState(false)
   const createUser = async (values) => {
     setIsCreating(true);
     try {
@@ -101,45 +108,17 @@ export const AppContextProvider = ({ children }) => {
 
       if (dataDni.length > 0) {
         message.error("Ya existe un usuario con ese DNI")
-
+        setUserNotExists(true)
+        setTimeout(() => {
+          setUserNotExists(false)
+        }, 3500);
         return;
-      }
-
-      //verificar por nombre
-      let { data: dataFullName, error: errorFullName } = await supabase
-        .from('users')
-        .select()
-        .eq('nombre_completo', values.fullName.toLowerCase());
-
-      if (errorFullName) {
-        throw errorFullName;
-      }
-
-      if (dataFullName.length > 0) {
-        message.error("Ya existe un usuario con ese nombre")
-        return; 
-      }
-
-      //verificar por apellido
-      let { data: dataSurname, error: errorSurname } = await supabase
-      .from('users')
-      .select()
-      .eq('nombre_completo', values.fullName.toLowerCase());
-
-      if (errorSurname) {
-        throw errorSurname;
-      }
-
-      if (dataSurname.length > 0) {
-        message.error("Ya existe un usuario con ese apellido")
-        return; 
       }
 
       const { error } = await supabase
         .from('users')
         .insert({
           "nombre_completo": values.fullName.toLowerCase(),
-          "apellido": values.surname.toLowerCase(),
           "dni": values.dni,
           "telefono": values.phone,
           "direccion": values.street,
@@ -147,15 +126,14 @@ export const AppContextProvider = ({ children }) => {
         });
 
       if (error) {
-        message.error("Error al crear el usuario, por favor intente nuevamente")
-
+        message.error("Ocurrió un error, verifique su conexión e intente nuevamente")
         throw error;
 
       } else {
         message.success("Usuario creado con exito")
       }
     } catch (error) {
-      message.error("Error al crear el usuario, por favor intente nuevamente")
+      message.error("Ocurrió un error, verifique su conexión e intente nuevamente")
     } finally {
       setIsCreating(false);
     }
@@ -178,11 +156,10 @@ export const AppContextProvider = ({ children }) => {
           setClientData(data)
         } else {
           message.error("No existe un cliente con esos datos")
-          message.info("¡Intentó con el nombre completo? (sin apellido)")
           setUserNotExist(true)
           setTimeout(() => {
             setUserNotExist(false)
-          }, 3000)
+          }, 8000)
         }
       }
       if (!values.fullName && values.dni) {
@@ -273,6 +250,7 @@ export const AppContextProvider = ({ children }) => {
   const [addingDebt, setIsAddingDebt] = useState(false)
 
   const addDebt = async (values) => {
+    
     message.loading("Añadiendo producto...")
     setIsAddingDebt(true)
     try {
@@ -282,7 +260,7 @@ export const AppContextProvider = ({ children }) => {
           "nombre_cliente": values.nombre_cliente,
           "apellido_cliente": values.apellido_cliente,
 
-          "buyDate": values.buyDate,
+          "buyDate": fullDate,
           "nameProduct": values.nameProduct,
           "quantity": values.quantity,
           "price": values.price,
@@ -448,6 +426,7 @@ export const AppContextProvider = ({ children }) => {
   const [registers, setRegisters] = useState([]);
 
   const cancelDebt = async () => {
+    
     message.loading("Aguarde...");
     try {
       const { data: registerData, error: registerError } = await supabase
@@ -474,12 +453,11 @@ export const AppContextProvider = ({ children }) => {
       setDebts(debtsData);
   
       if (debtsData.length > 0 && registerData.length > 0) { // Validación
-        const actuallyDate = new Date().toISOString().split("T")[0];
         const fullName = `${registerData[0].nombre_cliente} ${registerData[0].apellido_cliente}`;
         
         const insertData = debtsData.map(item => ({
           "nombre_completo": fullName,
-          "fecha_cancelacion": actuallyDate,
+          "fecha_cancelacion": fullDate,
           "nombre_producto": item.nameProduct,
           "precio_producto": item.price || "",
           "quantity": item.quantity || 1,
@@ -568,7 +546,7 @@ if (!isOnlime) {
     <AppContext.Provider value={{
       loginAdmin, invalidUser, loading,
       closeSession, isClossing,
-      createUser, isCreating,
+      createUser, isCreating,userExists,
       findUser, searching, clientData, setClientData, userNotExist,
       updateDataClient, isUpdating,
       addDebt, addingDebt,

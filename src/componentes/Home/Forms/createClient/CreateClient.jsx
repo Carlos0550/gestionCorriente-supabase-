@@ -3,11 +3,11 @@ import "./CreateClient.css"
 
 import { useAppContext } from '../../../context'
 import { Alert, Button } from '@mui/material'
+import { message } from 'antd'
 function CreateClient() {
-  const { createUser, isCreating} = useAppContext()
+  const { createUser, isCreating,userExists} = useAppContext()
   const [values, setValues] = useState({
     fullName: "",
-    surname: "",
     dni: "",
     phone: "",
     street: ""
@@ -20,23 +20,24 @@ function CreateClient() {
     }))
   }
   const [showAlert, setShowAlert] = useState(false)
-  const validateForm = (ev) => {
+  const validateForm = async(ev) => {
     ev.preventDefault()
-    if (!values.fullName || !values.surname ) {
+    if (!values.fullName ) {
       setShowAlert(true)
       setTimeout(() => {
         setShowAlert(false)
       }, 3000)
     } else {
       setShowAlert(false)
-      createUser(values)
+      message.loading("Creando fichero de cliente, aguarde...")
+      await createUser(values)
     }
   }
   return (
     <div className='container custom__container-createUser'>
       <div className="columns">
         <div className="column">
-        <h1 className='title has-text-centered is-color-white'>Crear ficha de cliente</h1>
+        <h1 className='title is-color-white'>Crear ficha de cliente</h1>
       <form onSubmit={validateForm} className='form-createClient'>
         <div className="field">
           <div className="label is-color-white">Nombre completo:
@@ -45,19 +46,8 @@ function CreateClient() {
               value={values.fullName}
               className='input'
               onChange={handleInputChange} />
-            <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span>
-          </div>
-        </div>
-
-        <div className="field">
-          <div className="label is-color-white">Apellido:
-            <input type="text"
-              name='surname'
-              value={values.surname}
-              className='input'
-              onChange={handleInputChange} />
-            <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span>
-
+              <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-2`}>Este campo es obligatorio</span>
+            
           </div>
         </div>
 
@@ -67,8 +57,9 @@ function CreateClient() {
               name='dni' value={values.dni}
               className='input'
               onChange={handleInputChange} />
-            {/* <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span> */}
-            <span className="tag is-normal m-2">Opcional</span>
+            
+            {!userExists ? <span className="tag is-warning m-2">Recomendado</span> : ""}
+            {userExists ? <span className='tag is-danger is-size-6 m-2'>Ya existe un usuario con este DNI</span> : ""}
 
 
           </div>
@@ -81,7 +72,6 @@ function CreateClient() {
               value={values.phone}
               className='input'
               onChange={handleInputChange} />
-            {/* <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span> */}
             <span className="tag is-normal m-2">Opcional</span>
 
 
@@ -95,7 +85,6 @@ function CreateClient() {
               value={values.street}
               className='input'
               onChange={handleInputChange} />
-            {/* <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span> */}
             <span className="tag is-normal m-2">Opcional</span>
 
           </div>
