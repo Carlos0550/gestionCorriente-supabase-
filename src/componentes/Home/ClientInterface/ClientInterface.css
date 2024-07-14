@@ -22,3 +22,10 @@
 .custom__control-debts:first-child{
     background-color: red;
 }
+
+.custom__pop-cancellDebt{
+   background-color: red;
+   color: white; 
+   font-weight: bold;
+   font-size: 1rem;
+}

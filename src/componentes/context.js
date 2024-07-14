@@ -3,6 +3,8 @@ import { supabase } from "../Auth/supabase";
 import { useNavigate } from 'react-router-dom'
 import { v4 } from "uuid";
 import { message } from 'antd';
+import Item from "antd/es/list/Item";
+import Networck from "./Network/Networck";
 
 
 export const AppContext = createContext();
@@ -19,7 +21,7 @@ export const useAppContext = () => {
 
 export const AppContextProvider = ({ children }) => {
   const navigate = useNavigate()
-
+  
   const [progress, setProgress] = useState(0)
 
   const activateLoader = () => {
@@ -103,10 +105,11 @@ export const AppContextProvider = ({ children }) => {
         return;
       }
 
+      //verificar por nombre
       let { data: dataFullName, error: errorFullName } = await supabase
         .from('users')
         .select()
-        .eq('nombre_completo', values.fullName);
+        .eq('nombre_completo', values.fullName.toLowerCase());
 
       if (errorFullName) {
         throw errorFullName;
@@ -114,15 +117,29 @@ export const AppContextProvider = ({ children }) => {
 
       if (dataFullName.length > 0) {
         message.error("Ya existe un usuario con ese nombre")
+        return; 
+      }
 
+      //verificar por apellido
+      let { data: dataSurname, error: errorSurname } = await supabase
+      .from('users')
+      .select()
+      .eq('nombre_completo', values.fullName.toLowerCase());
+
+      if (errorSurname) {
+        throw errorSurname;
+      }
+
+      if (dataSurname.length > 0) {
+        message.error("Ya existe un usuario con ese apellido")
         return; 
       }
 
       const { error } = await supabase
         .from('users')
         .insert({
-          "nombre_completo": values.fullName,
-          "apellido": values.surname,
+          "nombre_completo": values.fullName.toLowerCase(),
+          "apellido": values.surname.toLowerCase(),
           "dni": values.dni,
           "telefono": values.phone,
           "direccion": values.street,
@@ -147,6 +164,7 @@ export const AppContextProvider = ({ children }) => {
   const [searching, setSearching] = useState(false)
   const [userNotExist, setUserNotExist] = useState(false)
   const [clientData, setClientData] = useState([])
+
   const findUser = async (values) => {
     setSearching(true)
     try {
@@ -154,12 +172,13 @@ export const AppContextProvider = ({ children }) => {
         const { data, error } = await supabase
           .from('users')
           .select()
-          .eq('nombre_completo', values.fullName)
+          .eq('nombre_completo', values.fullName.toLowerCase())
         setSearching(false)
         if (data.length > 0) {
           setClientData(data)
         } else {
           message.error("No existe un cliente con esos datos")
+          message.info("¡Intentó con el nombre completo? (sin apellido)")
           setUserNotExist(true)
           setTimeout(() => {
             setUserNotExist(false)
@@ -174,6 +193,7 @@ export const AppContextProvider = ({ children }) => {
         setSearching(false)
         if (data.length > 0) {
           setClientData(data)
+
         } else {
           message.error("No existe un cliente con esos datos")
           setUserNotExist(true)
@@ -187,10 +207,11 @@ export const AppContextProvider = ({ children }) => {
         const { data, error } = await supabase
           .from('users')
           .select()
-          .eq('apellido', values.apellido)
+          .eq('apellido', values.apellido.toLowerCase())
         setSearching(false)
         if (data.length > 0) {
           setClientData(data)
+
         } else {
           message.error("No existe un cliente con esos datos")
           setUserNotExist(true)
@@ -224,8 +245,8 @@ export const AppContextProvider = ({ children }) => {
       const { error } = await supabase
         .from('users')
         .update({
-          "nombre_completo": values.nombre_completo || "",
-          "apellido": values.apellido || "",
+          "nombre_completo": values.nombre_completo.toLowerCase() || "",
+          "apellido": values.apellido.toLowerCase() || "",
           "dni": values.dni || "",
           "telefono": values.telefono || "",
           "direccion": values.direccion || ""
@@ -252,6 +273,7 @@ export const AppContextProvider = ({ children }) => {
   const [addingDebt, setIsAddingDebt] = useState(false)
 
   const addDebt = async (values) => {
+    message.loading("Añadiendo producto...")
     setIsAddingDebt(true)
     try {
       const { error } = await supabase
@@ -271,7 +293,7 @@ export const AppContextProvider = ({ children }) => {
         console.log(error)
         message.error("Error al añadir la deuda, por favor intente nuevamente")
       } else {
-        message.success("Deuda añadida correctamente!")
+        message.success("Producto añadido correctamente!")
         setTimeout(() => {
           showDebtUser()
           fetchRegisterDeliverys()
@@ -347,7 +369,6 @@ export const AppContextProvider = ({ children }) => {
 
   const [isInserting, setIsInserting] = useState(false)
   const insertDebtTables = async (deliveryValues) => {
-    console.log("InsertTables: ", deliveryValues)
     setIsInserting(true)
     try {
       const { error: DB_1 } = await supabase
@@ -383,7 +404,9 @@ export const AppContextProvider = ({ children }) => {
       const { data, error } = await supabase
         .from('registerDelierys')
         .select()
+        .eq("uuid_cliente", userUUID)
       if (error) {
+        console.log(error)
         message.error("Hubo un error al mostrar el registro, reintente nuevamente!")
       }
       if (data.length > 0) {
@@ -421,6 +444,125 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
+  const [debts, setDebts] = useState([]);
+  const [registers, setRegisters] = useState([]);
+
+  const cancelDebt = async () => {
+    message.loading("Aguarde...");
+    try {
+      const { data: registerData, error: registerError } = await supabase
+        .from("registerDelierys") // Asegúrate del nombre correcto
+        .select()
+        .eq("uuid_cliente", userUUID);
+  
+      if (registerError) {
+        console.log(registerError);
+        throw registerError;
+      }
+  
+      const { data: debtsData, error: debtsError } = await supabase
+        .from("debts")
+        .select()
+        .eq("uuid", userUUID);
+  
+      if (debtsError) {
+        console.log(debtsError);
+        throw debtsError;
+      }
+  
+      setRegisters(registerData);
+      setDebts(debtsData);
+  
+      if (debtsData.length > 0 && registerData.length > 0) { // Validación
+        const actuallyDate = new Date().toISOString().split("T")[0];
+        const fullName = `${registerData[0].nombre_cliente} ${registerData[0].apellido_cliente}`;
+        
+        const insertData = debtsData.map(item => ({
+          "nombre_completo": fullName,
+          "fecha_cancelacion": actuallyDate,
+          "nombre_producto": item.nameProduct,
+          "precio_producto": item.price || "",
+          "quantity": item.quantity || 1,
+          "moneda": item.change || "",
+          "fecha_compra": item.buyDate || "",
+          "userId": userUUID
+        }));
+  
+        const { error: insertError } = await supabase
+          .from("userHistory")
+          .insert(insertData);
+  
+        if (insertError) {
+          console.log(insertError);
+          throw insertError;
+        }
+  
+        const { error: deleteRegisterError } = await supabase
+          .from("registerDelierys")
+          .delete()
+          .eq("uuid_cliente", userUUID);
+  
+        if (deleteRegisterError) {
+          throw deleteRegisterError;
+        }
+  
+        const { error: deleteDebtsError } = await supabase
+          .from("debts")
+          .delete()
+          .eq("uuid", userUUID);
+  
+        if (deleteDebtsError) {
+          throw deleteDebtsError;
+        }
+  
+        message.success("Fichero cancelado");
+        setDebtData([]);
+        setDeliverData([]);
+        showDebtUser();
+        fetchRegisterDeliverys();
+      } else {
+        message.error("No se encontraron registros o deudas para cancelar.");
+      }
+  
+    } catch (error) {
+      console.error("Error cancelando deuda:", error);
+      message.error("Error cancelando deuda");
+    }
+  };
+  
+
+  useEffect(()=>{
+    console.log(debts)
+    console.log(registers)
+  },[debts, registers])
+
+  const [clientHistory, setClientHistory] = useState([])
+  const fetchHistoryClient = async() =>{
+    message.loading("Trayendo historial...")
+    try {
+      const {data,error} = await supabase
+      .from("userHistory")
+      .select()
+      .eq("userId", userUUID)
+
+      if (error) {
+        message.error("Ocurrió un error al mostrar el historial del cliente")
+        console.error(error)
+        throw error
+      }
+      console.log(data)
+      setClientHistory(data)
+    } catch (error) {
+      message.error("Ocurrió un error al mostrar el historial del cliente")
+    }
+  }
+
+const isOnlime = Networck();
+
+if (!isOnlime) {
+  message.info("Verifique su conexión a internet")
+}
+  
 
   return (
     <AppContext.Provider value={{
@@ -435,6 +577,8 @@ export const AppContextProvider = ({ children }) => {
       updateProduct, isUpdatingProduct,
       insertDebtTables, isInserting,
       fetchRegisterDeliverys, deliverData, fetchingDeliverys,
+      cancelDebt,
+      fetchHistoryClient, clientHistory,
 
       activateLoader, progress
     }}>

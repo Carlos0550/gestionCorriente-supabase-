@@ -22,7 +22,7 @@ function CreateClient() {
   const [showAlert, setShowAlert] = useState(false)
   const validateForm = (ev) => {
     ev.preventDefault()
-    if (!values.fullName || !values.phone || !values.surname || !values.dni || !values.street) {
+    if (!values.fullName || !values.surname ) {
       setShowAlert(true)
       setTimeout(() => {
         setShowAlert(false)
@@ -67,7 +67,9 @@ function CreateClient() {
               name='dni' value={values.dni}
               className='input'
               onChange={handleInputChange} />
-            <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span>
+            {/* <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span> */}
+            <span className="tag is-normal m-2">Opcional</span>
+
 
           </div>
         </div>
@@ -79,7 +81,9 @@ function CreateClient() {
               value={values.phone}
               className='input'
               onChange={handleInputChange} />
-            <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span>
+            {/* <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span> */}
+            <span className="tag is-normal m-2">Opcional</span>
+
 
           </div>
         </div>
@@ -91,7 +95,8 @@ function CreateClient() {
               value={values.street}
               className='input'
               onChange={handleInputChange} />
-            <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span>
+            {/* <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-1`}>Este campo es obligatorio</span> */}
+            <span className="tag is-normal m-2">Opcional</span>
 
           </div>
         </div>

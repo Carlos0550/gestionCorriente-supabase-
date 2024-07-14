@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom"
 //Components
 import Home from './componentes/Home/Home'
 import Login from './componentes/Login/Login'
+import NotFound from './componentes/NotFound/NotFound'
 //************ */
 
 
@@ -15,6 +16,7 @@ function App() {
         <Routes>
           <Route path='/' element={<Login />} />
           <Route path="/home" element={<Home />}></Route>
+          <Route path='*' element={<NotFound/>}></Route>
         </Routes>
         <footer className=" custom__footer">
           <div className="content has-text-centered">

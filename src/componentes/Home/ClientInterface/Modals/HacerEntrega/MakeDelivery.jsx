@@ -37,7 +37,7 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante }) {
     setValue(value);
   };
 
-  const validateForm = (ev) => {
+  const validateForm = async(ev) => {
     ev.preventDefault();
     if (!value || value < 0) {
       message.error("Hay campos vacíos, complételos");
@@ -45,7 +45,8 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante }) {
     } else if (value > saldo_restante) {
       message.error("No puede hacer una entrega mayor al saldo total")
     } else {
-      insertDebtTables(hookDeliverData)
+      await insertDebtTables(hookDeliverData)
+      closeModal()
     }
   };
 

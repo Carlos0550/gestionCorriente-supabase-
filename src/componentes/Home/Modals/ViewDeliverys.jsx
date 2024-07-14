@@ -5,12 +5,15 @@ import Loader from '../../Loaders/Loader';
 import "./viewDeliverRegister.css"
 function ViewDeliverys({ closeModal, total_entregas }) {
   const { deliverData, fetchingDeliverys } = useAppContext();
-
+console.log(deliverData)
   const handleOk = () => {
     closeModal();
   };
 
-  console.log("totalENtregas", total_entregas)
+  const reverseDate = (date)=>{
+    const [year, month, day] = date.split("-")
+    return `${day}-${month}-${year}`
+  }
 
   return (
     <Modal
@@ -30,16 +33,19 @@ function ViewDeliverys({ closeModal, total_entregas }) {
         <div className="columns">
           <div className="column">
             <label className='label box'>
-              <p>Total de entregas ${total_entregas}</p>
+              <p>Total en entregas ${total_entregas}</p>
             </label>
             {fetchingDeliverys ? (
               <Loader />
             ) : (
               deliverData.length > 0 ? (
-                deliverData.map((item, index) => (
+                deliverData
+                .slice() //copia de array para evitar mutaciones
+                .reverse()
+                .map((item, index) => (
                   <div key={index} className='box'>
                     <label className='label is-color-black'>
-                      <p>El día <strong className='has-text-weight-bold is-color-black'>{item.fecha_entrega}</strong> se hizo una entrega de: <strong className='has-text-weight-bold is-color-black'>${item.monto_entrega}</strong></p>
+                      <p>El día <strong className='has-text-weight-bold is-color-black'>{reverseDate(item.fecha_entrega)}</strong> se hizo una entrega de: <strong className='has-text-weight-bold is-color-black'>${item.monto_entrega}</strong></p>
                     </label>
                   </div>
                 ))

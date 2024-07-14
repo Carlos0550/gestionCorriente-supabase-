@@ -37,13 +37,13 @@ const ProductModal = ({ closeModal }) => {
       [name]: value
     }))
   }
-  const validateForm = (ev) => {
+  const validateForm = async(ev) => {
     ev.preventDefault()
     if (!values.nameProduct || !values.change || !values.price || !values.quantity) {
       message.error("Todos los campos son requeridos")
     } else {
-      message.success("Producto añadido!")
-      addDebt(values)
+      await addDebt(values)
+      closeModal()
     }
   }
   // useEffect(() => {
@@ -73,25 +73,24 @@ const ProductModal = ({ closeModal }) => {
 
                 <div className="field">
                   <label className='label is-color-black'>Nombre producto:
-                    <input type="text" name='nameProduct' value={values.nameProduct} onChange={handleInputChange} className='input' />
+                    <input type="text" name='nameProduct' value={values.nameProduct} onChange={handleInputChange} className='input is-color-black' />
                   </label>
 
                   <label className='label is-color-black'>Precio Unitario:
-                    <input type="text" name='price' value={values.price} onChange={handleInputChange} className='input' />
+                    <input type="text" name='price' value={values.price} onChange={handleInputChange} className='input is-color-black' />
                   </label>
 
                   <label className='label is-color-black'>Moneda:
                    <div className="select is-rounded ml-2">
                    <select name="change" onChange={handleInputChange} className='select'>
-                      <option value=""><p>Por defecto pesos</p></option>
-                      <option value="ars">Pesos</option>
+                      <option value="ars"><p>Por defecto pesos</p></option>
                       <option value="usd">Usd</option>
                     </select>
                    </div>
                   </label>
 
                   <label className='label is-color-black'>Cantidad:
-                    <input type="text" name='quantity' value={values.quantity} onChange={handleInputChange} className='input' />
+                    <input type="text" name='quantity' value={values.quantity} onChange={handleInputChange} className='input is-color-black' />
                   </label>
                 </div>
               </form>

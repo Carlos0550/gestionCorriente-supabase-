@@ -15,7 +15,6 @@ const MuchUsers = ({ closeModal }) => {
     };
 
     const selectedOption = (index) => {
-        console.log("User data: ", [clientData[index]])
         setClientData([clientData[index]]) //mantenemos como array a clientData
         handleOk()
     }

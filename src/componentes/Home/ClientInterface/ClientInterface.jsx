@@ -10,9 +10,11 @@ import MuchUsers from '../Modals/ToMuchUsers/MuchUsers';
 //Ant Design MODULES
 import { Button, message, Popconfirm, Spin, Flex, Divider } from 'antd';
 import Loader from "../../Loaders/Loader";
+import ClientHistory from '../Modals/clientHistory/ClientHistory';
+import { LinearProgress } from '@mui/material';
 
 function ClientInterface() {
-    const { clientData, showDebtUser, fetchingData, DebtData, deleteProduct, isDeleting, fetchRegisterDeliverys, deliverData } = useAppContext();
+    const { clientData, showDebtUser, fetchingData, DebtData, deleteProduct, isDeleting, fetchRegisterDeliverys, deliverData, cancelDebt } = useAppContext();
     const [showEditDataClientModal, setShowEditDataClientModal] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
     const [showProductModal, setShowProductModal] = useState(false);
@@ -21,6 +23,7 @@ function ClientInterface() {
     const [showMakeDeliveryModal, setShowMakeDeliveryModal] = useState(false)
     const [showDeliveryRegister, setShowDeliveryRegister] = useState(false)
     const [showMuchUsers, setShowMuchUsers] = useState(false)
+    const [showHistory, setShowHistory] = useState(false)
 
     const handleEditModal = () => setShowEditDataClientModal(true);
     const closeEditModal = () => setShowEditDataClientModal(false);
@@ -30,7 +33,12 @@ function ClientInterface() {
     const closeEditProductModal = () => setShowEditProductModal(false)
     const closeShowDeliveryRegister = () => setShowDeliveryRegister(false)
     const closeShowMuchUsersModal = () => setShowMuchUsers(false)
+    const closeHistoryModal = () => setShowHistory(false)
 
+
+    const handleShowModalHistory = () =>{
+        setShowHistory(true)
+    }
     const closeClientDebts = () => {
         setShowSectionDebt(false);
         setCountClick(0);
@@ -117,9 +125,12 @@ function ClientInterface() {
         showDebtUser();
     };
 
+    const confirmCancellDebt = async () => {
+        await cancelDebt()
+    }
+
     const cancelDelete = () => {
-        console.log('Cancelando eliminación del ítem');
-        message.success('Cancelado');
+        message.success('Operación cancelada');
     };
 
     const total = () => {
@@ -133,7 +144,7 @@ function ClientInterface() {
             if (element.change === "ars") {
                 totalPesos += price * quantity
             } else if (element.change === "usd") {
-                totalUsdInPesos += price * 1300
+                totalUsdInPesos += price * 1450
             }
         });
         return {
@@ -156,13 +167,12 @@ function ClientInterface() {
                                 <div className="box"><p className='subtitle has-text-weight-bold'>DNI: {item.dni || "No hay datos"}</p></div>
                                 <div className="box"><p className='subtitle has-text-weight-bold'>Teléfono: {item.telefono || "No hay datos"}</p></div>
                                 <div className="box"><p className='subtitle has-text-weight-bold'>Dirección: {item.direccion || "No hay datos"}</p></div>
-                            </div>
+                                <button className='button m-1 is-background-white is-color-black m-2' onClick={handleEditModal}>Editar Datos del Cliente</button>
 
-                            <div className='control p-2'>
-                                <button className='button is-info m-1' onClick={openClientDebts}>Revisar Fichero</button>
-                                <button className='button m-1' onClick={handleProductModal}>Añadir un producto</button>
-                                <button className='button m-1' onClick={handleEditModal}>Editar Datos del Cliente</button>
                             </div>
+                            <button className='button is-link m-2' onClick={openClientDebts}>Revisar fichero</button>
+                            {totalGeneral - saldoRestante === 0 && DebtData.length > 0 ? "" : <button className='button m-1 is-background-white is-color-black m-2' onClick={handleProductModal}>Añadir un producto</button>}
+                            {showSectionDebt ? <button className='button is-info m-2' onClick={handleShowModalHistory}>Revisar Historial</button> : ""}
                         </div>
                     ))
                 ) : (
@@ -172,27 +182,46 @@ function ClientInterface() {
                 <div className="control">
                     {showSectionDebt && !fetchingData && <button className='button is-danger' onClick={closeClientDebts}>Cerrar</button>}
                 </div>
-                {fetchingData && <Loader />}
+                {fetchingData && <LinearProgress/>}
                 {showSectionDebt && !fetchingData && DebtData.length > 0 ? (
                     <section className='container '>
                         <div className='column'>
                             <h1 className='title is-color black'>Estado del fichero</h1>
                             <div className="box">
-                            {showSectionDebt ?
-                                (totalGeneral > 0 ? <p className='subtitle is-color-white has-text-weight-bold pt-1'>Saldo total: ${totalGeneral}</p> : <p>Saldo total: 0</p>)
-                                : ""}
-                                <hr className='hr'/>
-                            {showSectionDebt ?
-                                (deliverData.length > 0 ? <p className='subtitle is-color-white has-text-weight-bold pt-1'>Saldo restante: ${totalGeneral - saldoRestante}</p> : "")
-                                : ""}
+                                {showSectionDebt ?
+                                    (totalGeneral > 0 ? <p className='subtitle is-color-white has-text-weight-bold pt-1'>Saldo total: ${totalGeneral - saldoRestante}</p> : <p>Saldo total: 0</p>)
+                                    : ""}
                             </div>
 
 
                         </div>
 
 
-                        {showSectionDebt && !fetchingData && <button className='button is-warning m-1' onClick={openMakeDeliveryModal}>Hacer entrega</button>}
-                        {showSectionDebt && !fetchingData && <button className='button is-info m-1' onClick={openDeliverRegisterModal} >Ver registro de entregas</button>}
+                        {showSectionDebt && DebtData.length > 0 ?
+                            <>
+                                {totalGeneral - saldoRestante === 0 ?
+                                    <>
+                                        <Popconfirm
+                                            title="¿Estás seguro que este fichero está listo para cancelar?"
+                                            onConfirm={() => confirmCancellDebt()}
+                                            onCancel={() => cancelDelete()}
+                                            okText="Sí, cancelar fichero"
+                                            cancelText="No"
+                                        >
+                                            <Button className='custom__pop-cancellDebt'>
+                                                Cancelar fichero
+                                            </Button>
+                                        </Popconfirm>
+                                        <span className='tag is-danger custom__tag-container is-size-5 m-2'>Presione "Cancelar fichero" para seguir añadiendo productos</span>
+                                    </>
+                                    :
+                                    <>
+                                        <button className='button is-warning m-2' onClick={openMakeDeliveryModal}>Hacer entrega</button>
+                                        <button className='button m-1 is-background-white is-color-black m-2' onClick={openDeliverRegisterModal}>Ver registro de entregas</button>
+                                    </>
+                                }
+                            </>
+                            : ""}
                         {DebtData.map((item, index) => (
 
                             <div className="columns">
@@ -203,46 +232,42 @@ function ClientInterface() {
                                             <div className="custom__container-productoClient">
                                                 <p className='subtitle is-color-white has-text-weight-bold box'>{item.quantity} {item.nameProduct}</p>
                                                 <p className='subtitle is-color-white has-text-weight-bold box'>Fecha de compra: {item.buyDate}</p>
-                                                {item.change === "usd" && <p className='subtitle is-color-white has-text-weight-bold box'>${item.price} {(item.change).toUpperCase()} c/u</p>}
-                                                {item.change === "usd" && <p className='subtitle is-color-white has-text-weight-bold box'>Conversión: ${totalUsdInPesos} c/u</p>}
+                                                {item.change === "usd" && <p className='subtitle is-color-white has-text-weight-bold box'> x{item.price} c/u</p>}
+                                                
                                                 {item.change === "ars" && <p className='subtitle is-color-white has-text-weight-bold box'>${item.price} {(item.change).toUpperCase()} c/u</p>}
                                                 {
                                                     item.quantity > 1 ? (
-                                                        item.change === "usd" ? (
-                                                            <p className='subtitle is-color-white has-text-weight-bold box'>Total: ${(item.price * item.quantity) * 1300}</p>
-                                                        ) : (
-                                                            item.change === "ars" && <p className='subtitle is-color-white has-text-weight-bold box'>Total: ${(item.price * item.quantity)}</p>
-                                                        )
-                                                    ) : (
+                                                        item.change === "ars" && <p className='subtitle is-color-white has-text-weight-bold box'>Total: ${(item.price * item.quantity)}</p>
+                                                    ):(
                                                         ""
                                                     )
                                                 }
                                                 <div className="control p-1 custom__control-debts">
-                                        <Popconfirm
-                                            title="¿Estás seguro de eliminar este ítem?"
-                                            onConfirm={() => confirmDelete(item.debtIid)}
-                                            onCancel={cancelDelete}
-                                            okText="Eliminar"
-                                            cancelText="Cancelar"
-                                        >
-                                            <Button >
-                                                {isDeleting ? (
-                                                    <Flex align="center" gap="middle">
-                                                        <Spin />
-                                                    </Flex>
-                                                ) : (
-                                                    showSpinner ? <Spin /> : "Eliminar"
-                                                )}
-                                            </Button>
-                                        </Popconfirm>
-                                        <Button onClick={() => openEditProductModal(index)}>
-                                            Editar Producto
-                                        </Button>
-                                        </div>
+                                                    <Popconfirm
+                                                        title="¿Estás seguro de eliminar este ítem?"
+                                                        onConfirm={() => confirmDelete(item.debtIid)}
+                                                        onCancel={cancelDelete}
+                                                        okText="Eliminar"
+                                                        cancelText="Cancelar"
+                                                    >
+                                                        <Button >
+                                                            {isDeleting ? (
+                                                                <Flex align="center" gap="middle">
+                                                                    <Spin />
+                                                                </Flex>
+                                                            ) : (
+                                                                showSpinner ? <Spin /> : "Eliminar"
+                                                            )}
+                                                        </Button>
+                                                    </Popconfirm>
+                                                    <Button onClick={() => openEditProductModal(index)}>
+                                                        Editar Producto
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -265,6 +290,7 @@ function ClientInterface() {
                 {showMakeDeliveryModal && <MakeDeliver closeModal={closeMakeDeliveryModal} dataClient={clientData} saldo_restante={totalGeneral - saldoRestante} />}
                 {showDeliveryRegister && <ViewDeliverys closeModal={closeShowDeliveryRegister} total_entregas={saldoRestante} />}
                 {showMuchUsers && <MuchUsers closeModal={closeShowMuchUsersModal} />}
+                {showHistory && <ClientHistory closeModal={closeHistoryModal}/>}
             </div>
         </div>
     );
