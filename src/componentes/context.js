@@ -223,7 +223,6 @@ export const AppContextProvider = ({ children }) => {
         .from('users')
         .update({
           "nombre_completo": values.nombre_completo.toLowerCase() || "",
-          "apellido": values.apellido.toLowerCase() || "",
           "dni": values.dni || "",
           "telefono": values.telefono || "",
           "direccion": values.direccion || ""
@@ -233,8 +232,7 @@ export const AppContextProvider = ({ children }) => {
       if (error) {
         message.error("Hubo un error al actualizar, reintente nuevamente")
       } else {
-        message.success("Usuario actualizado, por favor cierre esta ventana")
-        message.info("Esta página se actualizará en 3 segundos...")
+        message.info("Usuario actualizdo, esta página se actualizará en 3 segundos...")
         setTimeout(() => {
           window.location.reload()
         }, 3000);
@@ -509,14 +507,15 @@ export const AppContextProvider = ({ children }) => {
   };
   
 
-  useEffect(()=>{
-    console.log(debts)
-    console.log(registers)
-  },[debts, registers])
+  // useEffect(()=>{
+  //   console.log(debts)
+  //   console.log(registers)
+  // },[debts, registers])
 
   const [clientHistory, setClientHistory] = useState([])
+  const [fetchingHistory, setFetchingHistory]= useState(false)
   const fetchHistoryClient = async() =>{
-    message.loading("Trayendo historial...")
+    setFetchingHistory(true)
     try {
       const {data,error} = await supabase
       .from("userHistory")
@@ -528,10 +527,13 @@ export const AppContextProvider = ({ children }) => {
         console.error(error)
         throw error
       }
-      console.log(data)
+      
       setClientHistory(data)
+      setFetchingHistory(false)
     } catch (error) {
       message.error("Ocurrió un error al mostrar el historial del cliente")
+    }finally{
+      setFetchingHistory(false)
     }
   }
 
@@ -556,7 +558,7 @@ if (!isOnlime) {
       insertDebtTables, isInserting,
       fetchRegisterDeliverys, deliverData, fetchingDeliverys,
       cancelDebt,
-      fetchHistoryClient, clientHistory,
+      fetchHistoryClient, clientHistory,fetchingHistory,
 
       activateLoader, progress
     }}>

@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import { Button, Modal, message } from 'antd';
 import "./editProducts.css"
 import { useAppContext } from '../../../../context';
 import Loader from '../../../../Loaders/Loader';
+import { useNavigate } from 'react-router-dom';
 function EditProducts({ closeModal, dataProduct }) {
-  const {updateProduct,isUpdatingProduct} = useAppContext()
+  const navigate = useNavigate()
+  const { updateProduct, isUpdatingProduct } = useAppContext()
   const handleOk = () => {
     closeModal();
   };
@@ -17,24 +19,58 @@ function EditProducts({ closeModal, dataProduct }) {
     quantity: dataProduct.quantity,
   })
 
-  const handleInputChange = (e)=>{
-    const {value,name} = e.target;
-    setHookProduct((prevState)=>({
+  const [newValues, setNewValues] = useState({
+    id: dataProduct.id,
+    change: "",
+    nameProduct: "",
+    price: "",
+    quantity: "",
+  })
+
+  const handleInputChange = (e) => {
+    const { value, name } = e.target;
+    setNewValues((prevState) => ({
       ...prevState,
-      [name]:value
+      [name]: value
     }))
   }
-  const validateForm = (ev) =>{
+  const validateForm = async(ev) => {
     ev.preventDefault()
-    if (!hookProduct.nameProduct || !hookProduct.price || !hookProduct.change || !hookProduct.quantity) {
-      message.error("Hay campos vacios, complételos")
-      return
-    }else if(hookProduct.quantity < 1){
-      message.error("La cantidad insertada no puede ser menor a 1")
-    }else{
-      updateProduct(hookProduct)
+    if (!newValues.nameProduct || !newValues.price || !newValues.change || !newValues.quantity) {
+      message.error("¡No puede haber ningún campo vacío!");
+      return;
+    } else if (parseInt(newValues.quantity) < 1) {
+      message.error("La cantidad insertada no puede ser menor a 1");
+      return;
+    } else if (parseFloat(newValues.price) <= 0) {
+      message.error("El precio debe ser un valor numérico mayor a 0");
+      return;
+    } else if (parseInt(newValues.quantity) <= 0) {
+      message.error("La cantidad debe ser un valor numérico mayor a 0");
+      return;
+    } else if (parseFloat(newValues.price) < parseFloat(hookProduct.price)) {
+      message.error("El precio debe ser mayor o igual al producto anterior");
+      return;
+    } else {
+      await updateProduct(newValues);
+      closeModal()
     }
   }
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+        closeModal();
+    }
+};
+
+useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup listener on component unmount
+    return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+    };
+}, [navigate]);
   return (
     <>
       <Modal
@@ -51,31 +87,53 @@ function EditProducts({ closeModal, dataProduct }) {
         ]}
       >
         <div className='EditProduct__wrapper'>
-          <form className='form-addProduct' >
-            <h1 className='title'>Editando: {hookProduct.nameProduct}</h1>
-            <label className='label box'>Nombre producto:
-              <input type="text" name='nameProduct' value={hookProduct.nameProduct} onChange={handleInputChange} className='input' />
-            </label>
+          <div className="columns">
+            {/*Antiguo producto*/}
+            <div className="column">
+              <form className='form-addProduct' >
+                <h1 className='title is-color-white is-size-2 has-text-centered'>Antiguo producto</h1>
+                <ul >
+                  <li className='box is-background-white'>
+                    <h1 className='title is-color-black is-size-3'>- {hookProduct.nameProduct}</h1>
+                    {hookProduct.change === "ars" ? <h1 className='title is-color-black is-size-3'>- Precio unitario: ${hookProduct.price}</h1> : ""}
+                    {hookProduct.change === "usd" ? <h1 className='title is-color-black is-size-3'>- Código: x{hookProduct.price}</h1> : ""}
+                    <h1 className='title is-color-black is-size-3'>- Cantidad: {hookProduct.quantity} unidad/es</h1>
+                  </li>
+                </ul>
+              </form>
+            </div>
+            <div className="column">
+              <form className='form-addProduct'>
+              <h1 className='title is-color-white is-size-2 has-text-centered'>Nuevo producto</h1>
+                <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Nombre producto:
+                  <input type="text" name='nameProduct' value={newValues.nameProduct} onChange={handleInputChange} className='input is-color-white is-size-5' />
+                </label>
 
-            <label className='label box'>Precio Unitario:
-              <input type="number" name='price' value={hookProduct.price} onChange={handleInputChange} className='input' />
-            </label>
+                <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Precio Unitario:
+                  <input type="text" name='price' value={newValues.price} onChange={handleInputChange} className='input is-color-white is-size-5' />
+                </label>
 
-            <label className='label box'>Moneda:
-              <div className="select is-hovered is-rounded is-normal ml-3">
-              <select name="change" value={hookProduct.change} onChange={handleInputChange} className='is-rounded'>
-                <option value="">Seleccione la moneda</option>
-                <option value="ars">Pesos</option>
-                <option value="usd">Usd</option>
-              </select>
-              </div>
-            </label>
+                <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Moneda:
+                  <div className="select is-hovered is-rounded is-normal ml-3">
+                    <select name="change" value={newValues.change} onChange={handleInputChange} className='is-rounded is-size-5'>
+                      <option value="">Seleccione la moneda</option>
+                      <option value="ars">Pesos</option>
+                      <option value="usd">Usd</option>
+                    </select>
+                  </div>
+                </label>
 
-            <label className='label box'>Cantidad:
-              <input type="number" name='quantity' value={hookProduct.quantity} onChange={handleInputChange} className='input' />
-            </label>
-            <button className='button is-warning m-1' type='submit' onClick={validateForm}>{isUpdatingProduct ? <Loader/> : "Actualizar"}</button>
-          </form>
+                <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Cantidad:
+                  <input type="text" name='quantity' value={newValues.quantity} onChange={handleInputChange} className='input is-color-white is-size-5' />
+                </label>
+
+                <button className='button is-warning m-1' type='submit' onClick={validateForm}>
+                  {isUpdatingProduct ? <Loader /> : "Actualizar"}
+                </button>
+              </form>
+            </div>
+            
+          </div>
         </div>
       </Modal>
     </>

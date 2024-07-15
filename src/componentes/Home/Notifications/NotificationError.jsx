@@ -1,19 +1,17 @@
-import React,{useEffect} from 'react';
+import React,{useEffect, useRef} from 'react';
 import { Button, Space, notification } from 'antd';
 
 const NotificationError = ({ showAlert }) => {
   const [api, contextHolder] = notification.useNotification();
-
+  const hasShowAlert = useRef(false)
   // Abrir la notificación cuando showAlert es true
   useEffect(() => {
-    if (showAlert) {
+    if (showAlert && !hasShowAlert.current) {
         api.open({
-            message: 'Algunos campos vacios',
+            message: <h1 className='title is-size-5 is-color-danger'>Revise que todos los campos estén completos</h1>,
             pauseOnHover:true,
-            description:
-              'Debe completar todos los campos que sean obligatorios',
-            
           });
+          hasShowAlert.current = true
     }
   }, [showAlert, api]);
 

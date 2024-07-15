@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Modal } from 'antd';
+import { Button, Modal, message } from 'antd';
 import { useAppContext } from '../../../context';
 import { useNavigate } from 'react-router-dom';
+import { LinearProgress } from '@mui/material';
 
 const ClientHistory = ({ closeModal }) => {
-    const { fetchHistoryClient, clientHistory } = useAppContext();
+    const { fetchHistoryClient, clientHistory, fetchingHistory } = useAppContext();
     const navigate = useNavigate();
     const [confirmLoading, setConfirmLoading] = useState(false);
 
@@ -28,7 +29,7 @@ const ClientHistory = ({ closeModal }) => {
         }
         return 0;
     };
-    
+
 
     // Agrupación por fecha_compra
     const groupedHistory = clientHistory.reduce((acc, item) => {
@@ -40,6 +41,22 @@ const ClientHistory = ({ closeModal }) => {
         return acc;
     }, {});
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            closeModal();
+        }
+    };
+
+    useEffect(() => {
+        fetchHistoryClient();
+        window.addEventListener('keydown', handleKeyDown);
+
+        // Cleanup listener on component unmount
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [navigate]);
+
     return (
         <>
             <Modal
@@ -47,45 +64,55 @@ const ClientHistory = ({ closeModal }) => {
                 visible={true}
                 onOk={handleOk}
                 okText="Cancelar"
-                width={1000}
+                width={1800}
                 confirmLoading={confirmLoading}
+                
                 footer={[
-                    <Button key="update" type="primary" onClick={handleOk} loading={confirmLoading}>
-                        Cerrar
-                    </Button>,
+                    <Button key="update" type="primary" onClick={handleOk} loading={confirmLoading} className='button is-danger is-size-5'>
+                        Cerrar sección
+                    </Button>
                 ]}
                 closeIcon={false}
             >
                 <div className="control">
                     <div className="columns">
                         <div className="column">
-                            <h1 className='title is-color-black'>Historial de {clientHistory.map(item => item.nombre_completo)[0]}</h1>
-                            {Object.keys(groupedHistory).map((date, index) => (
-                                <div key={index} className="table-container">
-                                    <table className="table is-fullwidth is-bordered is-hoverable">
-                                        <thead>
-                                            
-                                            <tr>
-                                                <th className='has-text-weight-bold is-size-6'>Fecha de compra: {date}</th>
-                                                <th>Producto/detalle</th>
-                                                <th>Monto/código</th>
-                                                <th>Fecha de cancelación</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                          
-                                            {groupedHistory[date].map((item, idx) => (
-                                                <tr key={idx}>
-                                                  <td></td>
-                                                    <td>{item.nombre_producto} | <p>cantidad: {item.quantity}</p> </td>
-                                                    <td>{calcularMonto(item.precio_producto, item.quantity, item.moneda)}</td>
-                                                    <td>{item.fecha_cancelacion}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            ))}
+                            {fetchingHistory ? <LinearProgress /> :
+                                <React.Fragment>
+                                    <h1 className='title is-color-black'>Historial de {clientHistory.map(item => item.nombre_completo)[0]}</h1>
+                                    <Button key="update" type="primary" onClick={handleOk} loading={confirmLoading} className='button is-danger is-size-5'>
+                                        Cerrar sección
+                                    </Button>
+                                    {Object.keys(groupedHistory)
+                                        .reverse()
+                                        .map((date, index) => (
+                                            <div key={index} className="table-container">
+                                                <table className="table is-fullwidth is-bordered is-hoverable">
+                                                    <thead>
+
+                                                        <tr>
+                                                            <th className='has-text-weight-bold is-size-5 has-text-weigth-bold has-background-black'>Fecha de compra: {date}</th>
+                                                            <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Producto/detalle</th>
+                                                            <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Monto/código</th>
+                                                            <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Fecha de cancelación</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        {groupedHistory[date].map((item, idx) => (
+                                                            <tr key={idx}>
+                                                                <td className='is-background-white'></td>
+                                                                <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>{item.nombre_producto} | <p>cantidad: {item.quantity}</p> </td>
+                                                                <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>{calcularMonto(item.precio_producto, item.quantity, item.moneda)}</td>
+                                                                <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>{item.fecha_cancelacion}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        ))}
+                                </React.Fragment>
+                            }
                         </div>
                     </div>
                 </div>
@@ -95,3 +122,6 @@ const ClientHistory = ({ closeModal }) => {
 };
 
 export default ClientHistory;
+
+
+

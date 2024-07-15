@@ -64,28 +64,31 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante }) {
       closeIcon={false}
       
       footer={[
-        <Button type="primary" danger onClick={handleOk} className='btn_closeModalEditProduct'>
-          Cerrar
-        </Button>,
+        
       ]}
     >
       <div className='container'>
-        <div className="column">
-          <div className="columns">
-            <form className='box' onSubmit={validateForm}>
-              <label className='label box'>
-                <p className='subtitle has-text-weight-bold has-text-warning'>Saldo restante: ${saldo_restante}</p>
+        <div className="column ">
+          <div className="columns ">
+            <form className='box is-background-black' onSubmit={validateForm} >
+              <label className='label box is-background-white'>
+                <p className='title is-size-4 has-text-weight-bold has-text-black'>Saldo restante: ${saldo_restante}</p>
               </label>
-              <label className='label box'>
+              <label className='label title is-size-4 has-text-weight-bold has-text-black'>
                 Cantidad a entregar:
                 <input
-                  type="number"
+                  type="text"
                   value={value}
                   onChange={handleInput}
-                  className='input mt-1'
+                  className='input mt-1 is-color-black is-size-5'
+                  style={{backgroundColor: "#ccc"}}
+                  
                 />
               </label>
-              <button className='button is-warning' type='submit'>{isInserting ? <Loader /> : "Actualizar"}</button>
+              <button className='button is-info is-size-5 has-text-weight-bold m-3' type='submit'>{isInserting ? <Loader /> : "Entregar"}</button>
+              <Button type="primary" danger onClick={handleOk} className='button is-danger is-size-5 m-3 has-text-weight-bold'>
+                Cancelar
+              </Button>
             </form>
           </div>
         </div>

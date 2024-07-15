@@ -15,28 +15,25 @@
 
 }
 
-.custom__control-debts{
-    display: flex;
-    gap: 1rem;
-}
-.custom__control-debts:first-child{
-    background-color: red;
-}
 
-.custom__pop-cancellDebt{
-   background-color: red;
-   color: white; 
-   font-weight: bold;
-   font-size: 1rem;
-}
 
 .custom__column-clientInterface {
-    background-color: #222;
     color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
 }
 
 .table-container {
     margin-top: 20px;
+}
+
+
+
+.custom-table{
+    
+    background-color: white;
 }
 
 .table th, .table td {
@@ -54,18 +51,23 @@
     color: black;
 }
 
-.m-1 {
-    margin: 1rem;
+
+
+.custom-column-deliverys{
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: .5rem;
+    margin: .5rem;
+    margin-top: 6rem;
+    margin-bottom: 2rem;
+    height: 565px;
+    overflow: auto;
 }
 
-.m-2 {
-    margin: 2rem;
-}
-
-.title.is-size-5 {
-    font-size: 1.5rem;
-}
-
-.is-color-white {
-    color: white;
+.custom-table-container__debts{
+    overflow: auto;
+    height: 300px;
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: .5rem;
 }

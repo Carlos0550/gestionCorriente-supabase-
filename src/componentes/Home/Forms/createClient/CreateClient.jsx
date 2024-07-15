@@ -37,55 +37,55 @@ function CreateClient() {
     <div className='container custom__container-createUser'>
       <div className="columns">
         <div className="column">
-        <h1 className='title is-color-white'>Crear ficha de cliente</h1>
+        <h1 className='title is-color-black'>Crear ficha de cliente</h1>
       <form onSubmit={validateForm} className='form-createClient'>
         <div className="field">
-          <div className="label is-color-white">Nombre completo:
+          <div className="label is-color-black is-size-5">Nombre completo:
             <input type="text"
               name='fullName'
               value={values.fullName}
               className='input'
               onChange={handleInputChange} />
-              <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-normal mt-2`}>Este campo es obligatorio</span>
+              <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-color-black is-size-6 mt-2`}>Este campo es obligatorio</span>
             
           </div>
         </div>
 
         <div className="field">
-          <div className="label is-color-white">DNI:
+          <div className="label is-color-white is-color-black is-size-5">DNI:
             <input type="text"
               name='dni' value={values.dni}
               className='input'
               onChange={handleInputChange} />
             
             {!userExists ? <span className="tag is-warning m-2">Recomendado</span> : ""}
-            {userExists ? <span className='tag is-danger is-size-6 m-2'>Ya existe un usuario con este DNI</span> : ""}
+            {userExists ? <span className='tag is-danger is-color-black is-size-6m-2'>Ya existe un usuario con este DNI</span> : ""}
 
 
           </div>
         </div>
 
         <div className="field">
-          <div className="label is-color-white">Teléfono:
+          <div className="label is-color-black is-color-black is-size-5">Teléfono:
             <input type="text"
               name='phone'
               value={values.phone}
               className='input'
               onChange={handleInputChange} />
-            <span className="tag is-normal m-2">Opcional</span>
+            <span className="tag is-normal is-color-white is-size-6 is-background-black  m-2">Opcional</span>
 
 
           </div>
         </div>
 
         <div className="field">
-          <div className="label is-color-white">Dirección:
+          <div className="label is-color-black is-color-white is-size-5">Dirección:
             <input type="text"
               name='street'
               value={values.street}
               className='input'
               onChange={handleInputChange} />
-            <span className="tag is-normal m-2">Opcional</span>
+            <span className="tag is-normal is-color-white is-size-6  is-background-black  m-2">Opcional</span>
 
           </div>
         </div>
@@ -94,7 +94,7 @@ function CreateClient() {
           {showAlert ? <Alert severity='error'>Debe completar los campos que sean <strong className='subtitle has-text-weigth-bold has-text-danger is-size-6'>obligatorios</strong></Alert> : ""}
         </div>
         
-        <Button variant='outlined' disabled={isCreating} type='submit' style={{ backgroundColor: isCreating ? "grey" : "" }}>{isCreating ? "Aguarde..." : "Guardar Cliente"}</Button>
+        <Button variant='contained' disabled={isCreating} type='submit' style={{ backgroundColor: isCreating ? "grey" : "" }}>{isCreating ? "Aguarde..." : "Guardar Cliente"}</Button>
       </form>
         </div>
       </div>

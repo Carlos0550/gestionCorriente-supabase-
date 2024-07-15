@@ -4,16 +4,17 @@ import { useAppContext } from '../../context';
 import { message } from 'antd';
 import "./productModal.css"
 import BackTop from 'antd/es/float-button/BackTop';
+import { useNavigate } from 'react-router-dom';
 const ProductModal = ({ closeModal }) => {
   const { clientData, addDebt, addingDebt, debtError, debtSuccess } = useAppContext()
   const [confirmLoading, setConfirmLoading] = useState(false);
-
+  const navigate = useNavigate()
   const handleOk = () => {
     setConfirmLoading(true);
     setTimeout(() => {
       setConfirmLoading(false);
       closeModal();
-    }, 500);
+    }, 0);
   };
 
 
@@ -47,9 +48,20 @@ const ProductModal = ({ closeModal }) => {
       closeModal()
     }
   }
-  // useEffect(() => {
-  //   console.log("Values: ", values)
-  // }, [values])
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+        closeModal();
+    }
+};
+
+useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup listener on component unmount
+    return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+    };
+}, [navigate]);
   return (
     <>
       <Modal
@@ -61,19 +73,17 @@ const ProductModal = ({ closeModal }) => {
         closeIcon={false}
         width={1000}
         footer={[
-          <Button key="update" type="primary" onClick={handleOk} loading={confirmLoading}>
-            Cerrar
-          </Button>,
+          
         ]}
       >
         <div className='container p-3'>
           <div className="columns">
-            <div className="column custom-column-addProduct">
-              <form className='form__addProduct' onSubmit={validateForm}>
+            <div className="column custom-column-addProduct is-background-black">
+              <form className='form__addProduct ' onSubmit={validateForm}>
                 <h1 className='title is-color-white'>Agregar un producto</h1>
 
                 <div className="field">
-                  <label className='label is-color-black'>Nombre producto:
+                  <label className='label box is-background-white is-color-black'>Nombre producto:
                     <input type="text" name='nameProduct' value={values.nameProduct} onChange={handleInputChange} className='input is-color-black' />
                   </label>
 
@@ -95,7 +105,10 @@ const ProductModal = ({ closeModal }) => {
                   </label>
                 </div>
               </form>
-              <button className='button is-warning m-3' type='submit' disabled={addingDebt} style={{ cursor: addingDebt ? "not-allowed" : "" }} onClick={validateForm}>{addingDebt ? "Aguarde..." : "Añadir al fichero"}</button>
+              <button className='button is-size-5 is-warning m-3' type='submit' disabled={addingDebt} style={{ cursor: addingDebt ? "not-allowed" : "" }} onClick={validateForm}>{addingDebt ? "Aguarde..." : "Añadir al fichero"}</button>
+              <Button key="update" type="primary" onClick={handleOk} loading={confirmLoading} className='button is-size-5 is-danger m-3'>
+                Cerrar Sección
+              </Button>
             </div>
 
           </div>

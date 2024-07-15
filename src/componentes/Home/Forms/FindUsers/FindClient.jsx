@@ -40,21 +40,24 @@ function FindClient() {
       }, 3000)
     }
   }
+
+  
   return (
     <>
     <div className='container'>
       <div className="columns">
-        <div className="column">
-          <h1 className='title is-color-white is-size-4'>Buscar fichero del cliente</h1>
+        <div className="column is-background-white custom-column-findClient">
           <form className='form-findCLient' onSubmit={validateForm}>
-            <div className="label is-color-white is-size-4">Buscar por nombre completo:
+          <h1 className='title is-color-black is-size-4'>Buscar fichero del cliente</h1>
+
+            <div className="label is-color-black is-size-4">Buscar por nombre completo:
               <input type="text"
                 name='fullName'
                 value={values.fullName}
                 className='input'
                 onChange={handleInputChange} />
             </div>
-            <div className="label is-color-white is-size-4">Buscar por DNI:
+            <div className="label is-color-black is-size-4">Buscar por DNI:
               <input type="text"
                 name='dni' value={values.dni}
                 className='input'

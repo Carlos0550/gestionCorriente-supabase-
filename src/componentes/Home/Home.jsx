@@ -14,13 +14,13 @@ function Home() {
 
   return (
     <>
-      <div className="container home__wrapper">
+      <div className="container home__wrapper is-background-white ">
         <Navbar />
-        <div className="columns">
-          <div className="column">
-            <section id="home__option-selector">
-              <h1 className='title is-color-white'>Seleccione una opción</h1>
-              <div className="select is-info is-rounded is-normal">
+        <div className="columns ">
+          <div className="column ">
+            <section id="home__option-selector ">
+              <h1 className='title is-color-black'>Seleccione una opción</h1>
+              <div className="select is-normal is-rounded ">
                 <select value={selectedOption} onChange={handleChangeOptions} className='is-hovered'>
                    <option value="añadirDeuda">Buscar un cliente</option>
                     <option value="agregarCliente">Crear un Cliente</option>

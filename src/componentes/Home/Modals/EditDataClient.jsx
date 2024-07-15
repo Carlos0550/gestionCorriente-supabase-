@@ -5,10 +5,10 @@ import NotificationError from '../Notifications/NotificationError';
 import "./editClient.css"
 const EditDataClient = ({ closeModal }) => {
   const {clientData, updateDataClient, isUpdating} = useAppContext()
+  const navigate = useAppContext()
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [hookCLientData, setHookClientData] = useState({
     nombre_completo:"",
-    apellido:"",
     telefono:"",
     dni:"",
     direccion: "",
@@ -19,7 +19,6 @@ const EditDataClient = ({ closeModal }) => {
       const firstClient = clientData[0]
       setHookClientData({
         nombre_completo: firstClient.nombre_completo || "",
-        apellido: firstClient.apellido || "",
         telefono: firstClient.telefono || "",
         dni: firstClient.dni || "",
         direccion: firstClient.direccion || "",
@@ -33,7 +32,7 @@ const EditDataClient = ({ closeModal }) => {
     setTimeout(() => {
       setConfirmLoading(false);
       closeModal();
-    }, 1000);
+    }, 0);
   };
 
   
@@ -48,7 +47,7 @@ const EditDataClient = ({ closeModal }) => {
   const [showAlert, setShowAlert] = useState(false)
   const validateForm = (ev) =>{
     ev.preventDefault()
-    if (!hookCLientData.nombre_completo || !hookCLientData.telefono || !hookCLientData.apellido ) {
+    if (!hookCLientData.nombre_completo || !hookCLientData.telefono || !hookCLientData.direccion || !hookCLientData.dni) {
       setShowAlert(true)
       setTimeout(()=>{
         setShowAlert(false)
@@ -58,6 +57,21 @@ const EditDataClient = ({ closeModal }) => {
       updateDataClient(hookCLientData)
     }
   }
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+        closeModal();
+    }
+};
+
+useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup listener on component unmount
+    return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+    };
+}, [navigate]);
   return (
     <>
       <Modal
@@ -68,16 +82,15 @@ const EditDataClient = ({ closeModal }) => {
         width={1000}
         confirmLoading={confirmLoading}
         footer={[
-          <Button key="update" type="primary" onClick={handleOk} loading={confirmLoading}>
-            Cerrar
-          </Button>,
+          
         ]}
         closeIcon={false}
       >
-        <form className='container  ' onSubmit={validateForm}>
+        <div className="container">
+        <form className='box is-background-black' onSubmit={validateForm}>
         <label className='label is-color-black'>
-          <div className='box'>
-          <p>Nombre Completo:</p>
+          <div className='is-background-white'>
+          <p className='is-color-black is-size-5'>Nombre Completo:</p>
           <span className='tag is-danger mb-3 mt-1'>*Obligatorio*</span>
           <input type="text" 
           name='nombre_completo'
@@ -87,23 +100,11 @@ const EditDataClient = ({ closeModal }) => {
           </div>
         </label>
 
-        <label className='label'>
-          <div className='box'>
-          <p>Apellido:</p>
-          <span className='tag is-danger mb-3 mt-1'>*Obligatorio*</span>
-
-          <input type="text" 
-          name='apellido' 
-          value={hookCLientData.apellido} 
-          className='input'
-          onChange={handleInputChange} />
-          </div>
-          
-        </label>
+        
 
         <label className='label'>
-          <div className="box">
-          <p>Dni:</p>
+          <div className="is-background-white">
+          <p className='is-color-black is-size-5'>Dni:</p>
           <span className='tag is-danger mb-3 mt-1'>*Obligatorio*</span>
 
           <input type="text" 
@@ -114,8 +115,8 @@ const EditDataClient = ({ closeModal }) => {
         </label>
 
         <label className='label'>
-          <div className='box'>
-          <p>Teléfono:</p>
+          <div className='is-background-white'>
+          <p className='is-color-black is-size-5'>Teléfono:</p>
           <span className='tag is-danger mb-3 mt-1'>*Obligatorio*</span>
           <input type="text" 
           name='telefono' 
@@ -126,8 +127,8 @@ const EditDataClient = ({ closeModal }) => {
         </label>
 
         <label className='label'>
-          <div className="box">
-          <p>Dirección:</p>
+          <div className="is-background-white">
+          <p className='is-color-black is-size-5'>Dirección:</p>
           <span className='tag is-danger mb-3 mt-1'>*Obligatorio*</span>
           <input type="text" 
           name='direccion' 
@@ -138,8 +139,12 @@ const EditDataClient = ({ closeModal }) => {
         </label>
         {showAlert && <NotificationError showAlert={showAlert} />}
         
-        <button className='button is-warning' type='submit' disabled={isUpdating} style={{cursor: isUpdating ? "not-allowed" : "pointer"}}>{isUpdating ? "Aguarde..." : "Actualizar"}</button>
+        <button className='button is-warning is-size-5 m-2' type='submit' disabled={isUpdating} style={{cursor: isUpdating ? "not-allowed" : "pointer"}}>{isUpdating ? "Aguarde..." : "Actualizar"}</button>
+        <Button key="update" type="primary" onClick={handleOk} loading={confirmLoading} className='button is-danger is-size-5 m-2'>
+            Cerrar sección
+        </Button>
       </form>
+        </div>
       </Modal>
     </>
   );
