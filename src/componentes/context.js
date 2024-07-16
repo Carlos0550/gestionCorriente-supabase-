@@ -258,7 +258,7 @@ export const AppContextProvider = ({ children }) => {
           "nombre_cliente": values.nombre_cliente,
           "apellido_cliente": values.apellido_cliente,
 
-          "buyDate": fullDate,
+          "buyDate": values.buyDate,
           "nameProduct": values.nameProduct,
           "quantity": values.quantity,
           "price": values.price,
@@ -351,7 +351,6 @@ export const AppContextProvider = ({ children }) => {
         .from('registerDelierys')
         .insert({
           "nombre_cliente": deliveryValues.nombre_cliente,
-          "apellido_cliente": deliveryValues.apellido,
           "uuid_cliente": deliveryValues.uuid_cliente,
           "fecha_entrega": deliveryValues.fecha_entrega,
           "monto_entrega": deliveryValues.monto_entrega,
@@ -388,6 +387,9 @@ export const AppContextProvider = ({ children }) => {
       if (data.length > 0) {
         setDeliverData(data)
         setFetchingDelierys(false)
+      }else{
+        setDeliverData([])
+
       }
     } catch (error) {
       console.log(error)
@@ -560,7 +562,7 @@ if (!isOnlime) {
       cancelDebt,
       fetchHistoryClient, clientHistory,fetchingHistory,
 
-      activateLoader, progress
+      activateLoader, progress,fullDate
     }}>
       {children}
     </AppContext.Provider>

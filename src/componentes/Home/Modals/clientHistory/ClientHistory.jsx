@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Modal, message } from 'antd';
 import { useAppContext } from '../../../context';
 import { useNavigate } from 'react-router-dom';
-import { LinearProgress } from '@mui/material';
+import { Box, LinearProgress } from '@mui/material';
 
 const ClientHistory = ({ closeModal }) => {
     const { fetchHistoryClient, clientHistory, fetchingHistory } = useAppContext();
@@ -78,6 +78,7 @@ const ClientHistory = ({ closeModal }) => {
                     <div className="columns">
                         <div className="column">
                             {fetchingHistory ? <LinearProgress /> :
+                                clientHistory.length > 0 ? 
                                 <React.Fragment>
                                     <h1 className='title is-color-black'>Historial de {clientHistory.map(item => item.nombre_completo)[0]}</h1>
                                     <Button key="update" type="primary" onClick={handleOk} loading={confirmLoading} className='button is-danger is-size-5'>
@@ -112,6 +113,8 @@ const ClientHistory = ({ closeModal }) => {
                                             </div>
                                         ))}
                                 </React.Fragment>
+                                : <div className="box">No hay datos</div>
+
                             }
                         </div>
                     </div>

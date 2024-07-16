@@ -3,12 +3,13 @@ import { Button, Modal } from 'antd';
 import { useAppContext } from '../../context';
 import { message } from 'antd';
 import "./productModal.css"
-import BackTop from 'antd/es/float-button/BackTop';
 import { useNavigate } from 'react-router-dom';
+
 const ProductModal = ({ closeModal }) => {
-  const { clientData, addDebt, addingDebt, debtError, debtSuccess } = useAppContext()
+  const { clientData, addDebt, addingDebt, fullDate } = useAppContext();
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
   const handleOk = () => {
     setConfirmLoading(true);
     setTimeout(() => {
@@ -17,51 +18,63 @@ const ProductModal = ({ closeModal }) => {
     }, 0);
   };
 
+  const firstClient = clientData[0];
 
-  //  Formulario
-  const fechaActual = new Date();
-  const firstClient = clientData[0]
- 
   const [values, setValues] = useState({
     nameProduct: "",
     quantity: "",
     price: "",
     change: "ars",
-    buyDate: fechaActual.toISOString().split("T")[0],
+    buyDate: fullDate,
     nombre_cliente: firstClient.nombre_completo,
     apellido_cliente: firstClient.apellido,
     uuid: firstClient.uuid
-  })
+  });
+
   const handleInputChange = (e) => {
-    const { value, name } = e.target
+    const { value, name } = e.target;
     setValues((prevState) => ({
       ...prevState,
       [name]: value
-    }))
-  }
-  const validateForm = async(ev) => {
-    ev.preventDefault()
+    }));
+  };
+
+  const validateForm = async (ev) => {
+    ev.preventDefault();
+
+    const dateRegex = /^\d{1,2}-\d{1,2}-\d{4}$/;
+
     if (!values.nameProduct || !values.change || !values.price || !values.quantity) {
-      message.error("Todos los campos son requeridos")
+      message.error("Todos los campos son requeridos");
+    } else if (values.buyDate && !dateRegex.test(values.buyDate)) {
+      message.error("La fecha debe tener el formato dd-mm-yyyy");
     } else {
-      await addDebt(values)
-      closeModal()
+      // Si no se ha proporcionado una fecha, usar fullDate
+      if (!values.buyDate) {
+        setValues((prevState) => ({
+          ...prevState,
+          buyDate: fullDate
+        }));
+      }
+      await addDebt(values);
+      closeModal();
     }
-  }
+  };
+
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
-        closeModal();
+      closeModal();
     }
-};
+  };
 
-useEffect(() => {
+  useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
 
-    // Cleanup listener on component unmount
     return () => {
-        window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown);
     };
-}, [navigate]);
+  }, [navigate]);
+
   return (
     <>
       <Modal
@@ -72,9 +85,7 @@ useEffect(() => {
         confirmLoading={confirmLoading}
         closeIcon={false}
         width={1000}
-        footer={[
-          
-        ]}
+        footer={[]}
       >
         <div className='container p-3'>
           <div className="columns">
@@ -86,9 +97,13 @@ useEffect(() => {
                   <label className='label box is-background-white is-color-black'>Nombre producto:
                     <input type="text" name='nameProduct' value={values.nameProduct} onChange={handleInputChange} className='input is-color-black' />
                   </label>
-
+                  
                   <label className='label is-color-black'>Precio Unitario:
                     <input type="text" name='price' value={values.price} onChange={handleInputChange} className='input is-color-black' />
+                  </label>
+
+                  <label className='label is-color-black'>Fecha de compra (opcional):
+                    <input type="text" name='buyDate' value={values.buyDate} onChange={handleInputChange} className='input is-color-black' />
                   </label>
 
                   <label className='label is-color-black'>Moneda:
