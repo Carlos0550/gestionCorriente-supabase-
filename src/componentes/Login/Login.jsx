@@ -43,7 +43,6 @@ function Login() {
         if (!hasFetchedSession.current) {
             const retrieveSession = async () => {
               const { data, error } = await supabase.auth.getSession();
-              console.log(data);
               if (data.session && data.session.user.id === process.env.REACT_APP_ADMIN_ID) {
                 navigate("/home");
               }

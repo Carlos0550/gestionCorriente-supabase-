@@ -80,7 +80,7 @@ const ClientHistory = ({ closeModal }) => {
                             {fetchingHistory ? <LinearProgress /> :
                                 clientHistory.length > 0 ? 
                                 <React.Fragment>
-                                    <h1 className='title is-color-black'>Historial de {clientHistory.map(item => item.nombre_completo)[0]}</h1>
+                                    <h1 className='title is-color-black' style={{textTransform: "capitalize"}}>Historial de {clientHistory.map(item => item.nombre_completo)[0]}</h1>
                                     <Button key="update" type="primary" onClick={handleOk} loading={confirmLoading} className='button is-danger is-size-5'>
                                         Cerrar sección
                                     </Button>
@@ -92,7 +92,7 @@ const ClientHistory = ({ closeModal }) => {
                                                     <thead>
 
                                                         <tr>
-                                                            <th className='has-text-weight-bold is-size-5 has-text-weigth-bold has-background-black'>Fecha de compra: {date}</th>
+                                                            <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold has-background-black'>Fecha de compra: {date}</th>
                                                             <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Producto/detalle</th>
                                                             <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Monto/código</th>
                                                             <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Fecha de cancelación</th>

@@ -35,27 +35,35 @@ const MuchUsers = ({ closeModal }) => {
                     </Button>,
                 ]}
             >
-                <h1 className='title is-color-black'>Se encontraron más de 1 cliente con el mismo parámetro de busqueda: </h1>
-                {clientData && clientData.map((item, index) => {
-                    return (
-                        <div key={index} className='container custom__container-muchUsers'>
-                            <label className='label'>
-                                <div className="box"><p className='subtitle has-text-weight-bold'>#{index + 1} Coincidencia</p></div>
-                                <div className="field">
-                                <div className="box"><p>Nombre: {item.nombre_completo}</p></div>
-                                <div className="box"><p>Apellido: {item.apellido}</p></div>
-                                <div className="box"><p>Dni: {item.dni}</p></div>
-                                <div className="box"><p>Dirección: {item.direccion}</p></div>
-                                <div className="box"><p>Teléfono: {item.telefono}</p></div>
-                                </div>
-                            </label>
-                            <div className="control">
-                            <button className='button is-info m-5' onClick={() => selectedOption(index)}>Seleccionar este cliente</button>
+                <h1 className='title is-color-black'>Se encontró más de 1 cliente con el mismo parámetro de busqueda: </h1>
 
-                            </div>
-                        </div>
-                    )
-                })}
+
+                <div className='container custom__container-muchUsers'>
+                    <div className="columns" >
+                        {clientData && clientData.map((item, index) => {
+                            return (
+                                <div className="column" key={index}>
+                                    <label className='label'>
+                                        <div className="box is-background-black"><p className='subtitle has-text-weight-bold  is-color-white'>#{index + 1} Coincidencia</p></div>
+                                        <div className="field">
+                                            <div className="box"><p>Nombre: {item.nombre_completo}</p></div>
+                                            <div className="box"><p>Apodo: {item.apodo}</p></div>
+                                            <div className="box"><p>Dni: {item.dni}</p></div>
+                                            <div className="box"><p>Dirección: {item.direccion}</p></div>
+                                            <div className="box"><p>Teléfono: {item.telefono}</p></div>
+                                        </div>
+                                    </label>
+                                    <div className="control">
+                                        <button className='button is-info m-5' onClick={() => selectedOption(index)}>Seleccionar este cliente</button>
+
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+
+
             </Modal>
         </>
     );

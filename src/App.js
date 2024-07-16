@@ -21,7 +21,7 @@ function App() {
         <footer className=" custom__footer">
           <div className="content has-text-centered">
             <div className='columns custom__columns-footer'>
-              <div className='column custom__column-footer is-color-white'>Aplicación web creada por <strong>Pelinski Carlos </strong></div>
+              <div className='column custom__column-footer is-color-white'>Aplicación web creada por <strong className='is-color-white has-text-weight-bold'>Pelinski Carlos </strong></div>
               
             </div>
           </div>

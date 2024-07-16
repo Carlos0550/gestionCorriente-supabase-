@@ -4,10 +4,13 @@ import "./CreateClient.css"
 import { useAppContext } from '../../../context'
 import { Alert, Button } from '@mui/material'
 import { message } from 'antd'
+import { useNavigate } from 'react-router-dom'
 function CreateClient() {
   const { createUser, isCreating,userExists} = useAppContext()
+  const navigate = useNavigate()
   const [values, setValues] = useState({
     fullName: "",
+    apodo: "",
     dni: "",
     phone: "",
     street: ""
@@ -31,6 +34,9 @@ function CreateClient() {
       setShowAlert(false)
       message.loading("Creando fichero de cliente, aguarde...")
       await createUser(values)
+      setTimeout(() => {
+        window.location.reload()
+      }, 2500);
     }
   }
   return (
@@ -47,7 +53,6 @@ function CreateClient() {
               className='input'
               onChange={handleInputChange} />
               <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-color-black is-size-6 mt-2`}>Este campo es obligatorio</span>
-            
           </div>
         </div>
 
@@ -58,10 +63,21 @@ function CreateClient() {
               className='input'
               onChange={handleInputChange} />
             
-            {!userExists ? <span className="tag is-warning m-2">Recomendado</span> : ""}
-            {userExists ? <span className='tag is-danger is-color-black is-size-6m-2'>Ya existe un usuario con este DNI</span> : ""}
+            {!userExists ? <span className="tag is-warning is-size-6 m-2">Recomendado</span> : ""}
+            {userExists ? <span className='tag is-danger is-color-black is-size-5 m-2'>Ya existe un usuario con este DNI</span> : ""}
 
 
+          </div>
+        </div>
+
+        <div className="field">
+          <div className="label is-color-black is-color-black is-size-5">Apodo:
+            <input type="text"
+              name='apodo'
+              value={values.apodo}
+              className='input'
+              onChange={handleInputChange} />
+            <span className="tag is-warning is-color-white is-size-6  is-color-black m-2">Recomendado</span>
           </div>
         </div>
 
@@ -73,8 +89,6 @@ function CreateClient() {
               className='input'
               onChange={handleInputChange} />
             <span className="tag is-normal is-color-white is-size-6 is-background-black  m-2">Opcional</span>
-
-
           </div>
         </div>
 

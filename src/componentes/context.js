@@ -66,7 +66,6 @@ export const AppContextProvider = ({ children }) => {
       } else {
         navigate("/home")
       }
-      console.log("Data", data)
     } catch (error) {
       console.log(error)
     } finally {
@@ -100,7 +99,7 @@ export const AppContextProvider = ({ children }) => {
       let { data: dataDni, error: errorDni } = await supabase
         .from('users')
         .select()
-        .eq('dni', values.dni);
+        .eq('dni', values.dni || 0);
 
       if (errorDni) {
         throw errorDni;
@@ -108,6 +107,7 @@ export const AppContextProvider = ({ children }) => {
 
       if (dataDni.length > 0) {
         message.error("Ya existe un usuario con ese DNI")
+        console.log(dataDni)
         setUserNotExists(true)
         setTimeout(() => {
           setUserNotExists(false)
@@ -119,9 +119,10 @@ export const AppContextProvider = ({ children }) => {
         .from('users')
         .insert({
           "nombre_completo": values.fullName.toLowerCase(),
-          "dni": values.dni,
-          "telefono": values.phone,
-          "direccion": values.street,
+          "apodo": values.apodo || "",
+          "dni": values.dni || "",
+          "telefono": values.phone || "",
+          "direccion": values.street || "",
           "uuid": v4()
         });
 
@@ -180,23 +181,7 @@ export const AppContextProvider = ({ children }) => {
         }
       }
 
-      if (values.apellido) {
-        const { data, error } = await supabase
-          .from('users')
-          .select()
-          .eq('apellido', values.apellido.toLowerCase())
-        setSearching(false)
-        if (data.length > 0) {
-          setClientData(data)
-
-        } else {
-          message.error("No existe un cliente con esos datos")
-          setUserNotExist(true)
-          setTimeout(() => {
-            setUserNotExist(false)
-          }, 3000)
-        }
-      }
+      
 
     } catch (error) {
       message.error("Hubo un error, por favor intente nuevamente")
