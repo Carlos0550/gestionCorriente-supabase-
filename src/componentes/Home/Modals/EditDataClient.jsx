@@ -9,6 +9,7 @@ const EditDataClient = ({ closeModal }) => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [hookCLientData, setHookClientData] = useState({
     nombre_completo:"",
+    apodo: "",
     telefono:"",
     dni:"",
     direccion: "",
@@ -21,6 +22,7 @@ const EditDataClient = ({ closeModal }) => {
         nombre_completo: firstClient.nombre_completo || "",
         telefono: firstClient.telefono || "",
         dni: firstClient.dni || "",
+        apodo: firstClient.apodo || "",
         direccion: firstClient.direccion || "",
         uuid: firstClient.uuid
       })
@@ -95,7 +97,19 @@ useEffect(() => {
           <input type="text" 
           name='nombre_completo'
           value={hookCLientData.nombre_completo}
-          className='input'
+          className='input is-color-black'
+          onChange={handleInputChange} />
+          </div>
+        </label>
+
+        <label className='label is-color-black'>
+          <div className='is-background-white'>
+          <p className='is-color-black is-size-5'>Apodo:</p>
+          <span className='tag is-info mb-3 mt-1'>*Opcional*</span>
+          <input type="text" 
+          name='apodo'
+          value={hookCLientData.apodo}
+          className='input is-color-black'
           onChange={handleInputChange} />
           </div>
         </label>
@@ -105,11 +119,11 @@ useEffect(() => {
         <label className='label'>
           <div className="is-background-white">
           <p className='is-color-black is-size-5'>Dni:</p>
-          <span className='tag is-danger mb-3 mt-1'>*Obligatorio*</span>
+          <span className='tag is-info mb-3 mt-1'>*Opcional*</span>
 
           <input type="text" 
           name='dni' value={hookCLientData.dni} 
-          className='input'
+          className='input is-color-black'
           onChange={handleInputChange} />
           </div>
         </label>
@@ -117,11 +131,11 @@ useEffect(() => {
         <label className='label'>
           <div className='is-background-white'>
           <p className='is-color-black is-size-5'>Teléfono:</p>
-          <span className='tag is-danger mb-3 mt-1'>*Obligatorio*</span>
+          <span className='tag is-info mb-3 mt-1'>*Opcional*</span>
           <input type="text" 
           name='telefono' 
           value={hookCLientData.telefono} 
-          className='input'
+          className='input is-color-black'
           onChange={handleInputChange} />
           </div>
         </label>
@@ -129,11 +143,11 @@ useEffect(() => {
         <label className='label'>
           <div className="is-background-white">
           <p className='is-color-black is-size-5'>Dirección:</p>
-          <span className='tag is-danger mb-3 mt-1'>*Obligatorio*</span>
+          <span className='tag is-info mb-3 mt-1'>*Opcional*</span>
           <input type="text" 
           name='direccion' 
           value={hookCLientData.direccion} 
-          className='input'
+          className='input is-color-black'
           onChange={handleInputChange} />
           </div>
         </label>

@@ -12,20 +12,22 @@ function EditProducts({ closeModal, dataProduct }) {
   };
 
   const [hookProduct, setHookProduct] = useState({
+    
+  })
+
+
+  const [newValues, setNewValues] = useState({
     id: dataProduct.id,
     change: dataProduct.change,
     nameProduct: dataProduct.nameProduct,
     price: dataProduct.price,
+    date: dataProduct.buyDate,
     quantity: dataProduct.quantity,
   })
 
-  const [newValues, setNewValues] = useState({
-    id: dataProduct.id,
-    change: "",
-    nameProduct: "",
-    price: "",
-    quantity: "",
-  })
+  useEffect(()=>{
+    
+  },[hookProduct])
 
   const handleInputChange = (e) => {
     const { value, name } = e.target;
@@ -89,7 +91,7 @@ useEffect(() => {
         <div className='EditProduct__wrapper'>
           <div className="columns">
             {/*Antiguo producto*/}
-            <div className="column">
+            {/* <div className="column">
               <form className='form-addProduct' >
                 <h1 className='title is-color-white is-size-2 has-text-centered'>Antiguo producto</h1>
                 <ul >
@@ -101,16 +103,16 @@ useEffect(() => {
                   </li>
                 </ul>
               </form>
-            </div>
+            </div> */}
             <div className="column">
               <form className='form-addProduct'>
-              <h1 className='title is-color-white is-size-2 has-text-centered'>Nuevo producto</h1>
+              <h1 className='title is-color-white is-size-2 has-text-centered'>Editar producto</h1>
                 <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Nombre producto:
-                  <input type="text" name='nameProduct' value={newValues.nameProduct} onChange={handleInputChange} className='input is-color-white is-size-5' />
+                  <input type="text" name='nameProduct' value={newValues.nameProduct} onChange={handleInputChange} className='input is-color-white is-background-black is-size-5' />
                 </label>
 
                 <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Precio Unitario:
-                  <input type="text" name='price' value={newValues.price} onChange={handleInputChange} className='input is-color-white is-size-5' />
+                  <input type="text" name='price' value={newValues.price} onChange={handleInputChange} className='input is-color-white is-background-black is-size-5' />
                 </label>
 
                 <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Moneda:
@@ -124,7 +126,11 @@ useEffect(() => {
                 </label>
 
                 <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Cantidad:
-                  <input type="text" name='quantity' value={newValues.quantity} onChange={handleInputChange} className='input is-color-white is-size-5' />
+                  <input type="text" name='quantity' value={newValues.quantity} onChange={handleInputChange} className='input is-color-white is-background-black is-size-5' />
+                </label>
+
+                <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Fecha de compra:
+                  <input type="text" name='date' value={newValues.date} onChange={handleInputChange} className='input is-color-white is-background-black is-size-5' />
                 </label>
 
                 <button className='button is-warning m-1' type='submit' onClick={validateForm}>

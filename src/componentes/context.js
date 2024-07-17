@@ -209,6 +209,7 @@ export const AppContextProvider = ({ children }) => {
         .update({
           "nombre_completo": values.nombre_completo.toLowerCase() || "",
           "dni": values.dni || "",
+          "apodo": values.apodo || "",
           "telefono": values.telefono || "",
           "direccion": values.direccion || ""
         })
@@ -309,6 +310,7 @@ export const AppContextProvider = ({ children }) => {
           "nameProduct": values.nameProduct,
           "quantity": values.quantity,
           "price": values.price,
+          "buyDate": values.date,
           "change": values.change
         })
         .eq('id', values.id)

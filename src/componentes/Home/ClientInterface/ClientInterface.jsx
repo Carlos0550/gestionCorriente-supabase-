@@ -183,7 +183,7 @@ function ClientInterface() {
                                             <thead>
                                                 <tr>
                                                     <th className='is-background-white is-color-black '>
-                                                    <p className='title has-text-weight-bold is-color-black'>Cliente: {item.nombre_completo || "No hay datos" } ({item ?. apodo})</p>
+                                                    <p className='title has-text-weight-bold is-color-black'>Cliente: {item.nombre_completo || "No hay datos" } {item ?. apodo}</p>
 
 
                                                     </th>
