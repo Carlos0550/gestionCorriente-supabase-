@@ -49,7 +49,7 @@ const EditDataClient = ({ closeModal }) => {
   const [showAlert, setShowAlert] = useState(false)
   const validateForm = (ev) =>{
     ev.preventDefault()
-    if (!hookCLientData.nombre_completo || !hookCLientData.telefono || !hookCLientData.direccion || !hookCLientData.dni) {
+    if (!hookCLientData.nombre_completo ) {
       setShowAlert(true)
       setTimeout(()=>{
         setShowAlert(false)
@@ -97,7 +97,7 @@ useEffect(() => {
           <input type="text" 
           name='nombre_completo'
           value={hookCLientData.nombre_completo}
-          className='input is-color-black'
+          className='input is-color-black is-background-white'
           onChange={handleInputChange} />
           </div>
         </label>
@@ -109,7 +109,7 @@ useEffect(() => {
           <input type="text" 
           name='apodo'
           value={hookCLientData.apodo}
-          className='input is-color-black'
+          className='input is-color-black is-background-white'
           onChange={handleInputChange} />
           </div>
         </label>
@@ -123,7 +123,7 @@ useEffect(() => {
 
           <input type="text" 
           name='dni' value={hookCLientData.dni} 
-          className='input is-color-black'
+          className='input is-color-black is-background-white'
           onChange={handleInputChange} />
           </div>
         </label>
@@ -135,7 +135,7 @@ useEffect(() => {
           <input type="text" 
           name='telefono' 
           value={hookCLientData.telefono} 
-          className='input is-color-black'
+          className='input is-color-black is-background-white'
           onChange={handleInputChange} />
           </div>
         </label>
@@ -147,7 +147,7 @@ useEffect(() => {
           <input type="text" 
           name='direccion' 
           value={hookCLientData.direccion} 
-          className='input is-color-black'
+          className='input is-color-black is-background-white'
           onChange={handleInputChange} />
           </div>
         </label>

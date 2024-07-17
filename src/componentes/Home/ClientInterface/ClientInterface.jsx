@@ -10,7 +10,6 @@ import MuchUsers from '../Modals/ToMuchUsers/MuchUsers';
 import { Button, message, Popconfirm, Spin } from 'antd';
 import ClientHistory from '../Modals/clientHistory/ClientHistory';
 import { LinearProgress } from '@mui/material';
-import { Receipt } from '@mui/icons-material';
 
 function ClientInterface() {
     const { clientData, showDebtUser, userUUID, fetchingData, DebtData, deleteProduct, isDeleting, fetchRegisterDeliverys, deliverData, cancelDebt, fetchingDeliverys } = useAppContext();
@@ -38,10 +37,10 @@ function ClientInterface() {
         setShowHistory(true)
     }
 
-    const closeClientDebts = () => {
-        setShowSectionDebt(false);
-        setCountClick(0);
-    };
+    // const closeClientDebts = () => {
+    //     setShowSectionDebt(false);
+    //     setCountClick(0);
+    // };
 
     const openModalMuchUsers = () => {
         setShowMuchUsers(true)
@@ -87,30 +86,30 @@ function ClientInterface() {
         setShowMakeDeliveryModal(true)
     }
 
-    const openDeliverRegisterModal = () => {
-        setShowDeliveryRegister(true)
-        fetchRegisterDeliverys()
-    }
+    // const openDeliverRegisterModal = () => {
+    //     setShowDeliveryRegister(true)
+    //     fetchRegisterDeliverys()
+    // }
 
-    const [countClick, setCountClick] = useState(0);
-    const openClientDebts = () => {
-        setShowSectionDebt(true);
-        setCountClick(countClick + 1);
-        showDebtUser();
-        fetchRegisterDeliverys()
+    // const [countClick, setCountClick] = useState(0);
+    // const openClientDebts = () => {
+    //     setShowSectionDebt(true);
+    //     setCountClick(countClick + 1);
+    //     showDebtUser();
+    //     fetchRegisterDeliverys()
 
-        if (countClick === 1) {
-            closeClientDebts();
-            setCountClick(0);
-            showDebtUser();
-            fetchRegisterDeliverys()
-        }
-    };
+    //     if (countClick === 1) {
+    //         closeClientDebts();
+    //         setCountClick(0);
+    //         showDebtUser();
+    //         fetchRegisterDeliverys()
+    //     }
+    // };
 
-    const confirmDelete = async (debtId) => {
-        await deleteProduct(debtId);
-        showDebtUser();
-    };
+    // const confirmDelete = async (debtId) => {
+    //     await deleteProduct(debtId);
+    //     showDebtUser();
+    // };
 
     const confirmCancellDebt = async () => {
         await cancelDebt()
@@ -166,6 +165,15 @@ function ClientInterface() {
         return acc;
     }, {});
 
+    useEffect(()=>{
+        if (totalGeneral - saldoRestante === 0 && DebtData.length > 0) {
+            confirmCancellDebt()
+        }else{
+            console.log("No hay que cancelar")
+
+        }
+    },[totalGeneral,saldoRestante, DebtData])
+
 
 
     return (
@@ -183,7 +191,7 @@ function ClientInterface() {
                                             <thead>
                                                 <tr>
                                                     <th className='is-background-white is-color-black '>
-                                                    <p className='title has-text-weight-bold is-color-black'>Cliente: {item.nombre_completo || "No hay datos" } {item ?. apodo}</p>
+                                                    <p className='title has-text-weight-bold is-color-black'>Cliente: {item.nombre_completo || "No hay datos"} {item.apodo ? `(${item.apodo})` : ""}</p>
 
 
                                                     </th>
@@ -197,30 +205,7 @@ function ClientInterface() {
                                                         {totalGeneral - saldoRestante === 0 && DebtData.length > 0 ? "" : <button className='button m-1 is-background-black is-color-white m-2 is-size-5' onClick={handleProductModal}>Añadir un producto</button>}
                                                         <button className='button is-background-black is-color-white m-2 is-size-5' onClick={handleShowModalHistory}>Revisar historial</button>
                                                         {/* {DebtData && DebtData.length > 0 ? <button className='button m-1 is-background-black is-color-white m-2 is-size-5' onClick={openDeliverRegisterModal}>Ver registro de entregas</button> : ""} */}
-                                                        {showSectionDebt && DebtData.length > 0 ?
-                                                            <>
-                                                                {totalGeneral - saldoRestante === 0 ?
-                                                                    <>
-                                                                        <Popconfirm
-                                                                            title="¿Estás seguro que este fichero está listo para cancelar?"
-                                                                            onConfirm={() => confirmCancellDebt()}
-                                                                            onCancel={() => cancelDelete()}
-                                                                            okText="Sí, cancelar fichero"
-                                                                            cancelText="No"
-                                                                        >
-                                                                            <Button className='button is-danger m-2 is-size-5'>
-                                                                                Cancelar fichero
-                                                                            </Button>
-                                                                        </Popconfirm>
-                                                                        <span className='tag is-danger custom__tag-container is-size-4 m-2 has-text-weight-bold'>Presione "Cancelar fichero" para seguir añadiendo productos</span>
-                                                                    </>
-                                                                    :
-                                                                    <>
-
-                                                                    </>
-                                                                }
-                                                            </>
-                                                            : ""}
+                                                        
                                                     </td>
                                                 </tr>
                                             </tbody>

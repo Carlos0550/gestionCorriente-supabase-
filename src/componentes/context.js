@@ -146,12 +146,16 @@ export const AppContextProvider = ({ children }) => {
 
   const findUser = async (values) => {
     setSearching(true)
+    console.log(values)
     try {
       if (values.fullName && !values.dni) {
+        
         const { data, error } = await supabase
           .from('users')
           .select()
           .eq('nombre_completo', values.fullName.toLowerCase())
+          console.log(error)
+          console.log(data)
         setSearching(false)
         if (data.length > 0) {
           setClientData(data)
@@ -165,6 +169,8 @@ export const AppContextProvider = ({ children }) => {
       }
       if (!values.fullName && values.dni) {
         const { data, error } = await supabase
+        console.log(error)
+
           .from('users')
           .select()
           .eq('dni', values.dni)
@@ -185,6 +191,7 @@ export const AppContextProvider = ({ children }) => {
 
     } catch (error) {
       message.error("Hubo un error, por favor intente nuevamente")
+      console.log(error)
     } finally {
       setSearching(false)
     }
@@ -414,7 +421,7 @@ export const AppContextProvider = ({ children }) => {
 
   const cancelDebt = async () => {
     
-    message.loading("Aguarde...");
+    message.loading("Cancelando fichero, aguarde...");
     try {
       const { data: registerData, error: registerError } = await supabase
         .from("registerDelierys") // Asegúrate del nombre correcto
