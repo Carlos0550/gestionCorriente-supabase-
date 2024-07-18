@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Modal, message } from 'antd';
 import { useAppContext } from '../../context';
 import { useNavigate } from 'react-router-dom';
@@ -39,15 +39,19 @@ const ProductModal = ({ closeModal }) => {
     ev.preventDefault();
 
     // Dividir el texto en líneas usando comas y saltos de línea
-    const productLines = values.products.split(/,|\n/).map(line => line.trim()).filter(line => line.length > 0);
+    const productLines = values.products
+      .toLowerCase() // Convertir todo a minúsculas
+      .split(/,|\n/)
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
     
     const productsToAdd = productLines.map(line => {
       const [quantity, ...rest] = line.split(' ');
       const restStr = rest.join(' ');
-      const [nameProduct, price] = restStr.split(/(\d+(?:x\d+)?$)/).filter(Boolean);
+      const [nameProduct, price] = restStr.split(/(\d+(?:\.\d+)?(?:x\d+(?:\.\d+)?)?$)/).filter(Boolean);
       const change = restStr.includes('x') ? 'usd' : 'ars';
       return {
-        nameProduct: nameProduct,
+        nameProduct: nameProduct.trim(),
         quantity: parseInt(quantity),
         price: parseFloat(price.replace('x', '')),
         change: change,
@@ -73,20 +77,6 @@ const ProductModal = ({ closeModal }) => {
     }
   };
 
-  // const handleKeyDown = (event) => {
-  //   if (event.key === 'Enter') {
-  //     closeModal();
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   window.addEventListener('keydown', handleKeyDown);
-
-  //   return () => {
-  //     window.removeEventListener('keydown', handleKeyDown);
-  //   };
-  // }, [navigate]);
-
   return (
     <>
       <Modal
@@ -110,13 +100,12 @@ const ProductModal = ({ closeModal }) => {
                   </div>
                   <div className='message-body '>
                     <ol >
-                      <li className='is-size-5'>El formato es (Cantidad) seguido de (detalle o nombre del producto) seguido del codigo o el monto</li>
+                      <li className='is-size-5'>El formato es (Cantidad) seguido de (detalle o nombre del producto) seguido del código o el monto</li>
                       <ol type='A' className='ml-5'>
                         <li className='is-size-5 is-color-link'>Ejemplo en pesos: 1 mate de arpillera 25000</li>
-                        <li className='is-size-5 is-color-link'>Ejemplo en dolares: 1 mate de arpillera x15 <span className='tag is-danger is-size-5'>Importante no olvidar la equis "x"</span></li>
-
+                        <li className='is-size-5 is-color-link'>Ejemplo en dólares: 1 mate de arpillera x15 <span className='tag is-danger is-size-5'>Importante no olvidar la equis "x"</span></li>
                       </ol>
-                      <li className='is-size-5'>Para insertar varios productos puede añadir una coma "," al final o simplemente precionar Enter para ir agregando uno abajo del otro</li>
+                      <li className='is-size-5'>Para insertar varios productos puede añadir una coma "," al final o simplemente presionar Enter para ir agregando uno abajo del otro</li>
                     </ol>
                   </div>
                 </article>
@@ -128,7 +117,6 @@ const ProductModal = ({ closeModal }) => {
                       onChange={handleInputChange} 
                       className='textarea is-color-white is-background-black is-size-5'
                       rows="10"
-                      placeholder="(Cantidad) 1 (Detalle) Mate imperial de algarrobo (precio) 25000, 2 pulseritas de plata x15"
                     />
                   </label>
 

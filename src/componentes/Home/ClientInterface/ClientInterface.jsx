@@ -25,8 +25,13 @@ function ClientInterface() {
         cancelDebt, 
         fetchingDeliverys,
         setIsUpdatingDeliver, 
-        isUpdatingDeliver
+        isUpdatingDeliver,
+        usdPrice
      } = useAppContext();
+    let value = 0
+    usdPrice.map(el =>{
+        value += el.value
+    })
     const [showEditDataClientModal, setShowEditDataClientModal] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
     const [showProductModal, setShowProductModal] = useState(false);
@@ -164,7 +169,7 @@ function ClientInterface() {
             if (element.change === "ars") {
                 totalPesos += price * quantity
             } else if (element.change === "usd") {
-                totalUsdInPesos += (price * quantity) * 1500
+                totalUsdInPesos += (price * quantity) * value
             }
         });
         return {
@@ -185,7 +190,7 @@ function ClientInterface() {
             return `$${price * quantity}`;
         } else if (moneda === "usd") {
 
-            return `$${(price * quantity) * 1500}`;
+            return `$${(price * quantity) * value}`;
         }
 
         return 0;
@@ -219,7 +224,7 @@ function ClientInterface() {
                 totalPesos += debt.price * debt.quantity
             } else if (debt.change === "usd") {
 
-                totalUsd += (debt.price * debt.quantity) * 1500
+                totalUsd += (debt.price * debt.quantity) * value
             }
 
             return monto_total = totalPesos + totalUsd;

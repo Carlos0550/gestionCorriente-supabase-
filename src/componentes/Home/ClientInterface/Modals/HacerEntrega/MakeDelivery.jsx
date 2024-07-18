@@ -25,7 +25,7 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
 
   const handleOk = () => {
     closeModal();
-    setIsUpdatingDeliver(!isUpdatingDeliver);
+    setIsUpdatingDeliver(false);
   };
 
   const handleInput = (e) => {
@@ -48,6 +48,7 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
         message.error("Hay campos vacíos, complételos");
       } else {
         await updateDeliver(values);
+        setIsUpdatingDeliver(false);
         closeModal();
       }
     } else if (parseFloat(monto_entrega) > saldo_restante) {

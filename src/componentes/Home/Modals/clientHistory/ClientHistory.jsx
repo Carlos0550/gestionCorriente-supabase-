@@ -103,7 +103,7 @@ const ClientHistory = ({ closeModal }) => {
                                                         {groupedHistory[date].map((item, idx) => (
                                                             <tr key={idx}>
                                                                 <td className='is-background-white'></td>
-                                                                <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>{item.nombre_producto} | <p>cantidad: {item.quantity}</p> </td>
+                                                                <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>{item.nombre_producto.replace(/X|x/g, '')} | <p>cantidad: {item.quantity}</p> </td>
                                                                 <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>{calcularMonto(item.precio_producto, item.quantity, item.moneda)}</td>
                                                                 <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>{item.fecha_cancelacion}</td>
                                                             </tr>

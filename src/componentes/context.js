@@ -196,8 +196,6 @@ export const AppContextProvider = ({ children }) => {
       }
       if (!values.fullName && values.dni) {
         const { data, error } = await supabase
-        console.log(error)
-
           .from('users')
           .select()
           .eq('dni', values.dni)
@@ -270,7 +268,6 @@ export const AppContextProvider = ({ children }) => {
   const [addingDebt, setIsAddingDebt] = useState(false)
 
   const addDebt = async (values) => {
-    console.log(values)
     message.loading("Añadiendo producto...")
     setIsAddingDebt(true)
     try {
@@ -424,7 +421,6 @@ export const AppContextProvider = ({ children }) => {
   const [isSendingUpdatingDeliver, setIsSendingUpdatingDeliver] = useState(false)
   const updateDeliver = async(values) =>{
     setIsSendingUpdatingDeliver(true)
-    console.log(values)
     try {
       const { error } = await supabase 
       .from('registerDelierys')
@@ -587,6 +583,27 @@ export const AppContextProvider = ({ children }) => {
     }
   }
 
+const [usdPrice, setUsdPrice] = useState(0)
+useEffect(()=>{
+  const handleFetchUsd = async() =>{
+    const { data, error } = await supabase
+    .from('usdPrice')
+    .select()
+    .eq('id', 1)
+  
+    if (data) {
+      setUsdPrice(data)
+    }
+  }
+  handleFetchUsd()
+  
+  
+},[navigate, clientData, userUUID])
+
+// useEffect(()=>{
+//   console.log(usdPrice)
+// },[usdPrice])
+
 const isOnlime = Networck();
 
 if (!isOnlime) {
@@ -609,7 +626,7 @@ if (!isOnlime) {
       fetchRegisterDeliverys, deliverData, fetchingDeliverys,
       cancelDebt,
       fetchHistoryClient, clientHistory,fetchingHistory,
-
+      usdPrice,setUsdPrice,
       activateLoader, progress,fullDate
     }}>
       {children}
