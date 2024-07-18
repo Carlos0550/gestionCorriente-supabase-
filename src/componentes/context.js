@@ -270,7 +270,7 @@ export const AppContextProvider = ({ children }) => {
   const [addingDebt, setIsAddingDebt] = useState(false)
 
   const addDebt = async (values) => {
-    
+    console.log(values)
     message.loading("Añadiendo producto...")
     setIsAddingDebt(true)
     try {

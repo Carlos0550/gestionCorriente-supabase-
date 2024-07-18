@@ -37,35 +37,29 @@ const ProductModal = ({ closeModal }) => {
 
   const processProducts = async (ev) => {
     ev.preventDefault();
-  
+
     // Dividir el texto en líneas usando comas y saltos de línea
     const productLines = values.products.split(/,|\n/).map(line => line.trim()).filter(line => line.length > 0);
-  
+    
     const productsToAdd = productLines.map(line => {
       const [quantity, ...rest] = line.split(' ');
       const restStr = rest.join(' ');
-  
-      // Aquí usamos una expresión regular que captura correctamente los precios con decimales y con 'x'
-      const priceMatch = restStr.match(/(\d+(?:\.\d+)?(?:x\d+(?:\.\d+)?)?)$/);
-      const price = priceMatch ? priceMatch[0] : '0';
-      const nameProduct = restStr.replace(price, '').trim();
-      const change = price.includes('x') ? 'usd' : 'ars';
-      const finalPrice = change === 'usd' ? parseFloat(price.replace('x', '')) : parseFloat(price);
-  
+      const [nameProduct, price] = restStr.split(/(\d+(?:x\d+)?$)/).filter(Boolean);
+      const change = restStr.includes('x') ? 'usd' : 'ars';
       return {
-        nameProduct,
+        nameProduct: nameProduct,
         quantity: parseInt(quantity),
-        price: finalPrice,
-        change,
+        price: parseFloat(price.replace('x', '')),
+        change: change,
         buyDate: values.buyDate,
         nombre_cliente: values.nombre_cliente,
         apellido_cliente: values.apellido_cliente,
         uuid: values.uuid
       };
     });
-  
+
     const dateRegex = /^\d{1,2}-\d{1,2}-\d{4}$/;
-  
+
     if (!values.products) {
       message.error("El campo de productos no puede estar vacío");
     } else if (values.buyDate && !dateRegex.test(values.buyDate)) {
