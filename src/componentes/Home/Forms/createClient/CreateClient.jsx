@@ -1,119 +1,155 @@
-import React, { useState } from 'react'
-import "./CreateClient.css"
+import React, { useState } from 'react';
+import { Button } from '@mui/material';
+import { message } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '../../../context';
+import './CreateClient.css';
 
-import { useAppContext } from '../../../context'
-import { Alert, Button } from '@mui/material'
-import { message } from 'antd'
-import { useNavigate } from 'react-router-dom'
 function CreateClient() {
-  const { createUser, isCreating,userExists} = useAppContext()
-  const navigate = useNavigate()
+  const { createUser, isCreating, userExists } = useAppContext();
+  const navigate = useNavigate();
+
   const [values, setValues] = useState({
-    fullName: "",
-    apodo: "",
-    dni: "",
-    phone: "",
-    street: ""
-  })
+    fullName: '',
+    apodo: '',
+    dni: '',
+    phone: '',
+    street: '',
+  });
+
   const handleInputChange = (e) => {
-    const { value, name } = e.target
+    const { value, name } = e.target;
     setValues((prevState) => ({
       ...prevState,
-      [name]: value
-    }))
-  }
-  const [showAlert, setShowAlert] = useState(false)
-  const validateForm = async(ev) => {
-    ev.preventDefault()
-    if (!values.fullName ) {
-      setShowAlert(true)
+      [name]: value,
+    }));
+  };
+
+  const [showAlert, setShowAlert] = useState(false);
+
+  const validateForm = async (ev) => {
+    ev.preventDefault();
+    if (!values.fullName) {
+      setShowAlert(true);
       setTimeout(() => {
-        setShowAlert(false)
-      }, 3000)
+        setShowAlert(false);
+      }, 3000);
     } else {
-      setShowAlert(false)
-      message.loading("Creando fichero de cliente, aguarde...")
-      await createUser(values)
-      setTimeout(() => {
-        window.location.reload()
-      }, 2500);
+      setShowAlert(false);
+      message.loading('Creando fichero de cliente, aguarde...');
+      await createUser(values);
+      
     }
-  }
+  };
+
   return (
-    <div className='container custom__container-createUser'>
-      <div className="columns">
-        <div className="column">
-        <h1 className='title is-color-black'>Crear ficha de cliente</h1>
-      <form onSubmit={validateForm} className='form-createClient'>
-        <div className="field">
-          <div className="label is-color-black is-size-5">Nombre completo:
-            <input type="text"
-              name='fullName'
-              value={values.fullName}
-              className='input'
-              onChange={handleInputChange} />
-              <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-color-black is-size-6 mt-2`}>Este campo es obligatorio</span>
+    <div className="container custom__container-createUser">
+      <h1 className="title is-color-black">Crear ficha de cliente</h1>
+      <form onSubmit={validateForm} className="form-createClient">
+        <div className="columns">
+          <div className="column">
+            <div className="field">
+              <label className="label is-color-black is-size-5">Nombre completo:</label>
+              <input
+                type="text"
+                name="fullName"
+                value={values.fullName}
+                className="input"
+                onChange={handleInputChange}
+              />
+              <span className={`tag ${showAlert ? 'is-danger' : 'is-info'} is-color-black is-size-6 mt-2`}>
+                Este campo es obligatorio
+              </span>
+            </div>
+
+            <div className="field">
+              <label className="label is-color-black is-size-5">DNI:</label>
+              <input
+                type="text"
+                name="dni"
+                value={values.dni}
+                className="input"
+                onChange={handleInputChange}
+              />
+              {!userExists ? (
+                <span className="tag is-warning is-size-6 m-2">Recomendado</span>
+              ) : (
+                <span className="tag is-danger is-color-black is-size-5 m-2">
+                  Ya existe un usuario con este DNI
+                </span>
+              )}
+            </div>
+
+            <div className="field">
+              <label className="label is-color-black is-size-5">Apodo:</label>
+              <input
+                type="text"
+                name="apodo"
+                value={values.apodo}
+                className="input"
+                onChange={handleInputChange}
+              />
+              <span className="tag is-warning is-color-white is-size-6 is-color-black m-2">
+                Recomendado
+              </span>
+            </div>
+          </div>
+
+          <div className="column">
+            <div className="field">
+              <label className="label is-color-black is-size-5">Teléfono:</label>
+              <input
+                type="text"
+                name="phone"
+                value={values.phone}
+                className="input"
+                onChange={handleInputChange}
+              />
+              <span className="tag is-normal is-color-white is-size-6 is-background-black m-2">
+                Opcional
+              </span>
+            </div>
+
+            <div className="field">
+              <label className="label is-color-black is-size-5">Dirección:</label>
+              <input
+                type="text"
+                name="street"
+                value={values.street}
+                className="input"
+                onChange={handleInputChange}
+              />
+              <span className="tag is-normal is-color-white is-size-6 is-background-black m-2">
+                Opcional
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="field">
-          <div className="label is-color-white is-color-black is-size-5">DNI:
-            <input type="text"
-              name='dni' value={values.dni}
-              className='input'
-              onChange={handleInputChange} />
-            
-            {!userExists ? <span className="tag is-warning is-size-6 m-2">Recomendado</span> : ""}
-            {userExists ? <span className='tag is-danger is-color-black is-size-5 m-2'>Ya existe un usuario con este DNI</span> : ""}
-
-
-          </div>
-        </div>
+        {/* <div className="field">
+          {showAlert && (
+            <div className="field">
+              <Alert severity="error">
+                Debe completar los campos que sean{' '}
+                <strong className="subtitle has-text-weigth-bold has-text-danger is-size-6">obligatorios</strong>
+              </Alert>
+            </div>
+          )}
+        </div> */}
 
         <div className="field">
-          <div className="label is-color-black is-color-black is-size-5">Apodo:
-            <input type="text"
-              name='apodo'
-              value={values.apodo}
-              className='input'
-              onChange={handleInputChange} />
-            <span className="tag is-warning is-color-white is-size-6  is-color-black m-2">Recomendado</span>
-          </div>
+          <Button
+            variant="contained"
+            disabled={isCreating}
+            type="submit"
+            style={{ backgroundColor: isCreating ? 'grey' : '' }}
+          >
+            {isCreating ? 'Aguarde...' : 'Guardar Cliente'}
+          </Button>
         </div>
-
-        <div className="field">
-          <div className="label is-color-black is-color-black is-size-5">Teléfono:
-            <input type="text"
-              name='phone'
-              value={values.phone}
-              className='input'
-              onChange={handleInputChange} />
-            <span className="tag is-normal is-color-white is-size-6 is-background-black  m-2">Opcional</span>
-          </div>
-        </div>
-
-        <div className="field">
-          <div className="label is-color-black is-color-white is-size-5">Dirección:
-            <input type="text"
-              name='street'
-              value={values.street}
-              className='input'
-              onChange={handleInputChange} />
-            <span className="tag is-normal is-color-white is-size-6  is-background-black  m-2">Opcional</span>
-
-          </div>
-        </div>
-
-        <div className="field">
-          {showAlert ? <Alert severity='error'>Debe completar los campos que sean <strong className='subtitle has-text-weigth-bold has-text-danger is-size-6'>obligatorios</strong></Alert> : ""}
-        </div>
-        
-        <Button variant='contained' disabled={isCreating} type='submit' style={{ backgroundColor: isCreating ? "grey" : "" }}>{isCreating ? "Aguarde..." : "Guardar Cliente"}</Button>
       </form>
-        </div>
-      </div>
     </div>
-  )
+  );
 }
 
-export default CreateClient
+export default CreateClient;

@@ -12,7 +12,21 @@ import ClientHistory from '../Modals/clientHistory/ClientHistory';
 import { LinearProgress } from '@mui/material';
 
 function ClientInterface() {
-    const { clientData, showDebtUser, userUUID, fetchingData, DebtData, deleteProduct, isDeleting, fetchRegisterDeliverys, deliverData, cancelDebt, fetchingDeliverys } = useAppContext();
+    const { 
+        clientData, 
+        showDebtUser, 
+        userUUID, 
+        fetchingData, 
+        DebtData, 
+        deleteProduct, 
+        isDeleting, 
+        fetchRegisterDeliverys, 
+        deliverData, 
+        cancelDebt, 
+        fetchingDeliverys,
+        setIsUpdatingDeliver, 
+        isUpdatingDeliver
+     } = useAppContext();
     const [showEditDataClientModal, setShowEditDataClientModal] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
     const [showProductModal, setShowProductModal] = useState(false);
@@ -75,11 +89,32 @@ function ClientInterface() {
             setShowSpinner(false);
         }
     }, [isDeleting]);
-
     const [productData, setProductData] = useState([])
     const openEditProductModal = (index) => {
         setProductData(DebtData[index])
         setShowEditProductModal(true)
+    }
+    const [edit_entrega_data, setEdit_entrega_data] = useState({
+        idDebt: "",
+        tope_maximo: "",
+        fecha_entrega: "",
+        uuid_cliente: ""
+    })
+
+    const prepareEditDeliverData = (index) => {
+        const deliverHookData = deliverData[index]
+        setIsUpdatingDeliver(true)
+        setEdit_entrega_data({
+            idDebt: deliverHookData.id,
+            tope_maximo: monto_total - saldoRestante,
+            fecha_entrega: deliverHookData.fecha_entrega,
+            uuid_cliente: deliverHookData.uuid_cliente
+        })
+
+        if (edit_entrega_data) {
+            openMakeDeliveryModal()
+        }
+
     }
 
     const openMakeDeliveryModal = () => {
@@ -115,14 +150,13 @@ function ClientInterface() {
         await cancelDebt()
     }
 
-    const cancelDelete = () => {
-        message.success('Operación cancelada');
-    };
+    // const cancelDelete = () => {
+    //     message.success('Operación cancelada');
+    // };
 
     const total = () => {
         let totalPesos = 0;
         let totalUsdInPesos = 0
-
         DebtData && DebtData.forEach(element => {
             const price = parseFloat(element.price)
             const quantity = parseInt(element.quantity)
@@ -130,7 +164,7 @@ function ClientInterface() {
             if (element.change === "ars") {
                 totalPesos += price * quantity
             } else if (element.change === "usd") {
-                totalUsdInPesos += price * 1450
+                totalUsdInPesos += (price * quantity) * 1500
             }
         });
         return {
@@ -144,14 +178,16 @@ function ClientInterface() {
             showDebtUser()
             fetchRegisterDeliverys()
         }
-      }, [clientData,userUUID])
+    }, [clientData, userUUID])
 
     const calcularMonto = (price, quantity, moneda) => {
         if (moneda === "ars") {
             return `$${price * quantity}`;
         } else if (moneda === "usd") {
+
             return `$${(price * quantity) * 1500}`;
         }
+
         return 0;
     };
 
@@ -165,161 +201,178 @@ function ClientInterface() {
         return acc;
     }, {});
 
-    useEffect(()=>{
+
+    useEffect(() => {
         if (totalGeneral - saldoRestante === 0 && DebtData.length > 0) {
             confirmCancellDebt()
-        }else{
-            console.log("No hay que cancelar")
-
         }
-    },[totalGeneral,saldoRestante, DebtData])
+    }, [totalGeneral, saldoRestante, DebtData])
+
+    let monto_total = 0
+
+    Object.keys(groupedHistory).reverse().map((date, index) => {
+        let totalPesos = 0
+        let totalUsd = 0
+        groupedHistory[date].map((debt, debtIndex) => {
+            
+            if (debt.change === "ars") {
+                totalPesos += debt.price * debt.quantity
+            } else if (debt.change === "usd") {
+
+                totalUsd += (debt.price * debt.quantity) * 1500
+            }
+
+            return monto_total = totalPesos + totalUsd;
+        })
+    })
 
 
+    //para mañana implementar lo de eliminar entregas
 
     return (
         <div className='container'>
             <div className='columns '>
                 <div className="column">
-                {clientData && clientData.length > 0 ? (
-                    clientData.map((item, index) => (
-                        <div key={index} className='column custom__column-clientInterface is-background-white is-color-white'>
-                            <div className="field ">
-                                <div className="box is-background-white">
+                    {clientData && clientData.length > 0 ? (
+                        clientData.map((item, index) => (
+                            <div key={index} className='column custom__column-clientInterface is-background-white is-color-white'>
+                                <div className="field ">
+                                    <div className="box is-background-white">
 
-                                    <div className="table-container ">
-                                        <div className="table is-fullwidth is-bordered is-hoverable custom-table">
-                                            <thead>
-                                                <tr>
-                                                    <th className='is-background-white is-color-black '>
-                                                    <p className='title has-text-weight-bold is-color-black'>Cliente: {item.nombre_completo || "No hay datos"} {item.apodo ? `(${item.apodo})` : ""}</p>
+                                        <div className="table-container ">
+                                            <div className="table is-fullwidth is-bordered is-hoverable custom-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th className='is-background-white is-color-black '>
+                                                            <p className='title has-text-weight-bold is-color-black'>Cliente: {item.nombre_completo || "No hay datos"} {item.apodo ? `(${item.apodo})` : ""}</p>
 
 
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td className='is-background-white is-color-black'>
-                                                        {DebtData && DebtData.length > 0 ? <button className='button is-link m-2 is-size-5' onClick={openMakeDeliveryModal}>Hacer entrega</button> : ""}
-                                                        <button className='button m-1 is-background-black is-color-white m-2 is-size-5' onClick={handleEditModal}>Editar datos</button>
-                                                        {totalGeneral - saldoRestante === 0 && DebtData.length > 0 ? "" : <button className='button m-1 is-background-black is-color-white m-2 is-size-5' onClick={handleProductModal}>Añadir un producto</button>}
-                                                        <button className='button is-background-black is-color-white m-2 is-size-5' onClick={handleShowModalHistory}>Revisar historial</button>
-                                                        {/* {DebtData && DebtData.length > 0 ? <button className='button m-1 is-background-black is-color-white m-2 is-size-5' onClick={openDeliverRegisterModal}>Ver registro de entregas</button> : ""} */}
-                                                        
-                                                    </td>
-                                                </tr>
-                                            </tbody>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td className='is-background-white is-color-black'>
+                                                            {DebtData && DebtData.length > 0 ? <button className='button is-link m-2 is-size-5' onClick={openMakeDeliveryModal}>Hacer entrega</button> : ""}
+                                                            <button className='button m-1 is-background-black is-color-white m-2 is-size-5' onClick={handleEditModal}>Editar datos</button>
+                                                            {totalGeneral - saldoRestante === 0 && DebtData.length > 0 ? "" : <button className='button m-1 is-background-black is-color-white m-2 is-size-5' onClick={handleProductModal}>Añadir un producto</button>}
+                                                            <button className='button is-background-black is-color-white m-2 is-size-5' onClick={handleShowModalHistory}>Revisar historial</button>
+                                                            {/* {DebtData && DebtData.length > 0 ? <button className='button m-1 is-background-black is-color-white m-2 is-size-5' onClick={openDeliverRegisterModal}>Ver registro de entregas</button> : ""} */}
+
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                {DebtData.length > 0 ?
+                                    <div className='custom-table-container__debts'>
+                                        {showSectionDebt && (
+                                            <>
+                                                {Object.keys(groupedHistory)
+                                                    .reverse() // Si deseas mostrar las tablas en orden descendente por fecha
+                                                    .map((date, index) => (
+                                                        <div key={index} className="table-container">
+                                                            <table className="table is-fullwidth is-bordered is-hoverable">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Producto/detalle</th>
+                                                                        <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Monto/codigo</th>
+                                                                        <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Cantidad</th>
+                                                                        <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Total</th>
+                                                                        <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Saldo total: ${totalGeneral - saldoRestante}</th>
+                                                                        <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Fecha de compra: {date}</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                {fetchingData && <LinearProgress />}
+                                                                {!fetchingData && (
+                                                                    <tbody>
+                                                                        {groupedHistory[date].map((debtItem, debtIndex) => (
+                                                                            <tr key={debtIndex}>
+                                                                                <td className='is-size-5 is-background-white is-color-black'>x{debtItem.quantity} {(debtItem.nameProduct).replace(/X|x/g, '')}</td>
+                                                                                <td className='is-size-5 is-background-white is-color-black'>
+                                                                                    {debtItem.change === "usd" ? `x${debtItem.price} c/u` : ""}
+                                                                                    {debtItem.change === "ars" ? `$${debtItem.price} c/u` : ""}
+                                                                                </td>
+                                                                                <td className='is-size-5 is-background-white is-color-black'>
+                                                                                    {debtItem.quantity} unidades
+                                                                                </td>
+                                                                                <td className='is-size-5 is-background-white is-color-black'>
+                                                                                    {calcularMonto(debtItem.price, debtItem.quantity, debtItem.change)}
+                                                                                </td>
+                                                                                <td className='is-background-white is-color-black'></td>
+                                                                                <td className='is-background-white is-color-black'></td>
+                                                                                <td className='is-background-white is-color-black'>
+                                                                                    <div className="control">
+                                                                                        <button className="button is-warning m-2" onClick={() => openEditProductModal(debtIndex)}>Intercambiar</button>
+                                                                                    </div>
+                                                                                </td>
+                                                                            </tr>
+                                                                        ))}
+                                                                    </tbody>
+                                                                )}
+                                                            </table>
+                                                        </div>
+                                                    ))}
+                                            </>
+                                        )}
+                                    </div>
+                                    :
+                                    <React.Fragment>
+                                        <div className="box">
+                                            <div className="title is-size-5">El cliente no tiene deudas</div>
+                                        </div>
+                                    </React.Fragment>
+                                }
                             </div>
-                            {DebtData.length > 0 ? 
-                            <div className='custom-table-container__debts'>
-                                {showSectionDebt && (
-                                <>
-                                {Object.keys(groupedHistory)
-                .reverse() // Si deseas mostrar las tablas en orden descendente por fecha
-                .map((date, index) => (
-                    <div key={index} className="table-container">
-                        <table className="table is-fullwidth is-bordered is-hoverable">
-                            <thead>
-                                <tr>
-                                    <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Producto/detalle</th>
-                                    <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Monto/codigo</th>
-                                    <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Cantidad</th>
-                                    <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Total</th>
-                                    <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Saldo total: ${totalGeneral - saldoRestante}</th>
-                                    <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Fecha de compra: {date}</th>
-                                </tr>
-                            </thead>
-                            {fetchingData && <LinearProgress />}
-                            {!fetchingData && (
-                                <tbody>
-                                    {groupedHistory[date].map((debtItem, debtIndex) => (
-                                        <tr key={debtIndex}>
-                                            <td className='is-size-5 is-background-white is-color-black'>x{debtItem.quantity} {debtItem.nameProduct}</td>
-                                            <td className='is-size-5 is-background-white is-color-black'>
-                                                {debtItem.change === "usd" ? `x${debtItem.price} c/u` : ""}
-                                                {debtItem.change === "ars" ? `$${debtItem.price} c/u` : ""}
-                                            </td>
-                                            <td className='is-size-5 is-background-white is-color-black'>
-                                                {debtItem.quantity} unidades
-                                            </td>
-                                            <td className='is-size-5 is-background-white is-color-black'>
-                                                {calcularMonto(debtItem.price, debtItem.quantity, debtItem.change)}
-                                            </td>
-                                            <td className='is-background-white is-color-black'></td>
-                                            <td className='is-background-white is-color-black'></td>
-                                            <td className='is-background-white is-color-black'>
-                                                <div className="control">
-                                                    <button className="button is-warning m-2" onClick={() => openEditProductModal(debtIndex)}>Intercambiar</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            )}
-                        </table>
-                    </div>
-                ))}
-                                </>
-                            )}
-                            </div>
-                            : 
-                            <React.Fragment>
-                                <div className="box">
-                                    <div className="title is-size-5">El cliente no tiene deudas</div>
-                                </div>
-                            </React.Fragment>
-                            }
-                        </div>
-                    ))
-                ) : (
-                    <p>No hay nada que visualizar</p>
-                )}
-                </div>
-                {deliverData && deliverData.length > 0 ?
-                 <React.Fragment>
-                    <div className="column custom-column-deliverys">
-                        <h1 className='title is-size-5 box m-3'>Entregas</h1>
-                    {fetchingDeliverys ? (
-                    <LinearProgress />
+                        ))
                     ) : (
-                    deliverData.length > 0 ? (
-                        <div className="table-container">
-                        <table className="table is-fullwidth is-bordered is-hoverable">
-                            <thead>
-                            <tr>
-                                <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Fecha</th>
-                                <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Monto entregado</th>
-                                <td className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Saldo total: ${totalGeneral - saldoRestante}</td>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {deliverData
-                                // .slice() // copia de array para evitar mutaciones
-                                // .reverse()
-                                .map((item, index) => (
-                                <React.Fragment key={index}>
-                                    <tr>
-                                    <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>{item.fecha_entrega}</td>
-                                    <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>${item.monto_entrega}
-                                        {index === deliverData.length -1 ? <span className='tag is-danger is-size-6 ml-5 m-1'>Ultima entrega</span> : ""}
-                                    </td>
-                                    <td className='is-background-white'></td>
-                                    </tr>
-                                </React.Fragment>
-                                ))}
-                            </tbody>
-                        </table>
-                        </div>
-                    ) : (
-                        <p id='deliverRegister__p' className='box is-size-5'>No hay entregas</p>
-                    )
+                        <p>No hay nada que visualizar</p>
                     )}
                 </div>
-                 </React.Fragment>
-                : ""}
+                {deliverData && deliverData.length > 0 ?
+                    <React.Fragment>
+                        <div className="column custom-column-deliverys">
+                            <h1 className='title is-size-5 box m-3'>Entregas</h1>
+                            {fetchingDeliverys ? (
+                                <LinearProgress />
+                            ) : (
+                                deliverData.length > 0 ? (
+                                    <div className="table-container">
+                                        <table className="table is-fullwidth is-bordered is-hoverable">
+                                            <thead>
+                                                <tr>
+                                                    <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Fecha</th>
+                                                    <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Monto entregado</th>
+                                                    <td className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Saldo total: ${totalGeneral - saldoRestante}</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {deliverData
+                                                    // .slice() // copia de array para evitar mutaciones
+                                                    // .reverse()
+                                                    .map((item, index) => (
+                                                        <React.Fragment key={index}>
+                                                            <tr>
+                                                                <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>{item.fecha_entrega}</td>
+                                                                <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>${item.monto_entrega}
+                                                                    {index === deliverData.length - 1 ? <span className='tag is-danger is-size-6 ml-5 m-1'>Ultima entrega</span> : ""}
+                                                                </td>
+                                                                <td className='is-background-white'><Button className='button ' onClick={() => prepareEditDeliverData(index)}>Editar</Button></td>
+                                                            </tr>
+                                                        </React.Fragment>
+                                                    ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    <p id='deliverRegister__p' className='box is-size-5'>No hay entregas</p>
+                                )
+                            )}
+                        </div>
+                    </React.Fragment>
+                    : ""}
 
                 {showSectionDebt && !fetchingData && DebtData.length === 0 && (
                     <section className='title is-size-5 m-5 is-color-white'>
@@ -330,13 +383,13 @@ function ClientInterface() {
                 {showEditDataClientModal && <EditDataClient closeModal={closeEditModal} />}
                 {showProductModal && <ProductModal closeModal={closeProductModal} />}
                 {showEditProductModal && <EditProducts closeModal={closeEditProductModal} dataProduct={productData} />}
-                {showMakeDeliveryModal && <MakeDeliver closeModal={closeMakeDeliveryModal} dataClient={clientData} saldo_restante={totalGeneral - saldoRestante} />}
+                {showMakeDeliveryModal && <MakeDeliver closeModal={closeMakeDeliveryModal} dataClient={clientData} saldo_restante={totalGeneral - saldoRestante} edit_entrega_data={edit_entrega_data} />}
                 {showDeliveryRegister && <ViewDeliverys closeModal={closeShowDeliveryRegister} saldo_restante={totalGeneral - saldoRestante} />}
                 {showMuchUsers && <MuchUsers closeModal={closeShowMuchUsersModal} />}
                 {showHistory && <ClientHistory closeModal={closeHistoryModal} />}
-                
+
             </div>
-            
+
         </div>
     );
 };

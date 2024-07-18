@@ -55,14 +55,14 @@
 
 
 .custom-column-deliverys{
-    border: 2px solid rgb(255, 0, 0);
+    border: 2px solid black;
     border-radius: 5px;
     padding: .5rem;
     margin: .5rem;
     margin-top: 6rem;
     margin-bottom: 2rem;
     height: 565px;
-    overflow: auto;
+    overflow:auto;
     width: 100%;
 
 }
@@ -74,4 +74,5 @@
     border-radius: 5px;
     padding: .5rem;
     width: 100%;
+
 }

@@ -1,4 +1,6 @@
 .home__wrapper{
+    display: flex;
+    flex-direction: column;
     height: auto;
     border: 2px solid black;
     
@@ -7,6 +9,7 @@
     background: #0c0d24;
     margin-top: 5em;
     padding: 1em;
+   
 
 }
 

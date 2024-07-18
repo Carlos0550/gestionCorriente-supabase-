@@ -1,14 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react'
 import "./navbar.css"
 import { useAppContext } from '../context'
+import { IoSettings } from "react-icons/io5";
+import SettingsModal from './SettingsModal';
+
 function Navbar() {
 const {closeSession,isClossing} = useAppContext()
+const [openModalSettings, setOpenModalSettings] = useState(false)
+const openSettings = () =>{
+  setOpenModalSettings(!openModalSettings)
+}
   return (
     <>
       <header className='header'>
         <h1 className='logo'>Gestión Corriente</h1>
         <nav className='navbar'>
-          
+          <IoSettings style={{fontSize: "2rem", cursor: "pointer"}} fill='#ffffff' onClick={openSettings}/>
           <button className='button custom__button-logout' disabled={isClossing} style={{backgroundColor: isClossing ? "grey" : ""}} onClick={closeSession}>{isClossing ? "Aguarde...":"Cerrar Sesión"}</button>
         </nav>
 
@@ -27,6 +34,7 @@ const {closeSession,isClossing} = useAppContext()
           </nav>
         </form> */}
       </header>
+      {openModalSettings ? <SettingsModal closeModal={()=> openSettings()}/> : ""}
     </>
   )
 }

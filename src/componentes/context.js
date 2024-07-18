@@ -21,6 +21,21 @@ export const useAppContext = () => {
 
 export const AppContextProvider = ({ children }) => {
   const navigate = useNavigate()
+
+  useEffect(()=>{
+    const validateSessionToken = async () =>{
+      const {data: {session} } = await supabase.auth.getSession()
+      if (!session) {
+        navigate('/user-login')
+      }
+
+      const interval = setInterval(validateSessionToken, 30000)
+      validateSessionToken()
+      return () => clearInterval(interval)
+    }
+  },[navigate])
+
+
   const date = new Date();
 
     let año = date.getFullYear()
@@ -128,13 +143,21 @@ export const AppContextProvider = ({ children }) => {
 
       if (error) {
         message.error("Ocurrió un error, verifique su conexión e intente nuevamente")
-        throw error;
+        console.log(error)
 
       } else {
         message.success("Usuario creado con exito")
       }
+      let nombre_completo = values.fullName
+      let nombreMinuscula = nombre_completo.toLowerCase()
+      console.log(nombreMinuscula)
+      await findUser({
+        fullName: nombreMinuscula
+      })
+
     } catch (error) {
       message.error("Ocurrió un error, verifique su conexión e intente nuevamente")
+      console.log(error)
     } finally {
       setIsCreating(false);
     }
@@ -143,6 +166,8 @@ export const AppContextProvider = ({ children }) => {
   const [searching, setSearching] = useState(false)
   const [userNotExist, setUserNotExist] = useState(false)
   const [clientData, setClientData] = useState([])
+  const [DebtData, setDebtData] = useState([]);
+  const [deliverData, setDeliverData] = useState([]);
 
   const findUser = async (values) => {
     setSearching(true)
@@ -159,6 +184,8 @@ export const AppContextProvider = ({ children }) => {
         setSearching(false)
         if (data.length > 0) {
           setClientData(data)
+          setDebtData([])
+          setDeliverData([])
         } else {
           message.error("No existe un cliente con esos datos")
           setUserNotExist(true)
@@ -177,6 +204,8 @@ export const AppContextProvider = ({ children }) => {
         setSearching(false)
         if (data.length > 0) {
           setClientData(data)
+          setDebtData([])
+          setDeliverData([])
 
         } else {
           message.error("No existe un cliente con esos datos")
@@ -249,7 +278,6 @@ export const AppContextProvider = ({ children }) => {
         .from('debts')
         .insert({
           "nombre_cliente": values.nombre_cliente,
-          "apellido_cliente": values.apellido_cliente,
 
           "buyDate": values.buyDate,
           "nameProduct": values.nameProduct,
@@ -279,7 +307,6 @@ export const AppContextProvider = ({ children }) => {
   }
   const [isDeleting, setIsDeleting] = useState(false);
   const [fetchingData, setFetchingData] = useState(false);
-  const [DebtData, setDebtData] = useState([]);
 
   const deleteProduct = async (debtId) => {
     setIsDeleting(true);
@@ -366,7 +393,6 @@ export const AppContextProvider = ({ children }) => {
   }
 
   const [fetchingDeliverys, setFetchingDelierys] = useState(false)
-  const [deliverData, setDeliverData] = useState([]);
   const fetchRegisterDeliverys = async () => {
     setFetchingDelierys(true)
     try {
@@ -391,6 +417,34 @@ export const AppContextProvider = ({ children }) => {
 
     } finally {
       setFetchingDelierys(false)
+    }
+  }
+
+  const [isUpdatingDeliver, setIsUpdatingDeliver] = useState(false)
+  const [isSendingUpdatingDeliver, setIsSendingUpdatingDeliver] = useState(false)
+  const updateDeliver = async(values) =>{
+    setIsSendingUpdatingDeliver(true)
+    console.log(values)
+    try {
+      const { error } = await supabase 
+      .from('registerDelierys')
+      .update({
+        'monto_entrega': values.monto_entrega
+      })
+      .eq("id", values.idDebt)
+
+      if (error) {
+        message.error("Ocurrio un error al actualizar la entrega, por favor intente nuevamente")
+        console.log(error)
+      }
+      setIsSendingUpdatingDeliver(false)
+      showDebtUser();
+      fetchRegisterDeliverys();
+      
+    } catch (error) {
+      console.log(error)
+    }finally{
+      setIsSendingUpdatingDeliver(false)
     }
   }
 
@@ -551,7 +605,7 @@ if (!isOnlime) {
       showDebtUser, fetchingData, DebtData, setDebtData,
       deleteProduct, isDeleting, userUUID,
       updateProduct, isUpdatingProduct,
-      insertDebtTables, isInserting,
+      insertDebtTables, isInserting, setIsUpdatingDeliver, isUpdatingDeliver,updateDeliver,isSendingUpdatingDeliver,
       fetchRegisterDeliverys, deliverData, fetchingDeliverys,
       cancelDebt,
       fetchHistoryClient, clientHistory,fetchingHistory,
