@@ -174,6 +174,9 @@ export const AppContextProvider = ({ children }) => {
     setSearching(true);
     setDebtData([])
     setDeliverData([])
+    setClientData([])
+    setUserUUID([])
+    setClientHistory([])
   
     try {
       let data, error;
@@ -206,7 +209,7 @@ export const AppContextProvider = ({ children }) => {
         setUserNotExist(true);
         setTimeout(() => {
           setUserNotExist(false);
-        }, 8000); // Ajusta este tiempo según sea necesario
+        }, 8000); 
       }
     } catch (error) {
       message.error("Hubo un error, por favor intente nuevamente");
@@ -245,10 +248,7 @@ export const AppContextProvider = ({ children }) => {
       if (error) {
         message.error("Hubo un error al actualizar, reintente nuevamente")
       } else {
-        message.info("Usuario actualizdo, esta página se actualizará en 3 segundos...")
-        setTimeout(() => {
-          window.location.reload()
-        }, 3000);
+        
       }
     } catch (error) {
       console.log(error)
@@ -341,9 +341,7 @@ export const AppContextProvider = ({ children }) => {
         message.success("Actualizacion exitosa")
         showDebtUser()
         fetchRegisterDeliverys()
-        showDebtUser()
         setIsUpdatingProduct(false)
-
       }
     } catch (error) {
       console.log(error)
