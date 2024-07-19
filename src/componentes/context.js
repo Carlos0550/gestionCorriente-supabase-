@@ -172,7 +172,8 @@ export const AppContextProvider = ({ children }) => {
 
   const findUser = async (values) => {
     setSearching(true);
-    console.log(values);
+    setDebtData([])
+    setDeliverData([])
   
     try {
       let data, error;
@@ -267,7 +268,6 @@ export const AppContextProvider = ({ children }) => {
         .from('debts')
         .insert({
           "nombre_cliente": values.nombre_cliente,
-
           "buyDate": values.buyDate,
           "nameProduct": values.nameProduct,
           "quantity": values.quantity,
