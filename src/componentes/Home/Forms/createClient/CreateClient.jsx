@@ -47,9 +47,10 @@ function CreateClient() {
   };
 
   return (
-    <div className="container custom__container-createUser">
-      <h1 className="title is-color-black">Crear ficha de cliente</h1>
+    <div className=" custom__container-createUser">
       <form onSubmit={validateForm} className="form-createClient">
+      <h1 className="title is-color-black">Crear ficha de cliente</h1>
+
         <div className="columns">
           <div className="column">
             <div className="field">
@@ -66,7 +67,25 @@ function CreateClient() {
               </span>
             </div>
 
+            
+
             <div className="field">
+              <label className="label is-color-black is-size-5">Apodo:</label>
+              <input
+                type="text"
+                name="apodo"
+                value={values.apodo}
+                className="input"
+                onChange={handleInputChange}
+              />
+              <span className="tag is-warning is-color-white is-size-6 is-color-black m-2">
+                Recomendado
+              </span>
+            </div>
+          </div>
+
+          <div className="column">
+          <div className="field">
               <label className="label is-color-black is-size-5">DNI:</label>
               <input
                 type="text"
@@ -85,16 +104,16 @@ function CreateClient() {
             </div>
 
             <div className="field">
-              <label className="label is-color-black is-size-5">Apodo:</label>
+              <label className="label is-color-black is-size-5">Dirección:</label>
               <input
                 type="text"
-                name="apodo"
-                value={values.apodo}
+                name="street"
+                value={values.street}
                 className="input"
                 onChange={handleInputChange}
               />
-              <span className="tag is-warning is-color-white is-size-6 is-color-black m-2">
-                Recomendado
+              <span className="tag is-normal is-color-white is-size-6 is-background-black m-2">
+                Opcional
               </span>
             </div>
           </div>
@@ -114,19 +133,7 @@ function CreateClient() {
               </span>
             </div>
 
-            <div className="field">
-              <label className="label is-color-black is-size-5">Dirección:</label>
-              <input
-                type="text"
-                name="street"
-                value={values.street}
-                className="input"
-                onChange={handleInputChange}
-              />
-              <span className="tag is-normal is-color-white is-size-6 is-background-black m-2">
-                Opcional
-              </span>
-            </div>
+            
           </div>
         </div>
 

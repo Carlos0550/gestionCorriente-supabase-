@@ -13,6 +13,8 @@ html{
     overflow-x: hidden;
     background-color: #f3f5f6;
 }
+
+
 .custom__container-main{
     max-width: 100%;
     max-height: max-content;

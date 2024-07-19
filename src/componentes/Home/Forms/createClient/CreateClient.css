@@ -3,7 +3,7 @@
 .custom__container-createUser{
     display: flex;
     flex-direction: column;
-
+    width: 100%;
 }
 
 .form-createClient{
@@ -11,7 +11,8 @@
     background-color: rgb(255, 255, 255);
 
     padding: 1rem;
-    max-width: 950px;
+    width: 100%;
+    max-width: 100%;
     margin: 0 auto;
 
     border-radius: 15px;

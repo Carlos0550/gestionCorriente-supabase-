@@ -26,7 +26,8 @@ function ClientInterface() {
         fetchingDeliverys,
         setIsUpdatingDeliver, 
         isUpdatingDeliver,
-        usdPrice
+        usdPrice,
+        deleteDelivery
      } = useAppContext();
     let value = 0
     usdPrice.map(el =>{
@@ -186,14 +187,15 @@ function ClientInterface() {
     }, [clientData, userUUID])
 
     const calcularMonto = (price, quantity, moneda) => {
+        let monto;
         if (moneda === "ars") {
-            return `$${price * quantity}`;
+            monto = (price * quantity).toFixed(2);
+            return `$${monto}`;
         } else if (moneda === "usd") {
-
-            return `$${(price * quantity) * value}`;
+            monto = ((price * quantity) * value).toFixed(2);
+            return `$${monto}`;
         }
-
-        return 0;
+    
     };
 
     // Agrupación por fecha_compra
@@ -232,26 +234,25 @@ function ClientInterface() {
     })
 
 
-    //para mañana implementar lo de eliminar entregas
+    const handleDeleteDeliver = (idDeliver) =>{
+        deleteDelivery(idDeliver)
+    }
 
     return (
         <div className='container'>
-            <div className='columns '>
-                <div className="column">
+            <div className='columns'>
+                <div className='column is-12'>
                     {clientData && clientData.length > 0 ? (
                         clientData.map((item, index) => (
-                            <div key={index} className='column custom__column-clientInterface is-background-white is-color-white'>
+                            <div key={index} className='custom__column-clientInterface is-background-white is-color-white'>
                                 <div className="field ">
                                     <div className="box is-background-white">
-
-                                        <div className="table-container ">
-                                            <div className="table is-fullwidth is-bordered is-hoverable custom-table">
+                                        <div className="table-container">
+                                            <table className="table is-fullwidth is-bordered is-hoverable custom-table">
                                                 <thead>
                                                     <tr>
-                                                        <th className='is-background-white is-color-black '>
+                                                        <th className='is-background-white is-color-black'>
                                                             <p className='title has-text-weight-bold is-color-black'>Cliente: {item.nombre_completo || "No hay datos"} {item.apodo ? `(${item.apodo})` : ""}</p>
-
-
                                                         </th>
                                                     </tr>
                                                 </thead>
@@ -262,141 +263,135 @@ function ClientInterface() {
                                                             <button className='button m-1 is-background-black is-color-white m-2 is-size-5' onClick={handleEditModal}>Editar datos</button>
                                                             {totalGeneral - saldoRestante === 0 && DebtData.length > 0 ? "" : <button className='button m-1 is-background-black is-color-white m-2 is-size-5' onClick={handleProductModal}>Añadir un producto</button>}
                                                             <button className='button is-background-black is-color-white m-2 is-size-5' onClick={handleShowModalHistory}>Revisar historial</button>
-                                                            {/* {DebtData && DebtData.length > 0 ? <button className='button m-1 is-background-black is-color-white m-2 is-size-5' onClick={openDeliverRegisterModal}>Ver registro de entregas</button> : ""} */}
-
                                                         </td>
                                                     </tr>
                                                 </tbody>
-                                            </div>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
-                                {DebtData.length > 0 ?
-                                    <div className='custom-table-container__debts'>
-                                        {showSectionDebt && (
-                                            <>
-                                                {Object.keys(groupedHistory)
-                                                    .reverse() // Si deseas mostrar las tablas en orden descendente por fecha
-                                                    .map((date, index) => (
-                                                        <div key={index} className="table-container">
+                                <div className='columns'>
+                                    <div className='column '>
+                                        {DebtData.length > 0 ?
+                                            <div className='custom__container-productoClient'>
+                                                {showSectionDebt && (
+                                                    <>
+                                                        {Object.keys(groupedHistory)
+                                                            .reverse() // Si deseas mostrar las tablas en orden descendente por fecha
+                                                            .map((date, index) => (
+                                                                <div key={index} className="table-container">
+                                                                    <table className="table is-fullwidth is-bordered is-hoverable">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Producto/detalle</th>
+                                                                                <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Monto/codigo</th>
+                                                                                <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Cantidad</th>
+                                                                                <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Total</th>
+                                                                                <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Saldo total: ${totalGeneral - saldoRestante}</th>
+                                                                                <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Fecha de compra: {date}</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        {fetchingData && <LinearProgress />}
+                                                                        {!fetchingData && (
+                                                                            <tbody>
+                                                                                {groupedHistory[date].map((debtItem, debtIndex) => (
+                                                                                    <tr key={debtIndex}>
+                                                                                        <td className='is-size-5 is-background-white is-color-black'>x{debtItem.quantity} {(debtItem.nameProduct).replace(/X|x/g, '')}</td>
+                                                                                        <td className='is-size-5 is-background-white is-color-black'>
+                                                                                            {debtItem.change === "usd" ? `x${debtItem.price} c/u` : ""}
+                                                                                            {debtItem.change === "ars" ? `$${debtItem.price} c/u` : ""}
+                                                                                        </td>
+                                                                                        <td className='is-size-5 is-background-white is-color-black'>
+                                                                                            {debtItem.quantity} unidades
+                                                                                        </td>
+                                                                                        <td className='is-size-5 is-background-white is-color-black'>
+                                                                                            {calcularMonto(debtItem.price, debtItem.quantity, debtItem.change)}
+                                                                                        </td>
+                                                                                        <td className='is-background-white is-color-black'></td>
+                                                                                        <td className='is-background-white is-color-black'></td>
+                                                                                        <td className='is-background-white is-color-black'>
+                                                                                            <div className="control">
+                                                                                                <button className="button is-info m-2" onClick={() => openEditProductModal(debtIndex)}>Intercambiar</button>
+                                                                                            </div>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                ))}
+                                                                            </tbody>
+                                                                        )}
+                                                                    </table>
+                                                                </div>
+                                                            ))}
+                                                    </>
+                                                )}
+                                            </div>
+                                            :
+                                            <React.Fragment>
+                                                <div className="box">
+                                                    <div className="title is-size-5">El cliente no tiene deudas</div>
+                                                </div>
+                                            </React.Fragment>
+                                        }
+                                    </div>
+                                    <div className='column '>
+                                        {deliverData && deliverData.length > 0 ? (
+                                            <div className="custom-column-deliverys">
+                                                <h1 className='title is-size-5 box m-3'>Entregas</h1>
+                                                {fetchingDeliverys ? (
+                                                    <LinearProgress />
+                                                ) : (
+                                                    deliverData.length > 0 ? (
+                                                        <div className="table-container">
                                                             <table className="table is-fullwidth is-bordered is-hoverable">
                                                                 <thead>
                                                                     <tr>
-                                                                        <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Producto/detalle</th>
-                                                                        <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Monto/codigo</th>
-                                                                        <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Cantidad</th>
-                                                                        <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Total</th>
-                                                                        <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Saldo total: ${totalGeneral - saldoRestante}</th>
-                                                                        <th className='has-text-weight-bold is-size-5 is-background-black is-color-white'>Fecha de compra: {date}</th>
+                                                                        <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Fecha</th>
+                                                                        <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Monto entregado</th>
+                                                                        <td className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Saldo total: ${totalGeneral - saldoRestante}</td>
                                                                     </tr>
                                                                 </thead>
-                                                                {fetchingData && <LinearProgress />}
-                                                                {!fetchingData && (
-                                                                    <tbody>
-                                                                        {groupedHistory[date].map((debtItem, debtIndex) => (
-                                                                            <tr key={debtIndex}>
-                                                                                <td className='is-size-5 is-background-white is-color-black'>x{debtItem.quantity} {(debtItem.nameProduct).replace(/X|x/g, '')}</td>
-                                                                                <td className='is-size-5 is-background-white is-color-black'>
-                                                                                    {debtItem.change === "usd" ? `x${debtItem.price} c/u` : ""}
-                                                                                    {debtItem.change === "ars" ? `$${debtItem.price} c/u` : ""}
+                                                                <tbody>
+                                                                    {deliverData.map((item, index) => (
+                                                                        <React.Fragment key={index}>
+                                                                            <tr>
+                                                                                <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>{item.fecha_entrega}</td>
+                                                                                <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>${item.monto_entrega}
+                                                                                    {index === deliverData.length - 1 ? <span className='tag is-danger is-size-6 ml-5 m-1'>Ultima entrega</span> : ""}
                                                                                 </td>
-                                                                                <td className='is-size-5 is-background-white is-color-black'>
-                                                                                    {debtItem.quantity} unidades
-                                                                                </td>
-                                                                                <td className='is-size-5 is-background-white is-color-black'>
-                                                                                    {calcularMonto(debtItem.price, debtItem.quantity, debtItem.change)}
-                                                                                </td>
-                                                                                <td className='is-background-white is-color-black'></td>
-                                                                                <td className='is-background-white is-color-black'></td>
-                                                                                <td className='is-background-white is-color-black'>
-                                                                                    <div className="control">
-                                                                                        <button className="button is-warning m-2" onClick={() => openEditProductModal(debtIndex)}>Intercambiar</button>
-                                                                                    </div>
+                                                                                <td className='is-background-white'>
+                                                                                    <Button className='button m-2' onClick={() => prepareEditDeliverData(index)}>Editar</Button>
+                                                                                    <button className='button is-warning m-2' onClick={() => handleDeleteDeliver(item.id)}>Eliminar</button>
                                                                                 </td>
                                                                             </tr>
-                                                                        ))}
-                                                                    </tbody>
-                                                                )}
+                                                                        </React.Fragment>
+                                                                    ))}
+                                                                </tbody>
                                                             </table>
                                                         </div>
-                                                    ))}
-                                            </>
-                                        )}
+                                                    ) : (
+                                                        <p id='deliverRegister__p' className='box is-size-5'>No hay entregas</p>
+                                                    )
+                                                )}
+                                            </div>
+                                        ) : ""}
                                     </div>
-                                    :
-                                    <React.Fragment>
-                                        <div className="box">
-                                            <div className="title is-size-5">El cliente no tiene deudas</div>
-                                        </div>
-                                    </React.Fragment>
-                                }
+                                </div>
                             </div>
                         ))
                     ) : (
                         <p>No hay nada que visualizar</p>
                     )}
                 </div>
-                {deliverData && deliverData.length > 0 ?
-                    <React.Fragment>
-                        <div className="column custom-column-deliverys">
-                            <h1 className='title is-size-5 box m-3'>Entregas</h1>
-                            {fetchingDeliverys ? (
-                                <LinearProgress />
-                            ) : (
-                                deliverData.length > 0 ? (
-                                    <div className="table-container">
-                                        <table className="table is-fullwidth is-bordered is-hoverable">
-                                            <thead>
-                                                <tr>
-                                                    <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Fecha</th>
-                                                    <th className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Monto entregado</th>
-                                                    <td className='has-text-weight-bold is-color-white is-size-5 has-text-weigth-bold is-background-black'>Saldo total: ${totalGeneral - saldoRestante}</td>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {deliverData
-                                                    // .slice() // copia de array para evitar mutaciones
-                                                    // .reverse()
-                                                    .map((item, index) => (
-                                                        <React.Fragment key={index}>
-                                                            <tr>
-                                                                <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>{item.fecha_entrega}</td>
-                                                                <td className='has-text-weight-bold is-color-black is-size-5 has-text-weigth-bold is-background-white'>${item.monto_entrega}
-                                                                    {index === deliverData.length - 1 ? <span className='tag is-danger is-size-6 ml-5 m-1'>Ultima entrega</span> : ""}
-                                                                </td>
-                                                                <td className='is-background-white'><Button className='button ' onClick={() => prepareEditDeliverData(index)}>Editar</Button></td>
-                                                            </tr>
-                                                        </React.Fragment>
-                                                    ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                ) : (
-                                    <p id='deliverRegister__p' className='box is-size-5'>No hay entregas</p>
-                                )
-                            )}
-                        </div>
-                    </React.Fragment>
-                    : ""}
-
-                {showSectionDebt && !fetchingData && DebtData.length === 0 && (
-                    <section className='title is-size-5 m-5 is-color-white'>
-                        <strong>No hay deudas en este fichero</strong>
-                    </section>
-                )}
-
-                {showEditDataClientModal && <EditDataClient closeModal={closeEditModal} />}
-                {showProductModal && <ProductModal closeModal={closeProductModal} />}
-                {showEditProductModal && <EditProducts closeModal={closeEditProductModal} dataProduct={productData} />}
-                {showMakeDeliveryModal && <MakeDeliver closeModal={closeMakeDeliveryModal} dataClient={clientData} saldo_restante={totalGeneral - saldoRestante} edit_entrega_data={edit_entrega_data} />}
-                {showDeliveryRegister && <ViewDeliverys closeModal={closeShowDeliveryRegister} saldo_restante={totalGeneral - saldoRestante} />}
-                {showMuchUsers && <MuchUsers closeModal={closeShowMuchUsersModal} />}
-                {showHistory && <ClientHistory closeModal={closeHistoryModal} />}
-
             </div>
-
+    
+            {showEditDataClientModal && <EditDataClient closeModal={closeEditModal} />}
+            {showProductModal && <ProductModal closeModal={closeProductModal} />}
+            {showEditProductModal && <EditProducts closeModal={closeEditProductModal} dataProduct={productData} />}
+            {showMakeDeliveryModal && <MakeDeliver closeModal={closeMakeDeliveryModal} dataClient={clientData} saldo_restante={totalGeneral - saldoRestante} edit_entrega_data={edit_entrega_data} />}
+            {showDeliveryRegister && <ViewDeliverys closeModal={closeShowDeliveryRegister} saldo_restante={totalGeneral - saldoRestante} />}
+            {showMuchUsers && <MuchUsers closeModal={closeShowMuchUsersModal} />}
+            {showHistory && <ClientHistory closeModal={closeHistoryModal} />}
         </div>
     );
-};
+}       
 
 export default ClientInterface;

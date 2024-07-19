@@ -5,6 +5,7 @@ import { v4 } from "uuid";
 import { message } from 'antd';
 import Item from "antd/es/list/Item";
 import Networck from "./Network/Networck";
+import Swal from "sweetalert2";
 
 
 export const AppContext = createContext();
@@ -469,6 +470,71 @@ export const AppContextProvider = ({ children }) => {
   const [debts, setDebts] = useState([]);
   const [registers, setRegisters] = useState([]);
 
+  const deleteDelivery = async (val) => {
+    console.log(val);
+    Swal.fire({
+      title: "Eliminar esta entrega?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, eliminar"
+    }).then(async (result) => {  // Asegúrate de usar async aquí
+      if (result.isConfirmed) {
+        const hideMessage = message.loading("Aguarde...",0);
+  
+        try {
+          const { error } = await supabase  // Asegúrate de esperar esta operación
+            .from("registerDelierys")
+            .delete()
+            .eq('id', val);
+  
+          if (!error) {
+            hideMessage()
+            const Toast = Swal.mixin({
+              toast: true,
+              position: "top-end",
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: false,
+              didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+              }
+            });
+            Toast.fire({
+              icon: "success",
+              title: "Producto eliminado correctamente"
+            });
+            fetchRegisterDeliverys()
+            
+          } else {
+            throw new Error("Hubo un error al procesar la solicitud");
+          }
+        } catch (error) {
+          hideMessage()
+          console.error(error);
+          const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          });
+          Toast.fire({
+            icon: "error",
+            title: "Hubo un error al procesar la solicitud"
+          });
+        }
+      }
+    });
+  }
+  
+
   const cancelDebt = async () => {
     
     message.loading("Cancelando fichero, aguarde...");
@@ -624,7 +690,7 @@ if (!isOnlime) {
       updateProduct, isUpdatingProduct,
       insertDebtTables, isInserting, setIsUpdatingDeliver, isUpdatingDeliver,updateDeliver,isSendingUpdatingDeliver,
       fetchRegisterDeliverys, deliverData, fetchingDeliverys,
-      cancelDebt,
+      cancelDebt,deleteDelivery,
       fetchHistoryClient, clientHistory,fetchingHistory,
       usdPrice,setUsdPrice,
       activateLoader, progress,fullDate

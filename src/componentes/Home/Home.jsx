@@ -14,7 +14,7 @@ function Home() {
 
   return (
     <>
-      <div className="container home__wrapper is-background-white ">
+      <div className=" home__wrapper is-background-white ">
         <Navbar />
         <div className="columns ">
           <div className="column ">

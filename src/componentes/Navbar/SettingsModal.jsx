@@ -13,25 +13,26 @@ const SettingsModal = ({ closeModal }) => {
   };
 
   const handleSaveConfig = async () => {
-    message.loading("Guardando...");
     if (!usdValue) {
       message.error("El valor del dólar no puede estar vacío");
       return;
     }
 
     try {
+      const hideMessage = message.loading("Aguarde...",0);
+
       const { data,error } = await supabase
+      
         .from('usdPrice')
         .update({ 
             value: usdValue
          })
         .eq('id', 1)
         .select()
-
-        console.log(error)
-        console.log(data)
+        
       if (error) {
         message.error("Hubo un error, por favor intente nuevamente");
+        hideMessage()
       } else {
         message.success("Dólar guardado");
         setUsdPrice([
@@ -39,6 +40,8 @@ const SettingsModal = ({ closeModal }) => {
                 value: usdValue
             }
         ])
+        closeModal()
+        hideMessage()
       }
     } catch (error) {
       console.error("Error guardando el valor del dólar:", error);

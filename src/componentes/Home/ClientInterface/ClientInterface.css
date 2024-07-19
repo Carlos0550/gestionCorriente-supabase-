@@ -1,78 +1,33 @@
-.custom__column-clientInterface{
-    border: 2px solid #ffffff;
+.custom__column-clientInterface {
     margin: .5rem;
+    width: 100%;
     margin-top: 2rem;
     border-radius: 15px;
-}
-
-.custom__container-productoClient{
-    border: 2px solid #ffffff;
-    padding: 1rem;
-    margin: .5rem;
-    margin-top: 1rem;
-    border-radius: 15px;
-    box-shadow: 5px 5px 10px rgba(255, 250, 250, 0.144);
-
-}
-
-
-
-.custom__column-clientInterface {
-    color: #fff;
     display: flex;
-    width: 100%;
     flex-direction: column;
     align-items: center;
-    align-content: center;
+}
+
+.custom__container-productoClient {
+    border: 2px solid #000000;
+    padding: 1.5rem;
+    margin: .5rem;
+    border-radius: 15px;
+    display: flex;
+    
+    flex-direction: column;
+    align-items: center;
+}
+
+
+.custom-column-deliverys {
+    border: 2px solid #000000;
+    padding: 1.5rem;
+
+    border-radius: 15px;
+    padding: 1rem;
 }
 
 .table-container {
-    margin-top: 20px;
-}
-
-
-
-.custom-table{
-    
-    background-color: white;
-}
-
-.table th, .table td {
-    background-color: #222;
-    color: #fff;
-    text-align: center;
-    padding: 10px;
-}
-
-.button.is-background-white {
-    background-color: white;
-}
-
-.button.is-color-black {
-    color: black;
-}
-
-
-
-.custom-column-deliverys{
-    border: 2px solid black;
-    border-radius: 5px;
-    padding: .5rem;
-    margin: .5rem;
-    margin-top: 6rem;
-    margin-bottom: 2rem;
-    height: 565px;
-    overflow:auto;
-    width: 100%;
-
-}
-
-.custom-table-container__debts{
-    overflow: auto;
-    height: 500px;
-    border: 2px solid black;
-    border-radius: 5px;
-    padding: .5rem;
-    width: 100%;
-
+    margin: 1rem 0;
 }
