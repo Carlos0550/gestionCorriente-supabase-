@@ -536,8 +536,7 @@ export const AppContextProvider = ({ children }) => {
   
 
   const cancelDebt = async () => {
-    
-    message.loading("Cancelando fichero, aguarde...");
+    const hideMessage = message.loading("Cancelando fichero, aguarde...",0);
     try {
       const { data: registerData, error: registerError } = await supabase
         .from("registerDelierys") // Asegúrate del nombre correcto
@@ -546,6 +545,8 @@ export const AppContextProvider = ({ children }) => {
   
       if (registerError) {
         console.log(registerError);
+        hideMessage()
+        message.error("Hubo un error al procesar la solicitud, por favor intente nuevamente")
         throw registerError;
       }
   
@@ -556,6 +557,8 @@ export const AppContextProvider = ({ children }) => {
   
       if (debtsError) {
         console.log(debtsError);
+        hideMessage()
+        message.error("Hubo un error al procesar la solicitud, por favor intente nuevamente")
         throw debtsError;
       }
   
@@ -582,6 +585,8 @@ export const AppContextProvider = ({ children }) => {
   
         if (insertError) {
           console.log(insertError);
+          hideMessage()
+          message.error("Hubo un error al procesar la solicitud, por favor intente nuevamente")
           throw insertError;
         }
   
@@ -591,6 +596,8 @@ export const AppContextProvider = ({ children }) => {
           .eq("uuid_cliente", userUUID);
   
         if (deleteRegisterError) {
+          hideMessage()
+          message.error("Hubo un error al procesar la solicitud, por favor intente nuevamente")
           throw deleteRegisterError;
         }
   
@@ -600,9 +607,11 @@ export const AppContextProvider = ({ children }) => {
           .eq("uuid", userUUID);
   
         if (deleteDebtsError) {
+          hideMessage()
+          message.error("Hubo un error al procesar la solicitud, por favor intente nuevamente")
           throw deleteDebtsError;
         }
-  
+        hideMessage()
         message.success("Fichero cancelado");
         setDebtData([]);
         setDeliverData([]);
@@ -615,6 +624,8 @@ export const AppContextProvider = ({ children }) => {
     } catch (error) {
       console.error("Error cancelando deuda:", error);
       message.error("Error cancelando deuda");
+    }finally{
+      hideMessage()
     }
   };
   

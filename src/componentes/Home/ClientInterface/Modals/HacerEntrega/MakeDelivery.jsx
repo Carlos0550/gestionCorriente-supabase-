@@ -80,7 +80,7 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
                       </label>
                     </td>
                     <td>
-                      <p className='title is-size-4 has-text-weight-bold has-text-white'>
+                      <p className='title is-size-4 has-text-weight-bold has-text-black m-4'>
                         ${saldo_restante}
                       </p>
                     </td>
