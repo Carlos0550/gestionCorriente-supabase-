@@ -171,59 +171,50 @@ export const AppContextProvider = ({ children }) => {
   const [deliverData, setDeliverData] = useState([]);
 
   const findUser = async (values) => {
-    setSearching(true)
-    console.log(values)
+    setSearching(true);
+    console.log(values);
+  
     try {
+      let data, error;
+  
       if (values.fullName && !values.dni) {
-        
-        const { data, error } = await supabase
+        const normalizedFullName = `%${values.fullName.trim().toLowerCase()}%`;
+        ({ data, error } = await supabase
           .from('users')
           .select()
-          .eq('nombre_completo', values.fullName.toLowerCase())
-          console.log(error)
-          console.log(data)
-        setSearching(false)
-        if (data.length > 0) {
-          setClientData(data)
-          setDebtData([])
-          setDeliverData([])
-        } else {
-          message.error("No existe un cliente con esos datos")
-          setUserNotExist(true)
-          setTimeout(() => {
-            setUserNotExist(false)
-          }, 8000)
-        }
-      }
-      if (!values.fullName && values.dni) {
-        const { data, error } = await supabase
+          .ilike('nombre_completo', normalizedFullName));
+      } else if (!values.fullName && values.dni) {
+        ({ data, error } = await supabase
           .from('users')
           .select()
-          .eq('dni', values.dni)
-        setSearching(false)
-        if (data.length > 0) {
-          setClientData(data)
-          setDebtData([])
-          setDeliverData([])
-
-        } else {
-          message.error("No existe un cliente con esos datos")
-          setUserNotExist(true)
-          setTimeout(() => {
-            setUserNotExist(false)
-          }, 3000)
-        }
+          .eq('dni', values.dni));
+      } else {
+        throw new Error("Debes proporcionar un nombre completo o un DNI.");
       }
-
-      
-
+  
+      if (error) {
+        throw new Error(error.message);
+      }
+  
+      if (data.length > 0) {
+        setClientData(data);
+        setDebtData([]);
+        setDeliverData([]);
+      } else {
+        message.error("No existe un cliente con esos datos");
+        setUserNotExist(true);
+        setTimeout(() => {
+          setUserNotExist(false);
+        }, 8000); // Ajusta este tiempo según sea necesario
+      }
     } catch (error) {
-      message.error("Hubo un error, por favor intente nuevamente")
-      console.log(error)
+      message.error("Hubo un error, por favor intente nuevamente");
+      console.log(error);
     } finally {
-      setSearching(false)
+      setSearching(false);
     }
-  }
+  };
+  
 
   const [userUUID, setUserUUID] = useState(null)
   useEffect(() => {
