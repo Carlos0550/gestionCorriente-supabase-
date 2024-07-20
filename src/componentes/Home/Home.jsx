@@ -4,10 +4,10 @@ import "./Home.css"; // Importa tus estilos CSS
 
 import CreateClient from "./Forms/createClient/CreateClient";
 import FindClient from "./Forms/FindUsers/FindClient";
+import { useAppContext } from '../context';
 
 function Home() {
-  const [selectedOption, setSelectedOption] = useState('añadirDeuda');
-
+ const {setSelectedOption, selectedOption} = useAppContext()
   const handleChangeOptions = (event) => {
     setSelectedOption(event.target.value);
   };

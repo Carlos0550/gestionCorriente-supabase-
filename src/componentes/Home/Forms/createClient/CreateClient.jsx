@@ -6,7 +6,7 @@ import { useAppContext } from '../../../context';
 import './CreateClient.css';
 
 function CreateClient() {
-  const { createUser, isCreating, userExists } = useAppContext();
+  const { createUser, isCreating, userExists,setSelectedOption } = useAppContext();
   const navigate = useNavigate();
 
   const [values, setValues] = useState({
@@ -26,7 +26,6 @@ function CreateClient() {
   };
 
   const [showAlert, setShowAlert] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false)
   const validateForm = async (ev) => {
     ev.preventDefault();
     if (!values.fullName) {
@@ -38,11 +37,9 @@ function CreateClient() {
       setShowAlert(false);
       message.loading('Creando fichero de cliente, aguarde...');
       await createUser(values);
-      setShowSuccess(true)
+      setSelectedOption("añadirDeuda")
 
-      setTimeout(() => {
-        setShowSuccess(false)
-      }, 10000); 
+    
     }
   };
 
@@ -157,7 +154,6 @@ function CreateClient() {
           >
             {isCreating ? 'Aguarde...' : 'Guardar Cliente'}
           </Button>
-          {showSuccess ? <span className='tag is-success is-size-4 has-text-weight-bold'>Usuario creado, cambie a buscar cliente para visualizar el fichero del nuevo cliente</span> : ""}
 
         </div>
       </form>

@@ -1,43 +1,83 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button, Modal, message } from 'antd';
 import "./editProducts.css"
 import { useAppContext } from '../../../../context';
 import Loader from '../../../../Loaders/Loader';
 import { useNavigate } from 'react-router-dom';
-function EditProducts({ closeModal, dataProduct }) {
-  const navigate = useNavigate()
-  const { updateProduct, isUpdatingProduct } = useAppContext()
+import { supabase } from '../../../../../Auth/supabase';
+
+function EditProducts({ closeModal, idProduct }) {
+  console.log("Recibí el id n°: ", idProduct);
+
+  const navigate = useNavigate();
+  const { updateProduct, isUpdatingProduct } = useAppContext();
+  const [dataProduct, setDataProduct] = useState([]);
+  const [newValues, setNewValues] = useState({
+    id: "",
+    change: "",
+    nameProduct: "",
+    price: "",
+    date: "",
+    quantity: ""
+  });
+
   const handleOk = () => {
     closeModal();
   };
 
-  const [hookProduct, setHookProduct] = useState({
-    
-  })
+  const findDebt = async () => {
+    const hiddenMessage = message.loading("Aguarde...", 0);
 
+    try {
+      const { data, error } = await supabase
+        .from("debts")
+        .select()
+        .eq("id", idProduct);
 
-  const [newValues, setNewValues] = useState({
-    id: dataProduct.id,
-    change: dataProduct.change,
-    nameProduct: dataProduct.nameProduct,
-    price: dataProduct.price,
-    date: dataProduct.buyDate,
-    quantity: dataProduct.quantity,
-  })
+      if (error) {
+        hiddenMessage();
+        message.error("Hubo un problema al intentar editar el producto", 3);
+        console.log(error);
+      } else if (data.length > 0) {
+        setDataProduct(data[0]);
+        hiddenMessage();
+      }
+    } catch (error) {
+      message.error("Hubo un problema al intentar editar el producto", 3);
+    } finally {
+      hiddenMessage();
+    }
+  };
 
-  useEffect(()=>{
-    
-  },[hookProduct])
+  useEffect(() => {
+    if (idProduct) {
+      findDebt();
+    }
+  }, [idProduct]);
+
+  useEffect(() => {
+    if (dataProduct) {
+      setNewValues({
+        id: dataProduct.id,
+        change: dataProduct.change,
+        nameProduct: dataProduct.nameProduct,
+        price: dataProduct.price,
+        date: dataProduct.buyDate,
+        quantity: dataProduct.quantity,
+      });
+    }
+  }, [dataProduct]);
 
   const handleInputChange = (e) => {
     const { value, name } = e.target;
     setNewValues((prevState) => ({
       ...prevState,
       [name]: value
-    }))
-  }
-  const validateForm = async(ev) => {
-    ev.preventDefault()
+    }));
+  };
+
+  const validateForm = async (ev) => {
+    ev.preventDefault();
     if (!newValues.nameProduct || !newValues.price || !newValues.change || !newValues.quantity) {
       message.error("¡No puede haber ningún campo vacío!");
       return;
@@ -47,32 +87,26 @@ function EditProducts({ closeModal, dataProduct }) {
     } else if (parseFloat(newValues.price) <= 0) {
       message.error("El precio debe ser un valor numérico mayor a 0");
       return;
-    } else if (parseInt(newValues.quantity) <= 0) {
-      message.error("La cantidad debe ser un valor numérico mayor a 0");
-      return;
-    } else if (parseFloat(newValues.price) < parseFloat(hookProduct.price)) {
-      message.error("El precio debe ser mayor o igual al producto anterior");
-      return;
     } else {
       await updateProduct(newValues);
-      closeModal()
+      closeModal();
     }
-  }
+  };
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
-        closeModal();
+      closeModal();
     }
-};
+  };
 
-useEffect(() => {
+  useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
 
-    // Cleanup listener on component unmount
     return () => {
-        window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown);
     };
-}, [navigate]);
+  }, [navigate]);
+
   return (
     <>
       <Modal
@@ -106,7 +140,7 @@ useEffect(() => {
             </div> */}
             <div className="column">
               <form className='form-addProduct'>
-              <h1 className='title is-color-white is-size-2 has-text-centered'>Editar producto</h1>
+                <h1 className='title is-color-white is-size-2 has-text-centered'>Editar producto</h1>
                 <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Nombre producto:
                   <input type="text" name='nameProduct' value={newValues.nameProduct} onChange={handleInputChange} className='input is-color-white is-background-black is-size-5' />
                 </label>
@@ -138,7 +172,7 @@ useEffect(() => {
                 </button>
               </form>
             </div>
-            
+
           </div>
         </div>
       </Modal>

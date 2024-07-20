@@ -30,7 +30,7 @@ function ClientInterface() {
         deleteDelivery
      } = useAppContext();
     let value = 0
-    usdPrice.map(el =>{
+    usdPrice.forEach(el =>{
         value += el.value
     })
     const [showEditDataClientModal, setShowEditDataClientModal] = useState(false);
@@ -95,9 +95,12 @@ function ClientInterface() {
             setShowSpinner(false);
         }
     }, [isDeleting]);
-    const [productData, setProductData] = useState([])
-    const openEditProductModal = (index) => {
-        setProductData(DebtData[index])
+    const [productId, setProductId] = useState(null);
+    const openEditProductModal = (id) => {
+        if (id) {
+            setProductId(id);
+          }
+        
         setShowEditProductModal(true)
     }
     const [edit_entrega_data, setEdit_entrega_data] = useState({
@@ -107,21 +110,21 @@ function ClientInterface() {
         uuid_cliente: ""
     })
 
-    const prepareEditDeliverData = (index) => {
-        const deliverHookData = deliverData[index]
-        setIsUpdatingDeliver(true)
-        setEdit_entrega_data({
-            idDebt: deliverHookData.id,
-            tope_maximo: monto_total - saldoRestante,
-            fecha_entrega: deliverHookData.fecha_entrega,
-            uuid_cliente: deliverHookData.uuid_cliente
-        })
+    // const prepareEditDeliverData = (index) => {
+    //     const deliverHookData = deliverData[index]
+    //     setIsUpdatingDeliver(true)
+    //     setEdit_entrega_data({
+    //         idDebt: deliverHookData.id,
+    //         tope_maximo: monto_total - saldoRestante,
+    //         fecha_entrega: deliverHookData.fecha_entrega,
+    //         uuid_cliente: deliverHookData.uuid_cliente
+    //     })
 
-        if (edit_entrega_data) {
-            openMakeDeliveryModal()
-        }
+    //     if (edit_entrega_data) {
+    //         openMakeDeliveryModal()
+    //     }
 
-    }
+    // }
 
     const openMakeDeliveryModal = () => {
         setShowMakeDeliveryModal(true)
@@ -159,7 +162,6 @@ function ClientInterface() {
     // const cancelDelete = () => {
     //     message.success('Operación cancelada');
     // };
-
     const total = () => {
         let totalPesos = 0;
         let totalUsdInPesos = 0
@@ -178,7 +180,12 @@ function ClientInterface() {
         }
     }
 
+    
+
     const { totalGeneral } = total();
+    // console.log("Saldo total: ",totalGeneral)
+    // console.log("Saldo restante: ",saldoRestante)
+
     useEffect(() => {
         if (clientData.length > 0 && userUUID) {
             showDebtUser()
@@ -221,7 +228,6 @@ function ClientInterface() {
         let totalPesos = 0
         let totalUsd = 0
         groupedHistory[date].map((debt, debtIndex) => {
-            
             if (debt.change === "ars") {
                 totalPesos += debt.price * debt.quantity
             } else if (debt.change === "usd") {
@@ -276,8 +282,9 @@ function ClientInterface() {
                                             <div className='custom__container-productoClient'>
                                                 {showSectionDebt && (
                                                     <>
+                                                    {/* {console.log(groupedHistory)} */}
                                                         {Object.keys(groupedHistory)
-                                                            .reverse() // Si deseas mostrar las tablas en orden descendente por fecha
+                                                            .reverse() 
                                                             .map((date, index) => (
                                                                 <div key={index} className="table-container">
                                                                     <table className="table is-fullwidth is-bordered is-hoverable">
@@ -311,7 +318,7 @@ function ClientInterface() {
                                                                                         <td className='is-background-white is-color-black'></td>
                                                                                         <td className='is-background-white is-color-black'>
                                                                                             <div className="control">
-                                                                                                <button className="button is-info m-2" onClick={() => openEditProductModal(debtIndex)}>Intercambiar</button>
+                                                                                                <button className="button is-info m-2" onClick={() => openEditProductModal(debtItem.id)}>Intercambiar</button>
                                                                                             </div>
                                                                                         </td>
                                                                                     </tr>
@@ -358,7 +365,7 @@ function ClientInterface() {
                                                                                     {index === deliverData.length - 1 ? <span className='tag is-danger is-size-6 ml-5 m-1'>Ultima entrega</span> : ""}
                                                                                 </td>
                                                                                 <td className='is-background-white'>
-                                                                                    <Button className='button m-2' onClick={() => prepareEditDeliverData(index)}>Editar</Button>
+                                                                                    {/* <Button className='button m-2' onClick={() => prepareEditDeliverData(index)}>Editar</Button> */}
                                                                                     <button className='button is-warning m-2' onClick={() => handleDeleteDeliver(item.id)}>Eliminar</button>
                                                                                 </td>
                                                                             </tr>
@@ -385,7 +392,7 @@ function ClientInterface() {
     
             {showEditDataClientModal && <EditDataClient closeModal={closeEditModal} />}
             {showProductModal && <ProductModal closeModal={closeProductModal} />}
-            {showEditProductModal && <EditProducts closeModal={closeEditProductModal} dataProduct={productData} />}
+            {showEditProductModal && <EditProducts closeModal={closeEditProductModal} idProduct={productId} />}
             {showMakeDeliveryModal && <MakeDeliver closeModal={closeMakeDeliveryModal} dataClient={clientData} saldo_restante={totalGeneral - saldoRestante} edit_entrega_data={edit_entrega_data} />}
             {showDeliveryRegister && <ViewDeliverys closeModal={closeShowDeliveryRegister} saldo_restante={totalGeneral - saldoRestante} />}
             {showMuchUsers && <MuchUsers closeModal={closeShowMuchUsersModal} />}

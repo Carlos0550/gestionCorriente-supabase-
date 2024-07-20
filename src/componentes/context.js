@@ -22,6 +22,8 @@ export const useAppContext = () => {
 
 export const AppContextProvider = ({ children }) => {
   const navigate = useNavigate()
+  const [selectedOption, setSelectedOption] = useState('añadirDeuda');
+
 
   useEffect(()=>{
     const validateSessionToken = async () =>{
@@ -175,7 +177,7 @@ export const AppContextProvider = ({ children }) => {
     setDebtData([])
     setDeliverData([])
     setClientData([])
-    setUserUUID([])
+    setUserUUID(null)
     setClientHistory([])
   
     try {
@@ -204,6 +206,7 @@ export const AppContextProvider = ({ children }) => {
         setClientData(data);
         setDebtData([]);
         setDeliverData([]);
+        message.success("Cliente encontrado")
       } else {
         message.error("No existe un cliente con esos datos");
         setUserNotExist(true);
@@ -222,9 +225,9 @@ export const AppContextProvider = ({ children }) => {
 
   const [userUUID, setUserUUID] = useState(null)
   useEffect(() => {
-    if (Array.isArray(clientData)) {
-      clientData && clientData.forEach(element => {
-        setUserUUID(element.uuid)
+    if (clientData) {
+      clientData.forEach(el =>{
+        setUserUUID(el.uuid)
       })
     }
   }, [clientData])
@@ -233,6 +236,7 @@ export const AppContextProvider = ({ children }) => {
   const [isUpdating, setIsUpdating] = useState(false)
   const updateDataClient = async (values) => {
     setIsUpdating(true)
+    const hiddenMessage = message.loading("Aguarde...",0)
     try {
       const { error } = await supabase
         .from('users')
@@ -246,9 +250,14 @@ export const AppContextProvider = ({ children }) => {
         .eq('uuid', values.uuid)
       setIsUpdating(false)
       if (error) {
+        hiddenMessage()
         message.error("Hubo un error al actualizar, reintente nuevamente")
       } else {
-        
+        hiddenMessage()
+        message.success("Datos actualizados correctamente")
+        await findUser({
+          fullName: values.nombre_completo
+        })
       }
     } catch (error) {
       console.log(error)
@@ -493,7 +502,7 @@ export const AppContextProvider = ({ children }) => {
             });
             Toast.fire({
               icon: "success",
-              title: "Producto eliminado correctamente"
+              title: "Entrega eliminada correctamente"
             });
             fetchRegisterDeliverys()
             
@@ -649,7 +658,7 @@ export const AppContextProvider = ({ children }) => {
     }
   }
 
-const [usdPrice, setUsdPrice] = useState(0)
+const [usdPrice, setUsdPrice] = useState([])
 useEffect(()=>{
   const handleFetchUsd = async() =>{
     const { data, error } = await supabase
@@ -693,6 +702,7 @@ if (!isOnlime) {
       cancelDebt,deleteDelivery,
       fetchHistoryClient, clientHistory,fetchingHistory,
       usdPrice,setUsdPrice,
+      setSelectedOption, selectedOption,
       activateLoader, progress,fullDate
     }}>
       {children}

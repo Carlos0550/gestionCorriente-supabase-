@@ -47,7 +47,7 @@ const EditDataClient = ({ closeModal }) => {
     }))
   }
   const [showAlert, setShowAlert] = useState(false)
-  const validateForm = (ev) =>{
+  const validateForm = async(ev) =>{
     ev.preventDefault()
     if (!hookCLientData.nombre_completo ) {
       setShowAlert(true)
@@ -56,7 +56,8 @@ const EditDataClient = ({ closeModal }) => {
       },2500)
     }else{
       setShowAlert(false)
-      updateDataClient(hookCLientData)
+      await updateDataClient(hookCLientData)
+      closeModal()
     }
   }
 
