@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import "./ClientInterface.css";
 import { useAppContext } from '../../context';
 import EditDataClient from '../Modals/EditDataClient';
@@ -9,7 +9,7 @@ import ViewDeliverys from '../Modals/ViewDeliverys';
 import MuchUsers from '../Modals/ToMuchUsers/MuchUsers';
 import { Button, message, Popconfirm, Spin } from 'antd';
 import ClientHistory from '../Modals/clientHistory/ClientHistory';
-import { LinearProgress } from '@mui/material';
+import { LinearProgress, selectClasses } from '@mui/material';
 
 function ClientInterface() {
     const { 
@@ -27,7 +27,8 @@ function ClientInterface() {
         setIsUpdatingDeliver, 
         isUpdatingDeliver,
         usdPrice,
-        deleteDelivery
+        deleteDelivery,
+        selectedOption
      } = useAppContext();
     let value = 0
     usdPrice.forEach(el =>{
@@ -244,6 +245,22 @@ function ClientInterface() {
         deleteDelivery(idDeliver)
     }
 
+    const targetRef = useRef(null);
+
+    useEffect(() => {
+        if (clientData.length > 0 && DebtData.length > 0) {
+        //   console.log('Datos cargados:', clientData);
+        //   console.log('Elemento de referencia:', targetRef.current);
+          if (targetRef.current) {
+            setTimeout(() => {
+              targetRef.current.scrollIntoView({
+                behavior: 'smooth',
+              });
+            }, 400); 
+          }
+        }
+      }, [clientData, DebtData]);
+    
     return (
         <div className='container'>
             <div className='columns'>
@@ -279,12 +296,11 @@ function ClientInterface() {
                                 <div className='columns'>
                                     <div className='column '>
                                         {DebtData.length > 0 ?
-                                            <div className='custom__container-productoClient'>
+                                            <div className='custom__container-productoClient' >
                                                 {showSectionDebt && (
                                                     <>
                                                     {/* {console.log(groupedHistory)} */}
                                                         {Object.keys(groupedHistory)
-                                                            .reverse() 
                                                             .map((date, index) => (
                                                                 <div key={index} className="table-container">
                                                                     <table className="table is-fullwidth is-bordered is-hoverable">
@@ -300,7 +316,7 @@ function ClientInterface() {
                                                                         </thead>
                                                                         {fetchingData && <LinearProgress />}
                                                                         {!fetchingData && (
-                                                                            <tbody>
+                                                                            <tbody ref={targetRef}>
                                                                                 {groupedHistory[date].map((debtItem, debtIndex) => (
                                                                                     <tr key={debtIndex}>
                                                                                         <td className='is-size-5 is-background-white is-color-black'>x{debtItem.quantity} {(debtItem.nameProduct).replace(/X|x/g, '')}</td>

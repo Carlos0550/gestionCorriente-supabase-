@@ -41,6 +41,7 @@ function EditProducts({ closeModal, idProduct }) {
       } else if (data.length > 0) {
         setDataProduct(data[0]);
         hiddenMessage();
+        
       }
     } catch (error) {
       message.error("Hubo un problema al intentar editar el producto", 3);
