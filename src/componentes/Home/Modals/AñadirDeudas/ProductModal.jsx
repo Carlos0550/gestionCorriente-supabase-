@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { Button, Modal, message } from 'antd';
-import { useAppContext } from '../../context';
-import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '../../../context';
 import "./productModal.css";
 
 const ProductModal = ({ closeModal }) => {
   const { clientData, addDebt, addingDebt, fullDate } = useAppContext();
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleOk = () => {
     setConfirmLoading(true);
@@ -37,22 +35,41 @@ const ProductModal = ({ closeModal }) => {
 
   const processProducts = async (ev) => {
     ev.preventDefault();
-
+  
+    let hasError = false; // Variable para manejar errores
+  
     // Dividir el texto en líneas usando comas y saltos de línea
     const productLines = values.products
       .toLowerCase() // Convertir todo a minúsculas
       .split(/,|\n/)
       .map(line => line.trim())
       .filter(line => line.length > 0);
-    
+  
     const productsToAdd = productLines.map(line => {
       const [quantity, ...rest] = line.split(' ');
       const restStr = rest.join(' ');
-      const [nameProduct, price] = restStr.split(/(\d+(?:\.\d+)?(?:x\d+(?:\.\d+)?)?$)/).filter(Boolean);
+  
+      // Intentar dividir el resto de la cadena en nombre y precio
+      const parts = restStr.split(/(\d+(?:\.\d+)?(?:x\d+(?:\.\d+)?)?$)/).filter(Boolean);
+  
+      // Verificar si las partes son válidas y contienen precio
+      if (parts.length < 2) {
+        hasError = true; // Marcar como error
+        return null; // Devolver null para filtrar más tarde
+      }
+  
+      const [nameProduct, price] = parts;
       const change = restStr.includes('x') ? 'usd' : 'ars';
+  
+      // Validar precio y cantidad
+      if (!price || isNaN(parseFloat(price.replace('x', '')))) {
+        hasError = true; // Marcar como error
+        return null; // Devolver null para filtrar más tarde
+      }
+  
       return {
         nameProduct: nameProduct.trim(),
-        quantity: parseInt(quantity),
+        quantity: parseInt(quantity, 10) || 1,
         price: parseFloat(price.replace('x', '')),
         change: change,
         buyDate: values.buyDate,
@@ -60,22 +77,28 @@ const ProductModal = ({ closeModal }) => {
         apellido_cliente: values.apellido_cliente,
         uuid: values.uuid
       };
-    });
-
+    }).filter(product => product !== null); // Filtrar productos inválidos
+  
     const dateRegex = /^\d{1,2}-\d{1,2}-\d{4}$/;
-
+  
     if (!values.products) {
-      message.error("El campo de productos no puede estar vacío");
+      hasError = true;
     } else if (values.buyDate && !dateRegex.test(values.buyDate)) {
-      message.error("La fecha debe tener el formato dd-mm-yyyy");
-    } else {
-      // Enviar cada producto al servidor
-      for (const product of productsToAdd) {
-        await addDebt(product);
-      }
-      closeModal();
+      hasError = true;
     }
+  
+    if (hasError) {
+      message.error("1 o más líneas están mal formadas. Asegúrese de incluir precio y cantidad.");
+      return; // No continuar con el envío si hay errores
+    }
+  
+    // Enviar cada producto al servidor
+    for (const product of productsToAdd) {
+      await addDebt(product);
+    }
+    closeModal();
   };
+  
 
   return (
     <>
@@ -95,22 +118,22 @@ const ProductModal = ({ closeModal }) => {
               <form className='form__addProduct' onSubmit={processProducts}>
                 <h1 className='title is-color-white'>Agregar productos</h1>
                 <article className='message  is-background-white is-flex'>
-                  <div className='message-header is-size-5 is-color-white is-background-danger'>
+                  <div className='message-header is-size-5 is-color-white is-background-link'>
                     <p className='title'>¿Como insertar productos?</p>
                   </div>
                   <div className='message-body '>
                     <ol >
-                      <li className='is-size-5'>El formato es (Cantidad) seguido de (detalle o nombre del producto) seguido del código o el monto</li>
+                      <li className='is-size-5 is-color-black'>El formato esperado es (Cantidad) seguido de (detalle o nombre del producto) seguido del código o el monto</li>
                       <ol type='A' className='ml-5'>
                         <li className='is-size-5 is-color-link'>Ejemplo en pesos: 1 mate de arpillera 25000</li>
-                        <li className='is-size-5 is-color-link'>Ejemplo en dólares: 1 mate de arpillera x15 <span className='tag is-danger is-size-5'>Importante no olvidar la equis "x"</span></li>
+                        <li className='is-size-5 is-color-link'>Ejemplo en código: 1 mate de arpillera x15 <span className='tag is-danger is-size-5'>Importante no olvidar la equis "x"</span></li>
                       </ol>
-                      <li className='is-size-5'>Para insertar varios productos puede añadir una coma "," al final o simplemente presionar Enter para ir agregando uno abajo del otro</li>
+                      <li className='is-size-5 is-color-black'>Para insertar varios productos puede añadir una coma "," al final o simplemente presionar Enter para ir agregando uno abajo del otro</li>
                     </ol>
                   </div>
                 </article>
                 <div className="field">
-                  <label className='label box is-background-white is-color-black is-size-5'>Productos:
+                  <label className='label box is-background-white is-color-black is-size-5'>Productos: <span className='tag is-danger is-size-6 m-1'>Requerido</span>
                     <textarea 
                       name='products' 
                       value={values.products} 
@@ -120,7 +143,7 @@ const ProductModal = ({ closeModal }) => {
                     />
                   </label>
 
-                  <label className='label is-color-black'>Fecha de compra (opcional):
+                  <label className='label is-color-black is-size-5'>Fecha de compra <span className='tag is-info is-size-6 m-1'>Opcional</span>
                     <input 
                       type="text" 
                       name='buyDate' 
@@ -132,7 +155,7 @@ const ProductModal = ({ closeModal }) => {
                 </div>
               </form>
               <button 
-                className='button is-size-5 is-warning m-3' 
+                className='button is-size-5 is-success m-3' 
                 type='submit' 
                 disabled={addingDebt} 
                 style={{ cursor: addingDebt ? "not-allowed" : "" }} 

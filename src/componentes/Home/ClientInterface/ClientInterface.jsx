@@ -1,15 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import "./ClientInterface.css";
 import { useAppContext } from '../../context';
-import EditDataClient from '../Modals/EditDataClient';
-import ProductModal from '../Modals/ProductModal';
-import EditProducts from './Modals/ActualizarProductos/EditProducts';
-import MakeDeliver from './Modals/HacerEntrega/MakeDelivery';
-import ViewDeliverys from '../Modals/ViewDeliverys';
-import MuchUsers from '../Modals/ToMuchUsers/MuchUsers';
-import { Button, message, Popconfirm, Spin } from 'antd';
-import ClientHistory from '../Modals/clientHistory/ClientHistory';
-import { LinearProgress, selectClasses } from '@mui/material';
+import EditDataClient from '../Modals/EditarDatosCliente/EditDataClient';
+import ProductModal from '../Modals/AñadirDeudas/ProductModal';
+import EditProducts from '../Modals/ActualizarProductos/EditProducts';
+import MakeDeliver from '../Modals/HacerEntrega/MakeDelivery';
+import MuchUsers from '../Modals/MuchosUsuarios/MuchUsers';
+import ClientHistory from '../Modals/Historial/ClientHistory';
+import { LinearProgress } from '@mui/material';
 
 function ClientInterface() {
     const { 
@@ -18,29 +16,23 @@ function ClientInterface() {
         userUUID, 
         fetchingData, 
         DebtData, 
-        deleteProduct, 
-        isDeleting, 
+        selectedOption, 
         fetchRegisterDeliverys, 
         deliverData, 
         cancelDebt, 
         fetchingDeliverys,
-        setIsUpdatingDeliver, 
-        isUpdatingDeliver,
         usdPrice,
         deleteDelivery,
-        selectedOption
      } = useAppContext();
     let value = 0
     usdPrice.forEach(el =>{
         value += el.value
     })
     const [showEditDataClientModal, setShowEditDataClientModal] = useState(false);
-    const [showSpinner, setShowSpinner] = useState(false);
     const [showProductModal, setShowProductModal] = useState(false);
-    const [showSectionDebt, setShowSectionDebt] = useState(true);
+    const [showSectionDebt] = useState(true);
     const [showEditProductModal, setShowEditProductModal] = useState(false)
     const [showMakeDeliveryModal, setShowMakeDeliveryModal] = useState(false)
-    const [showDeliveryRegister, setShowDeliveryRegister] = useState(false)
     const [showMuchUsers, setShowMuchUsers] = useState(false)
     const [showHistory, setShowHistory] = useState(false)
 
@@ -50,7 +42,6 @@ function ClientInterface() {
     const closeProductModal = () => setShowProductModal(false);
     const closeMakeDeliveryModal = () => setShowMakeDeliveryModal(false)
     const closeEditProductModal = () => setShowEditProductModal(false)
-    const closeShowDeliveryRegister = () => setShowDeliveryRegister(false)
     const closeShowMuchUsersModal = () => setShowMuchUsers(false)
     const closeHistoryModal = () => setShowHistory(false)
 
@@ -58,10 +49,6 @@ function ClientInterface() {
         setShowHistory(true)
     }
 
-    // const closeClientDebts = () => {
-    //     setShowSectionDebt(false);
-    //     setCountClick(0);
-    // };
 
     const openModalMuchUsers = () => {
         setShowMuchUsers(true)
@@ -87,15 +74,8 @@ function ClientInterface() {
         return { last, saldoRestante }
     }
 
-    const { last, saldoRestante } = processingDeliverData();
+    const { saldoRestante } = processingDeliverData();
 
-    useEffect(() => {
-        if (isDeleting) {
-            setShowSpinner(true);
-        } else {
-            setShowSpinner(false);
-        }
-    }, [isDeleting]);
     const [productId, setProductId] = useState(null);
     const openEditProductModal = (id) => {
         if (id) {
@@ -111,58 +91,18 @@ function ClientInterface() {
         uuid_cliente: ""
     })
 
-    // const prepareEditDeliverData = (index) => {
-    //     const deliverHookData = deliverData[index]
-    //     setIsUpdatingDeliver(true)
-    //     setEdit_entrega_data({
-    //         idDebt: deliverHookData.id,
-    //         tope_maximo: monto_total - saldoRestante,
-    //         fecha_entrega: deliverHookData.fecha_entrega,
-    //         uuid_cliente: deliverHookData.uuid_cliente
-    //     })
-
-    //     if (edit_entrega_data) {
-    //         openMakeDeliveryModal()
-    //     }
-
-    // }
 
     const openMakeDeliveryModal = () => {
         setShowMakeDeliveryModal(true)
     }
 
-    // const openDeliverRegisterModal = () => {
-    //     setShowDeliveryRegister(true)
-    //     fetchRegisterDeliverys()
-    // }
 
-    // const [countClick, setCountClick] = useState(0);
-    // const openClientDebts = () => {
-    //     setShowSectionDebt(true);
-    //     setCountClick(countClick + 1);
-    //     showDebtUser();
-    //     fetchRegisterDeliverys()
-
-    //     if (countClick === 1) {
-    //         closeClientDebts();
-    //         setCountClick(0);
-    //         showDebtUser();
-    //         fetchRegisterDeliverys()
-    //     }
-    // };
-
-    // const confirmDelete = async (debtId) => {
-    //     await deleteProduct(debtId);
-    //     showDebtUser();
-    // };
 
     const confirmCancellDebt = async () => {
         await cancelDebt()
     }
 
-    // const cancelDelete = () => {
-    //     message.success('Operación cancelada');
-    // };
+
     const total = () => {
         let totalPesos = 0;
         let totalUsdInPesos = 0
@@ -184,8 +124,7 @@ function ClientInterface() {
     
 
     const { totalGeneral } = total();
-    // console.log("Saldo total: ",totalGeneral)
-    // console.log("Saldo restante: ",saldoRestante)
+
 
     useEffect(() => {
         if (clientData.length > 0 && userUUID) {
@@ -248,18 +187,17 @@ function ClientInterface() {
     const targetRef = useRef(null);
 
     useEffect(() => {
-        if (clientData.length > 0 && DebtData.length > 0) {
-        //   console.log('Datos cargados:', clientData);
-        //   console.log('Elemento de referencia:', targetRef.current);
+        if (clientData.length > 0 && DebtData.length > 0 && selectedOption==="añadirDeuda") {
+
           if (targetRef.current) {
             setTimeout(() => {
               targetRef.current.scrollIntoView({
                 behavior: 'smooth',
               });
-            }, 400); 
+            }, 500); 
           }
         }
-      }, [clientData, DebtData]);
+      }, [clientData, DebtData,selectedOption]);
     
     return (
         <div className='container'>
@@ -299,7 +237,6 @@ function ClientInterface() {
                                             <div className='custom__container-productoClient' >
                                                 {showSectionDebt && (
                                                     <>
-                                                    {/* {console.log(groupedHistory)} */}
                                                         {Object.keys(groupedHistory)
                                                             .map((date, index) => (
                                                                 <div key={index} className="table-container">
@@ -381,7 +318,6 @@ function ClientInterface() {
                                                                                     {index === deliverData.length - 1 ? <span className='tag is-danger is-size-6 ml-5 m-1'>Ultima entrega</span> : ""}
                                                                                 </td>
                                                                                 <td className='is-background-white'>
-                                                                                    {/* <Button className='button m-2' onClick={() => prepareEditDeliverData(index)}>Editar</Button> */}
                                                                                     <button className='button is-warning m-2' onClick={() => handleDeleteDeliver(item.id)}>Eliminar</button>
                                                                                 </td>
                                                                             </tr>
@@ -410,7 +346,6 @@ function ClientInterface() {
             {showProductModal && <ProductModal closeModal={closeProductModal} />}
             {showEditProductModal && <EditProducts closeModal={closeEditProductModal} idProduct={productId} />}
             {showMakeDeliveryModal && <MakeDeliver closeModal={closeMakeDeliveryModal} dataClient={clientData} saldo_restante={totalGeneral - saldoRestante} edit_entrega_data={edit_entrega_data} />}
-            {showDeliveryRegister && <ViewDeliverys closeModal={closeShowDeliveryRegister} saldo_restante={totalGeneral - saldoRestante} />}
             {showMuchUsers && <MuchUsers closeModal={closeShowMuchUsersModal} />}
             {showHistory && <ClientHistory closeModal={closeHistoryModal} />}
         </div>

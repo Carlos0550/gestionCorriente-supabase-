@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal } from 'antd';
-import { useAppContext } from '../../context';
-import NotificationError from '../Notifications/NotificationError';
+import { useAppContext } from '../../../context';
+import NotificationError from "../../Notifications/NotificationError"
 import "./editClient.css"
 const EditDataClient = ({ closeModal }) => {
   const {clientData, updateDataClient, isUpdating} = useAppContext()

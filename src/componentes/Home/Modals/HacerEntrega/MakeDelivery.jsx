@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Modal, message } from 'antd';
-import { useAppContext } from '../../../../context';
-import Loader from "../../../../Loaders/Loader";
+import { useAppContext } from '../../../context';
+import Loader from "../../../Loaders/Loader";
 
 function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data }) {
   const { 
@@ -13,8 +13,9 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
     updateDeliver,
     isSendingUpdatingDeliver
   } = useAppContext();
-  const { editing, tope_maximo } = edit_entrega_data;
-  let client = dataClient[0];
+  
+  const client = dataClient[0];
+  
   const [values, setValues] = useState({
     idDebt: edit_entrega_data.idDebt || "",
     monto_entrega: "",
@@ -30,7 +31,7 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
 
   const handleInput = (e) => {
     const { name, value } = e.target;
-    setValues((prevState) => ({
+    setValues(prevState => ({
       ...prevState,
       [name]: value
     }));
@@ -43,7 +44,9 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
     if (!monto_entrega || monto_entrega < 0) {
       message.error("Hay campos vacíos, complételos");
       return;
-    } else if (isUpdatingDeliver) {
+    }
+
+    if (isUpdatingDeliver) {
       if (!monto_entrega || monto_entrega < 0) {
         message.error("Hay campos vacíos, complételos");
       } else {
@@ -65,14 +68,14 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
       visible={true}
       onOk={handleOk}
       closeIcon={false}
-      footer={[]}
+      footer={null}
     >
       <div className='container'>
         <div className="column">
-          <form className='box is-background-black' onSubmit={validateForm}>
-            <table className="table is-fullwidth is-striped is-hoverable">
+          <form className='box is-background-white' onSubmit={validateForm} style={{borderRadius: "1rem"}}>
+            <table className="table is-fullwidth is-striped is-hoverable" style={{borderRadius: "1rem", overflow: "hidden"}}>
               <tbody>
-                {isUpdatingDeliver === true ? null : (
+                {!isUpdatingDeliver && (
                   <tr>
                     <td>
                       <label className='label is-size-4 has-text-weight-bold has-text-black is-background-white'>
@@ -80,7 +83,7 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
                       </label>
                     </td>
                     <td>
-                      <p className='title is-size-4 has-text-weight-bold has-text-black m-4'>
+                      <p className='title is-size-4 has-text-weight-bold has-text-black m-4' style={{backgroundColor: "#ccc", borderRadius:"15px", padding: "1rem"}}>
                         ${saldo_restante}
                       </p>
                     </td>
@@ -122,9 +125,15 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
                 </tr>
                 <tr>
                   <td colSpan="2">
-                    <button className='button is-info is-size-5 has-text-weight-bold m-3' type='submit'>
-                      {isUpdatingDeliver ? null : isInserting ? <Loader /> : "Entregar"}
-                      {isUpdatingDeliver ? isSendingUpdatingDeliver ? <Loader /> : "Actualizar" : null}
+                    <button 
+                      className='button is-info is-size-5 has-text-weight-bold m-3' 
+                      type='submit'
+                    >
+                      {isUpdatingDeliver ? (
+                        isSendingUpdatingDeliver ? <Loader /> : "Actualizar"
+                      ) : isInserting ? (
+                        <Loader />
+                      ) : "Entregar"}
                     </button>
                     <Button 
                       type="primary" 

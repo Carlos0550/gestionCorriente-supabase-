@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Button, Modal, message } from 'antd';
 import "./editProducts.css"
-import { useAppContext } from '../../../../context';
-import Loader from '../../../../Loaders/Loader';
+import { useAppContext } from '../../../context';
+import Loader from '../../..//Loaders/Loader';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../../../../Auth/supabase';
+import { supabase } from '../../../../Auth/supabase';
 
 function EditProducts({ closeModal, idProduct }) {
-  console.log("Recibí el id n°: ", idProduct);
 
   const navigate = useNavigate();
   const { updateProduct, isUpdatingProduct } = useAppContext();

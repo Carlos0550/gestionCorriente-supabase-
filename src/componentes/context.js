@@ -270,7 +270,6 @@ export const AppContextProvider = ({ children }) => {
   const [addingDebt, setIsAddingDebt] = useState(false)
 
   const addDebt = async (values) => {
-    message.loading("Añadiendo producto...")
     setIsAddingDebt(true)
     try {
       const { error } = await supabase
