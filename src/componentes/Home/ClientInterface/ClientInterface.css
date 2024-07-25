@@ -31,3 +31,18 @@
 .table-container {
     margin: 1rem 0;
 }
+
+@media(max-width:768px){
+    .custom__container-productoClient{
+        overflow: hidden;
+        padding: 3rem;
+        width: 40%;
+        margin: 0 auto;
+    }
+    .custom-column-deliverys{
+        overflow: hidden;
+        padding: 3rem;
+        width: 40%;
+        margin: 0 auto;
+    }
+}

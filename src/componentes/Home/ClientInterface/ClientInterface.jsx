@@ -1,15 +1,19 @@
 import React, { useEffect, useState, useRef } from 'react';
 import "./ClientInterface.css";
 import { useAppContext } from '../../context';
+//Componentes
 import EditDataClient from '../Modals/EditarDatosCliente/EditDataClient';
 import ProductModal from '../Modals/AñadirDeudas/ProductModal';
 import EditProducts from '../Modals/ActualizarProductos/EditProducts';
 import MakeDeliver from '../Modals/HacerEntrega/MakeDelivery';
 import MuchUsers from '../Modals/MuchosUsuarios/MuchUsers';
 import ClientHistory from '../Modals/Historial/ClientHistory';
+//Ui material
 import { LinearProgress } from '@mui/material';
+import ClientDataModal from '../Modals/VerDatosCliente/ClientDataModal';
 
 function ClientInterface() {
+    //Desestructuración de funciones del contexto
     const { 
         clientData, 
         showDebtUser, 
@@ -24,26 +28,26 @@ function ClientInterface() {
         usdPrice,
         deleteDelivery,
      } = useAppContext();
-    let value = 0
+    let valorDelDolar = 0
     usdPrice.forEach(el =>{
-        value += el.value
+        valorDelDolar += el.value
     })
-    const [showEditDataClientModal, setShowEditDataClientModal] = useState(false);
     const [showProductModal, setShowProductModal] = useState(false);
     const [showSectionDebt] = useState(true);
     const [showEditProductModal, setShowEditProductModal] = useState(false)
     const [showMakeDeliveryModal, setShowMakeDeliveryModal] = useState(false)
     const [showMuchUsers, setShowMuchUsers] = useState(false)
     const [showHistory, setShowHistory] = useState(false)
+    const [showClientData, setShowClientData] = useState(false)
 
-    const handleEditModal = () => setShowEditDataClientModal(true);
-    const closeEditModal = () => setShowEditDataClientModal(false);
     const handleProductModal = () => setShowProductModal(true);
     const closeProductModal = () => setShowProductModal(false);
     const closeMakeDeliveryModal = () => setShowMakeDeliveryModal(false)
     const closeEditProductModal = () => setShowEditProductModal(false)
     const closeShowMuchUsersModal = () => setShowMuchUsers(false)
     const closeHistoryModal = () => setShowHistory(false)
+    const toggleClientDataModal = () => setShowClientData(!showClientData);
+
 
     const handleShowModalHistory = () => {
         setShowHistory(true)
@@ -84,19 +88,12 @@ function ClientInterface() {
         
         setShowEditProductModal(true)
     }
-    const [edit_entrega_data, setEdit_entrega_data] = useState({
-        idDebt: "",
-        tope_maximo: "",
-        fecha_entrega: "",
-        uuid_cliente: ""
-    })
+   
 
 
     const openMakeDeliveryModal = () => {
         setShowMakeDeliveryModal(true)
     }
-
-
 
     const confirmCancellDebt = async () => {
         await cancelDebt()
@@ -113,7 +110,7 @@ function ClientInterface() {
             if (element.change === "ars") {
                 totalPesos += price * quantity
             } else if (element.change === "usd") {
-                totalUsdInPesos += (price * quantity) * value
+                totalUsdInPesos += (price * quantity) * valorDelDolar
             }
         });
         return {
@@ -139,7 +136,7 @@ function ClientInterface() {
             monto = (price * quantity).toFixed(2);
             return `$${monto}`;
         } else if (moneda === "usd") {
-            monto = ((price * quantity) * value).toFixed(2);
+            monto = ((price * quantity) * valorDelDolar).toFixed(2);
             return `$${monto}`;
         }
     
@@ -172,7 +169,7 @@ function ClientInterface() {
                 totalPesos += debt.price * debt.quantity
             } else if (debt.change === "usd") {
 
-                totalUsd += (debt.price * debt.quantity) * value
+                totalUsd += (debt.price * debt.quantity) * valorDelDolar
             }
 
             return monto_total = totalPesos + totalUsd;
@@ -206,31 +203,16 @@ function ClientInterface() {
                     {clientData && clientData.length > 0 ? (
                         clientData.map((item, index) => (
                             <div key={index} className='custom__column-clientInterface is-background-white is-color-white'>
-                                <div className="field ">
-                                    <div className="box is-background-white">
-                                        <div className="table-container">
-                                            <table className="table is-fullwidth is-bordered is-hoverable custom-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th className='is-background-white is-color-black'>
-                                                            <p className='title has-text-weight-bold is-color-black' style={{textTransform: "capitalize"}}>Cliente: {item.nombre_completo || "No hay datos"} {item.apodo ? `(${item.apodo})` : ""}</p>
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td className='is-background-white is-color-black'>
-                                                            {DebtData && DebtData.length > 0 ? <button className='button is-link m-2 is-size-5' onClick={openMakeDeliveryModal}>Hacer entrega</button> : ""}
-                                                            <button className='button m-1 is-background-black is-color-white m-2 is-size-5' onClick={handleEditModal}>Editar datos</button>
-                                                            {totalGeneral - saldoRestante === 0 && DebtData.length > 0 ? "" : <button className='button m-1 is-background-black is-color-white m-2 is-size-5' onClick={handleProductModal}>Añadir un producto</button>}
-                                                            <button className='button is-background-black is-color-white m-2 is-size-5' onClick={handleShowModalHistory}>Revisar historial</button>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+                            <article className='panel is-warning is-size-5'>
+                                <p className='panel-heading' style={{textTransform: "capitalize"}}>Cliente: {item.nombre_completo || "No hay datos"} {item.apodo ? `(${item.apodo})` : ""}</p>
+                                <p className='panel-tabs'>
+                                    <a>{DebtData && DebtData.length > 0 ? <button className='button is-link m-2 is-size-5' onClick={openMakeDeliveryModal}>Hacer entrega</button> : ""}</a>
+                                    <a><button className='button is-background-black is-color-white m-2 is-size-5' onClick={toggleClientDataModal}>Ver datos del cliente</button></a>
+                                    <a> {totalGeneral - saldoRestante === 0 && DebtData.length > 0 ? "" : <button className='button m-1 is-background-black is-color-white m-2 is-size-5' onClick={handleProductModal}>Añadir un producto</button>}</a>
+                                    <a><button className='button is-background-black is-color-white m-2 is-size-5' onClick={handleShowModalHistory}>Revisar historial</button></a>
+                                </p>
+                            </article>
+
                                 <div className='columns'>
                                     <div className='column '>
                                         {DebtData.length > 0 ?
@@ -342,12 +324,12 @@ function ClientInterface() {
                 </div>
             </div>
     
-            {showEditDataClientModal && <EditDataClient closeModal={closeEditModal} />}
             {showProductModal && <ProductModal closeModal={closeProductModal} />}
             {showEditProductModal && <EditProducts closeModal={closeEditProductModal} idProduct={productId} />}
-            {showMakeDeliveryModal && <MakeDeliver closeModal={closeMakeDeliveryModal} dataClient={clientData} saldo_restante={totalGeneral - saldoRestante} edit_entrega_data={edit_entrega_data} />}
+            {showMakeDeliveryModal && <MakeDeliver closeModal={closeMakeDeliveryModal} dataClient={clientData} saldo_restante={totalGeneral - saldoRestante}  />}
             {showMuchUsers && <MuchUsers closeModal={closeShowMuchUsersModal} />}
             {showHistory && <ClientHistory closeModal={closeHistoryModal} />}
+            {showClientData && <ClientDataModal openModal={showClientData} closeModal={toggleClientDataModal} clientData={clientData}/>}
         </div>
     );
 }       

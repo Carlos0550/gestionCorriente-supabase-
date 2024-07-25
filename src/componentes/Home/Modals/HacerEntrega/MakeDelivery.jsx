@@ -17,10 +17,10 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
   const client = dataClient[0];
   
   const [values, setValues] = useState({
-    idDebt: edit_entrega_data.idDebt || "",
+    idDebt: "",
     monto_entrega: "",
-    fecha_entrega: edit_entrega_data.fecha_entrega || fullDate,
-    nombre_cliente: edit_entrega_data.nombre_cliente || client.nombre_completo,
+    fecha_entrega: fullDate,
+    nombre_cliente: client.nombre_completo,
     uuid_cliente: client.uuid,
   });
 

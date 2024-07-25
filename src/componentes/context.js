@@ -1,4 +1,4 @@
-import React, { useContext, createContext, useState, useEffect } from "react";
+import React, { useContext, createContext, useState, useEffect, useRef } from "react";
 import { supabase } from "../Auth/supabase";
 import { useNavigate } from 'react-router-dom'
 import { v4 } from "uuid";
@@ -25,18 +25,7 @@ export const AppContextProvider = ({ children }) => {
   const [selectedOption, setSelectedOption] = useState('añadirDeuda');
 
 
-  useEffect(()=>{
-    const validateSessionToken = async () =>{
-      const {data: {session} } = await supabase.auth.getSession()
-      if (!session) {
-        navigate('/user-login')
-      }
-
-      const interval = setInterval(validateSessionToken, 30000)
-      validateSessionToken()
-      return () => clearInterval(interval)
-    }
-  },[navigate])
+ 
 
 
   const date = new Date();
@@ -108,6 +97,20 @@ export const AppContextProvider = ({ children }) => {
       setIsClossing(false)
     }
   }
+
+  useEffect(()=>{
+    const validateSessionToken = async () =>{
+      const {data: {session} } = await supabase.auth.getUser()
+      if (!session) {
+        closeSession()
+      }
+      console.log(session)
+
+      const interval = setInterval(validateSessionToken, 5000)
+      validateSessionToken()
+      return () => clearInterval(interval)
+    }
+  },[navigate])
   const [isCreating, setIsCreating] = useState(false)
   const [userExists, setUserNotExists] = useState(false)
   const createUser = async (values) => {
@@ -679,11 +682,14 @@ useEffect(()=>{
 // },[usdPrice])
 
 const isOnlime = Networck();
-
-if (!isOnlime) {
-  message.info("Verifique su conexión a internet")
+const alreadyShown = useRef(false)
+if (!isOnlime && !alreadyShown.current) {
+  message.info("La conexión a internet se perdió",10)
+  alreadyShown.current = true
+  if (isOnlime) {
+    message.success("La conexión a internet ha vuelto!")
+  }
 }
-  
 
   return (
     <AppContext.Provider value={{

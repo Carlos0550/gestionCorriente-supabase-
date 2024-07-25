@@ -45,3 +45,10 @@
     transform: translateX(0);
   }
 }
+
+.custom-tableDebts{
+  overflow:scroll;
+  height: 50vh;
+  border: 2px solid white;
+  padding: 2rem;
+}
