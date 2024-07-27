@@ -203,7 +203,7 @@ function ClientInterface() {
                     {clientData && clientData.length > 0 ? (
                         clientData.map((item, index) => (
                             <div key={index} className='custom__column-clientInterface is-background-white is-color-white'>
-                            <article className='panel is-warning is-size-5'>
+                            <article className='panel is-black is-size-5'>
                                 <p className='panel-heading' style={{textTransform: "capitalize"}}>Cliente: {item.nombre_completo || "No hay datos"} {item.apodo ? `(${item.apodo})` : ""}</p>
                                 <p className='panel-tabs'>
                                     <a>{DebtData && DebtData.length > 0 ? <button className='button is-link m-2 is-size-5' onClick={openMakeDeliveryModal}>Hacer entrega</button> : ""}</a>
@@ -268,8 +268,10 @@ function ClientInterface() {
                                             </div>
                                             :
                                             <React.Fragment>
-                                                <div className="box">
-                                                    <div className="title is-size-5">El cliente no tiene deudas</div>
+                                                <div className="box" style={{width: "max-content"}}>
+                                                    <div className="title is-size-4 is-color-white">
+                                                        <p>El cliente no tiene deudas</p>
+                                                    </div>
                                                 </div>
                                             </React.Fragment>
                                         }
@@ -329,7 +331,7 @@ function ClientInterface() {
             {showMakeDeliveryModal && <MakeDeliver closeModal={closeMakeDeliveryModal} dataClient={clientData} saldo_restante={totalGeneral - saldoRestante}  />}
             {showMuchUsers && <MuchUsers closeModal={closeShowMuchUsersModal} />}
             {showHistory && <ClientHistory closeModal={closeHistoryModal} />}
-            {showClientData && <ClientDataModal openModal={showClientData} closeModal={toggleClientDataModal} clientData={clientData}/>}
+            {showClientData && <ClientDataModal openModal={showClientData} closeModal={toggleClientDataModal} clientData={clientData} monto_adeudado={totalGeneral} deudas={groupedHistory}/>}
         </div>
     );
 }       

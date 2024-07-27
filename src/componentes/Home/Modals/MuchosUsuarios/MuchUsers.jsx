@@ -8,6 +8,7 @@ const MuchUsers = ({ closeModal }) => {
 
     const handleOk = () => {
         setConfirmLoading(true);
+        setClientData([])
         setTimeout(() => {
             setConfirmLoading(false);
             closeModal();
@@ -15,8 +16,8 @@ const MuchUsers = ({ closeModal }) => {
     };
 
     const selectedOption = (index) => {
-        setClientData([clientData[index]]) //mantenemos como array a clientData
-        handleOk()
+        setClientData([clientData[index]])
+        closeModal()
     }
 
     return (
@@ -30,40 +31,37 @@ const MuchUsers = ({ closeModal }) => {
                 closeIcon={false}
                 confirmLoading={confirmLoading}
                 footer={[
-                    <Button key="update" type="primary" onClick={handleOk} disabled={true} style={{ cursor: "not-allowed" }} loading={confirmLoading}>
-                        Cerrar
-                    </Button>,
+                    <Button key="update" type="primary" onClick={handleOk} loading={confirmLoading} className='button is-danger is-size-6'>
+                        Cancelar
+                    </Button>
                 ]}
             >
-                <h1 className='title is-color-black'>Se encontró más de 1 cliente con el mismo parámetro de busqueda: </h1>
-
-
-                <div className='container custom__container-muchUsers'>
-                    <div className="columns" >
-                        {clientData && clientData.map((item, index) => {
-                            return (
-                                <div className="column" key={index}>
-                                    <label className='label'>
-                                        <div className="box is-background-black"><p className='subtitle has-text-weight-bold  is-color-white'>#{index + 1} Coincidencia</p></div>
-                                        <div className="field">
-                                            <div className="box"><p>Nombre: {item.nombre_completo}</p></div>
-                                            <div className="box"><p>Apodo: {item.apodo}</p></div>
-                                            <div className="box"><p>Dni: {item.dni}</p></div>
-                                            <div className="box"><p>Dirección: {item.direccion}</p></div>
-                                            <div className="box"><p>Teléfono: {item.telefono}</p></div>
-                                        </div>
-                                    </label>
+                {clientData && (
+                <table className="table is-striped is-fullwidth">
+                    <thead>
+                        <tr className='is-background-white '>
+                            <th className='is-color-black is-size-5'>Nombre</th>
+                            <th className='is-color-black is-size-5'>Apodo</th>
+                            <th className='is-color-black is-size-5'>DNI</th>
+                            <th className='is-color-black is-size-5'>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                        {clientData.map((item, index) => (
+                            <tr key={index} className='is-background-white'>
+                                <td style={{ textTransform: "capitalize" }} className='is-color-black is-background-white has-text-weight-bold is-size-5'>{item.nombre_completo}</td>
+                                <td className='is-color-black is-background-white is-size-5'>{item.apodo || "No hay apodo"}</td>
+                                <td className='is-color-black is-background-white is-size-5'>{item.dni || "No tiene DNI"}</td>
+                                <td>
                                     <div className="control">
-                                        <button className='button is-info m-5' onClick={() => selectedOption(index)}>Seleccionar este cliente</button>
-
+                                        <button className='button is-info' onClick={() => selectedOption(index)}>Seleccionar este cliente</button>
                                     </div>
-                                </div>
-                            )
-                        })}
-                    </div>
-                </div>
-
-
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
             </Modal>
         </>
     );

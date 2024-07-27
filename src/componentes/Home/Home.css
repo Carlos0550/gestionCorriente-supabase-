@@ -47,8 +47,25 @@
 }
 
 .custom-tableDebts{
-  overflow:scroll;
+  overflow:hidden;
   height: 50vh;
-  border: 2px solid white;
   padding: 2rem;
+}
+
+.slide-component-alert{
+  animation: slide-component-alert 700ms ;
+
+}
+
+@keyframes slide-component-alert {
+  0% {
+    opacity: 0;
+    transform: translateX(-70%);
+
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+
+  }
 }

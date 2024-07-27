@@ -25,16 +25,16 @@ export const AppContextProvider = ({ children }) => {
   const [selectedOption, setSelectedOption] = useState('añadirDeuda');
 
 
- 
+
 
 
   const date = new Date();
 
-    let año = date.getFullYear()
-    let mes = date.getMonth() + 1 
-    let dia = date.getDate()
-  
-    const fullDate = `${dia}-${mes}-${año}`
+  let año = date.getFullYear()
+  let mes = date.getMonth() + 1
+  let dia = date.getDate()
+
+  const fullDate = `${dia}-${mes}-${año}`
   const [progress, setProgress] = useState(0)
 
   const activateLoader = () => {
@@ -97,20 +97,47 @@ export const AppContextProvider = ({ children }) => {
       setIsClossing(false)
     }
   }
+  const [isVerifying, setIsVerifying] = useState(true);
 
-  useEffect(()=>{
-    const validateSessionToken = async () =>{
-      const {data: {session} } = await supabase.auth.getUser()
-      if (!session) {
-        closeSession()
+  const alreadyShownToken = useRef(false);
+
+  useEffect(() => {
+    const validateSessionToken = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (!data.session.access_token) {
+          if (!alreadyShownToken.current) {
+            message.info("Sesión expirada", 5);
+            alreadyShownToken.current = true;
+          }
+          closeSession();
+          setIsVerifying(false); // Detener la verificación
+        } else {
+          // Si hay token, reiniciar la verificación si estaba detenida
+          setIsVerifying(true);
+        }
+      } catch (error) {
+        console.error("Error al validar la sesión:", error);
+        if (!alreadyShownToken.current) {
+          message.info("Sesión expirada", 5);
+          alreadyShownToken.current = true;
+        }
+        closeSession();
+        setIsVerifying(false); // Detener la verificación
       }
-      console.log(session)
+    };
 
-      const interval = setInterval(validateSessionToken, 5000)
-      validateSessionToken()
-      return () => clearInterval(interval)
+    let interval;
+    if (isVerifying) {
+      interval = setInterval(validateSessionToken, 5000);
     }
-  },[navigate])
+
+    // Ejecutar la validación inicial
+    validateSessionToken();
+
+    return () => clearInterval(interval);
+  }, [isVerifying]);
+
   const [isCreating, setIsCreating] = useState(false)
   const [userExists, setUserNotExists] = useState(false)
   const createUser = async (values) => {
@@ -182,10 +209,10 @@ export const AppContextProvider = ({ children }) => {
     setClientData([])
     setUserUUID(null)
     setClientHistory([])
-  
+
     try {
       let data, error;
-  
+
       if (values.fullName && !values.dni) {
         const normalizedFullName = `%${values.fullName.trim().toLowerCase()}%`;
         ({ data, error } = await supabase
@@ -200,11 +227,11 @@ export const AppContextProvider = ({ children }) => {
       } else {
         throw new Error("Debes proporcionar un nombre completo o un DNI.");
       }
-  
+
       if (error) {
         throw new Error(error.message);
       }
-  
+
       if (data.length > 0) {
         setClientData(data);
         setDebtData([]);
@@ -215,7 +242,7 @@ export const AppContextProvider = ({ children }) => {
         setUserNotExist(true);
         setTimeout(() => {
           setUserNotExist(false);
-        }, 8000); 
+        }, 8000);
       }
     } catch (error) {
       message.error("Hubo un error, por favor intente nuevamente");
@@ -224,12 +251,12 @@ export const AppContextProvider = ({ children }) => {
       setSearching(false);
     }
   };
-  
+
 
   const [userUUID, setUserUUID] = useState(null)
   useEffect(() => {
     if (clientData) {
-      clientData.forEach(el =>{
+      clientData.forEach(el => {
         setUserUUID(el.uuid)
       })
     }
@@ -239,7 +266,7 @@ export const AppContextProvider = ({ children }) => {
   const [isUpdating, setIsUpdating] = useState(false)
   const updateDataClient = async (values) => {
     setIsUpdating(true)
-    const hiddenMessage = message.loading("Aguarde...",0)
+    const hiddenMessage = message.loading("Aguarde...", 0)
     try {
       const { error } = await supabase
         .from('users')
@@ -405,7 +432,7 @@ export const AppContextProvider = ({ children }) => {
       if (data.length > 0) {
         setDeliverData(data)
         setFetchingDelierys(false)
-      }else{
+      } else {
         setDeliverData([])
 
       }
@@ -420,15 +447,15 @@ export const AppContextProvider = ({ children }) => {
 
   const [isUpdatingDeliver, setIsUpdatingDeliver] = useState(false)
   const [isSendingUpdatingDeliver, setIsSendingUpdatingDeliver] = useState(false)
-  const updateDeliver = async(values) =>{
+  const updateDeliver = async (values) => {
     setIsSendingUpdatingDeliver(true)
     try {
-      const { error } = await supabase 
-      .from('registerDelierys')
-      .update({
-        'monto_entrega': values.monto_entrega
-      })
-      .eq("id", values.idDebt)
+      const { error } = await supabase
+        .from('registerDelierys')
+        .update({
+          'monto_entrega': values.monto_entrega
+        })
+        .eq("id", values.idDebt)
 
       if (error) {
         message.error("Ocurrio un error al actualizar la entrega, por favor intente nuevamente")
@@ -437,10 +464,10 @@ export const AppContextProvider = ({ children }) => {
       setIsSendingUpdatingDeliver(false)
       showDebtUser();
       fetchRegisterDeliverys();
-      
+
     } catch (error) {
       console.log(error)
-    }finally{
+    } finally {
       setIsSendingUpdatingDeliver(false)
     }
   }
@@ -481,14 +508,14 @@ export const AppContextProvider = ({ children }) => {
       confirmButtonText: "Si, eliminar"
     }).then(async (result) => {  // Asegúrate de usar async aquí
       if (result.isConfirmed) {
-        const hideMessage = message.loading("Aguarde...",0);
-  
+        const hideMessage = message.loading("Aguarde...", 0);
+
         try {
           const { error } = await supabase  // Asegúrate de esperar esta operación
             .from("registerDelierys")
             .delete()
             .eq('id', val);
-  
+
           if (!error) {
             hideMessage()
             const Toast = Swal.mixin({
@@ -507,7 +534,7 @@ export const AppContextProvider = ({ children }) => {
               title: "Entrega eliminada correctamente"
             });
             fetchRegisterDeliverys()
-            
+
           } else {
             throw new Error("Hubo un error al procesar la solicitud");
           }
@@ -533,102 +560,119 @@ export const AppContextProvider = ({ children }) => {
       }
     });
   }
-  
 
-  const cancelDebt = async () => {
-    const hideMessage = message.loading("Cancelando fichero, aguarde...",0);
+
+  const MAX_RETRIES = 3; // Número máximo de reintentos
+
+const retryOperation = async (operation, args, maxRetries) => {
+  let attempts = 0; // Contador de intentos
+  let error;
+  while (attempts < maxRetries) {
     try {
-      const { data: registerData, error: registerError } = await supabase
-        .from("registerDelierys") // Asegúrate del nombre correcto
-        .select()
-        .eq("uuid_cliente", userUUID);
-  
-      if (registerError) {
-        console.log(registerError);
-        hideMessage()
-        message.error("Hubo un error al procesar la solicitud, por favor intente nuevamente")
-        throw registerError;
+      return await operation(...args); // Intentar ejecutar la operación
+    } catch (err) {
+      error = err; // Guardar el error
+      attempts++;
+      if (attempts >= maxRetries) {
+        throw error;
       }
-  
-      const { data: debtsData, error: debtsError } = await supabase
-        .from("debts")
-        .select()
-        .eq("uuid", userUUID);
-  
-      if (debtsError) {
-        console.log(debtsError);
-        hideMessage()
-        message.error("Hubo un error al procesar la solicitud, por favor intente nuevamente")
-        throw debtsError;
-      }
-  
-      setRegisters(registerData);
-      setDebts(debtsData);
-  
-      if (debtsData.length > 0 && registerData.length > 0) { // Validación
-        const fullName = `${registerData[0].nombre_cliente} ${registerData[0].apellido_cliente}`;
-        
-        const insertData = debtsData.map(item => ({
-          "nombre_completo": fullName,
-          "fecha_cancelacion": fullDate,
-          "nombre_producto": item.nameProduct,
-          "precio_producto": item.price || "",
-          "quantity": item.quantity || 1,
-          "moneda": item.change || "",
-          "fecha_compra": item.buyDate || "",
-          "userId": userUUID
-        }));
-  
-        const { error: insertError } = await supabase
-          .from("userHistory")
-          .insert(insertData);
-  
-        if (insertError) {
-          console.log(insertError);
-          hideMessage()
-          message.error("Hubo un error al procesar la solicitud, por favor intente nuevamente")
-          throw insertError;
-        }
-  
-        const { error: deleteRegisterError } = await supabase
-          .from("registerDelierys")
-          .delete()
-          .eq("uuid_cliente", userUUID);
-  
-        if (deleteRegisterError) {
-          hideMessage()
-          message.error("Hubo un error al procesar la solicitud, por favor intente nuevamente")
-          throw deleteRegisterError;
-        }
-  
-        const { error: deleteDebtsError } = await supabase
-          .from("debts")
-          .delete()
-          .eq("uuid", userUUID);
-  
-        if (deleteDebtsError) {
-          hideMessage()
-          message.error("Hubo un error al procesar la solicitud, por favor intente nuevamente")
-          throw deleteDebtsError;
-        }
-        hideMessage()
-        message.success("Fichero cancelado");
-        setDebtData([]);
-        setDeliverData([]);
-        showDebtUser();
-        fetchRegisterDeliverys();
-      } else {
-        message.error("No se encontraron registros o deudas para cancelar.");
-      }
-  
-    } catch (error) {
-      console.error("Error cancelando deuda:", error);
-      message.error("Error cancelando deuda");
-    }finally{
-      hideMessage()
     }
-  };
-  
+  }
+};
+
+const deleteRegisterDelierys = async (userUUID) => {
+  const { error } = await supabase
+    .from("registerDelierys")
+    .delete()
+    .eq("uuid_cliente", userUUID);
+  if (error) throw error;
+};
+
+const deleteDebts = async (userUUID) => {
+  const { error } = await supabase
+    .from("debts")
+    .delete()
+    .eq("uuid", userUUID);
+  if (error) throw error;
+};
+
+const cancelDebt = async () => {
+  const hideMessage = message.loading("Cancelando fichero, aguarde...", 0);
+  try {
+    const { data: registerData, error: registerError } = await supabase
+      .from("registerDelierys")
+      .select()
+      .eq("uuid_cliente", userUUID);
+
+    if (registerError) {
+      console.log(registerError);
+      hideMessage();
+      message.error("Hubo un error al procesar la solicitud, por favor intente nuevamente");
+      throw registerError;
+    }
+
+    const { data: debtsData, error: debtsError } = await supabase
+      .from("debts")
+      .select()
+      .eq("uuid", userUUID);
+
+    if (debtsError) {
+      console.log(debtsError);
+      hideMessage();
+      message.error("Hubo un error al procesar la solicitud, por favor intente nuevamente");
+      throw debtsError;
+    }
+
+    setRegisters(registerData);
+    setDebts(debtsData);
+
+    if (debtsData.length > 0 && registerData.length > 0) {
+      const fullName = `${registerData[0].nombre_cliente} ${registerData[0].apellido_cliente}`;
+
+      const insertData = debtsData.map(item => ({
+        "nombre_completo": fullName,
+        "fecha_cancelacion": fullDate,
+        "nombre_producto": item.nameProduct,
+        "precio_producto": item.price || "",
+        "quantity": item.quantity || 1,
+        "moneda": item.change || "",
+        "fecha_compra": item.buyDate || "",
+        "userId": userUUID
+      }));
+
+      const { error: insertError } = await supabase
+        .from("userHistory")
+        .insert(insertData);
+
+      if (insertError) {
+        console.log(insertError);
+        hideMessage();
+        message.error("Hubo un error al procesar la solicitud, por favor intente nuevamente");
+        throw insertError;
+      }
+
+      await retryOperation(deleteRegisterDelierys, [userUUID], MAX_RETRIES);
+      await retryOperation(deleteDebts, [userUUID], MAX_RETRIES);
+
+      hideMessage();
+      message.success("Fichero cancelado");
+      setDebtData([]);
+      setDeliverData([]);
+      showDebtUser();
+      fetchRegisterDeliverys();
+    } else {
+      message.error("No se encontraron registros o deudas para cancelar.");
+    }
+
+  } catch (error) {
+    console.error("Error cancelando deuda:", error);
+    message.error("Error cancelando deuda");
+  } finally {
+    hideMessage();
+  }
+};
+
+
 
   // useEffect(()=>{
   //   console.log(debts)
@@ -636,81 +680,119 @@ export const AppContextProvider = ({ children }) => {
   // },[debts, registers])
 
   const [clientHistory, setClientHistory] = useState([])
-  const [fetchingHistory, setFetchingHistory]= useState(false)
-  const fetchHistoryClient = async() =>{
+  const [fetchingHistory, setFetchingHistory] = useState(false)
+  const fetchHistoryClient = async () => {
     setFetchingHistory(true)
     try {
-      const {data,error} = await supabase
-      .from("userHistory")
-      .select()
-      .eq("userId", userUUID)
+      const { data, error } = await supabase
+        .from("userHistory")
+        .select()
+        .eq("userId", userUUID)
 
       if (error) {
         message.error("Ocurrió un error al mostrar el historial del cliente")
         console.error(error)
         throw error
       }
-      
+
       setClientHistory(data)
       setFetchingHistory(false)
     } catch (error) {
       message.error("Ocurrió un error al mostrar el historial del cliente")
-    }finally{
+    } finally {
       setFetchingHistory(false)
     }
   }
 
-const [usdPrice, setUsdPrice] = useState([])
-useEffect(()=>{
-  const handleFetchUsd = async() =>{
-    const { data, error } = await supabase
-    .from('usdPrice')
-    .select()
-    .eq('id', 1)
-  
-    if (data) {
-      setUsdPrice(data)
+  const [usdPrice, setUsdPrice] = useState([])
+  useEffect(() => {
+    const handleFetchUsd = async () => {
+      const { data, error } = await supabase
+        .from('usdPrice')
+        .select()
+        .eq('id', 1)
+
+      if (data) {
+        setUsdPrice(data)
+      }
     }
-  }
-  handleFetchUsd()
+    handleFetchUsd()
+
   
+  }, [navigate, clientData, userUUID])
+
+  const deleteUser = async () => {
+    const hideMessage = message.loading("Eliminando cliente", 0);
   
-},[navigate, clientData, userUUID])
+    const deleteFromTable = async (table, column, value) => {
+      const response = await supabase
+        .from(table)
+        .delete()
+        .eq(column, value);
+      return response;
+    };
+  
+    try {
+      const [responseDebts, responseDeliveries, responseHistory, responseUsers] = await Promise.all([
+        deleteFromTable('debts', 'uuid', userUUID),
+        deleteFromTable('registerDelierys', 'uuid_cliente', userUUID),
+        deleteFromTable('userHistory', 'userId', userUUID),
+        deleteFromTable('users', 'uuid', userUUID),
+      ]);
+  
+      const responses = [responseDebts, responseDeliveries, responseHistory, responseUsers];
+      console.log(responses)
+      const allSuccessful = responses.every(response => response.status === 204);
+  
+      if (allSuccessful) {
+        message.success("Usuario eliminado, no hubo errores");
+        message.info("Refrescando página en 3...",3)
+        setTimeout(() => {
+          window.location.reload()
+        }, 3000);
+      } else {
+        const errors = responses.filter(response => response.status !== 204);
+        throw new Error(`Error al eliminar en las siguientes tablas: ${errors.map(e => e.table).join(', ')}`);
+      }
+    } catch (error) {
+      message.error(`Error al eliminar el usuario: ${error.message}`);
+    } finally {
+      hideMessage();
+    }
+  };
+  
 
-// useEffect(()=>{
-//   console.log(usdPrice)
-// },[usdPrice])
+    const isOnlime = Networck();
+    const alreadyShown = useRef(false)
+    if (!isOnlime && !alreadyShown.current) {
+      message.info("La conexión a internet se perdió", 10)
+      alreadyShown.current = true
+      if (isOnlime) {
+        message.success("La conexión a internet ha vuelto!")
+      }
+    }
 
-const isOnlime = Networck();
-const alreadyShown = useRef(false)
-if (!isOnlime && !alreadyShown.current) {
-  message.info("La conexión a internet se perdió",10)
-  alreadyShown.current = true
-  if (isOnlime) {
-    message.success("La conexión a internet ha vuelto!")
-  }
-}
-
-  return (
-    <AppContext.Provider value={{
-      loginAdmin, invalidUser, loading,
-      closeSession, isClossing,
-      createUser, isCreating,userExists,
-      findUser, searching, clientData, setClientData, userNotExist,
-      updateDataClient, isUpdating,
-      addDebt, addingDebt,
-      showDebtUser, fetchingData, DebtData, setDebtData,
-      deleteProduct, isDeleting, userUUID,
-      updateProduct, isUpdatingProduct,
-      insertDebtTables, isInserting, setIsUpdatingDeliver, isUpdatingDeliver,updateDeliver,isSendingUpdatingDeliver,
-      fetchRegisterDeliverys, deliverData, fetchingDeliverys,
-      cancelDebt,deleteDelivery,
-      fetchHistoryClient, clientHistory,fetchingHistory,
-      usdPrice,setUsdPrice,
-      setSelectedOption, selectedOption,
-      activateLoader, progress,fullDate
-    }}>
-      {children}
-    </AppContext.Provider>
-  );
-};
+    return (
+      <AppContext.Provider value={{
+        loginAdmin, invalidUser, loading,
+        closeSession, isClossing,
+        createUser, isCreating, userExists,
+        findUser, searching, clientData, setClientData, userNotExist,
+        updateDataClient, isUpdating,
+        addDebt, addingDebt,
+        showDebtUser, fetchingData, DebtData, setDebtData,
+        deleteProduct, isDeleting, userUUID,
+        updateProduct, isUpdatingProduct,
+        insertDebtTables, isInserting, setIsUpdatingDeliver, isUpdatingDeliver, updateDeliver, isSendingUpdatingDeliver,
+        fetchRegisterDeliverys, deliverData, fetchingDeliverys,
+        cancelDebt, deleteDelivery,
+        fetchHistoryClient, clientHistory, fetchingHistory,
+        usdPrice, setUsdPrice,
+        setSelectedOption, selectedOption,
+        activateLoader, progress, fullDate,
+        deleteUser
+      }}>
+        {children}
+      </AppContext.Provider>
+    );
+  };

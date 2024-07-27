@@ -8,10 +8,6 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
     insertDebtTables, 
     isInserting, 
     fullDate,
-    setIsUpdatingDeliver, 
-    isUpdatingDeliver,
-    updateDeliver,
-    isSendingUpdatingDeliver
   } = useAppContext();
   
   const client = dataClient[0];
@@ -26,7 +22,6 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
 
   const handleOk = () => {
     closeModal();
-    setIsUpdatingDeliver(false);
   };
 
   const handleInput = (e) => {
@@ -39,22 +34,14 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
 
   const validateForm = async (ev) => {
     ev.preventDefault();
-    const { monto_entrega, fecha_entrega } = values;
+    const { monto_entrega } = values;
 
     if (!monto_entrega || monto_entrega < 0) {
       message.error("Hay campos vacíos, complételos");
       return;
     }
 
-    if (isUpdatingDeliver) {
-      if (!monto_entrega || monto_entrega < 0) {
-        message.error("Hay campos vacíos, complételos");
-      } else {
-        await updateDeliver(values);
-        setIsUpdatingDeliver(false);
-        closeModal();
-      }
-    } else if (parseFloat(monto_entrega) > saldo_restante) {
+    else if (parseFloat(monto_entrega) > saldo_restante) {
       message.error(`No puede hacer una entrega mayor a ${saldo_restante}`);
       return;
     } else {
@@ -75,8 +62,7 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
           <form className='box is-background-white' onSubmit={validateForm} style={{borderRadius: "1rem"}}>
             <table className="table is-fullwidth is-striped is-hoverable" style={{borderRadius: "1rem", overflow: "hidden"}}>
               <tbody>
-                {!isUpdatingDeliver && (
-                  <tr>
+              <tr>
                     <td>
                       <label className='label is-size-4 has-text-weight-bold has-text-black is-background-white'>
                         Saldo restante:
@@ -88,7 +74,6 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
                       </p>
                     </td>
                   </tr>
-                )}
                 <tr>
                   <td>
                     <label className='label is-size-4 has-text-weight-bold has-text-black is-background-white'>
@@ -128,10 +113,10 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
                     <button 
                       className='button is-info is-size-5 has-text-weight-bold m-3' 
                       type='submit'
+                      disabled={isInserting}
+                      style={{backgroundColor: isInserting ? "grey": "", cursor: isInserting ? "not-allowed" : ""}}
                     >
-                      {isUpdatingDeliver ? (
-                        isSendingUpdatingDeliver ? <Loader /> : "Actualizar"
-                      ) : isInserting ? (
+                      {isInserting ? (
                         <Loader />
                       ) : "Entregar"}
                     </button>
@@ -139,6 +124,9 @@ function MakeDeliver({ closeModal, dataClient, saldo_restante, edit_entrega_data
                       type="primary" 
                       danger 
                       onClick={handleOk} 
+                      disabled={isInserting}
+                      style={{backgroundColor: isInserting ? "grey": "", cursor: isInserting ? "not-allowed" : ""}}
+
                       className='button is-danger is-size-5 m-3 has-text-weight-bold'
                     >
                       Cancelar
