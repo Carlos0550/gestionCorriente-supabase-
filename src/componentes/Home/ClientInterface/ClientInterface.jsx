@@ -59,6 +59,7 @@ function ClientInterface() {
     }
 
     useEffect(() => {
+        console.log(clientData)
         if (clientData.length > 1) {
             openModalMuchUsers()
         }

@@ -1,25 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, Modal } from 'antd';
 import { useAppContext } from '../../../context';
 import "./muchUsers.css"
 const MuchUsers = ({ closeModal }) => {
-    const { clientData, setClientData } = useAppContext()
+    const { clientData, findUser } = useAppContext()
     const [confirmLoading, setConfirmLoading] = useState(false);
+    const [clientUuid, setClientUuid] = useState(null);
 
     const handleOk = () => {
         setConfirmLoading(true);
-        setClientData([])
         setTimeout(() => {
             setConfirmLoading(false);
             closeModal();
-        }, 1000);
+        }, 500);
     };
 
     const selectedOption = (index) => {
-        setClientData([clientData[index]])
-        closeModal()
-    }
-
+        setClientUuid(clientData[index].uuid); // Suponiendo que clientData es un array y cada elemento tiene una propiedad uuid
+    };
+    
+    useEffect(() => {
+        if (clientUuid) {
+            const uuid = clientUuid;
+            findUser({ uuid });
+            handleOk();
+        }
+    }, [clientUuid]);
     return (
         <>
             <Modal

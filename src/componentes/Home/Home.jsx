@@ -6,12 +6,11 @@ import CreateClient from "./Forms/createClient/CreateClient";
 import FindClient from "./Forms/FindUsers/FindClient";
 import { useAppContext } from '../context';
 import { useFetchDebts } from './UtilidadesInicio/useFetchDebts';
-import { filterExpiredDebts, groupByClient } from './UtilidadesInicio/utils';
-
+import { filterAndGroupOldDebts } from './UtilidadesInicio/utils';
 function Home() {
   const { setSelectedOption, selectedOption, findUser } = useAppContext();
   const [showClientOptions, setShowClientOptions] = useState(true);
-  const { debtUsers, fetchingData, showRetryAlert, fetchDataUsers } = useFetchDebts();
+  const { debtUsers, fetchDataUsers } = useFetchDebts();
   const refreshUserDebts = async()=>{
     const hideMessage = message.info("Actualizando...",0)
     await fetchDataUsers()
@@ -36,20 +35,8 @@ function Home() {
     }
   };
 
-  const filteredDebts = filterExpiredDebts(debtUsers);
-  const groupedClients = groupByClient(filteredDebts);
-  const expiredDebtors = Object.keys(groupedClients)
-    .filter(clientName => groupedClients[clientName].some(debt => debt.deudaVencida))
-    .reduce((acc, clientName) => {
-      acc[clientName] = groupedClients[clientName];
-      return acc;
-    }, {});
-  const clientList = Object.keys(expiredDebtors);
-
-  const getOldestDebtDays = (clientDebts) => {
-    return Math.max(...clientDebts.map(debt => debt.diffDays));
-  };
-
+  const overdueClients = filterAndGroupOldDebts(debtUsers);
+  
   const renderClientsOptions = () => (
     <>
       <div className="columns ">
@@ -83,7 +70,7 @@ function Home() {
   );
 
   const viewClient = (clientData) => {
-    findUser({ fullName: clientData });
+    findUser({ fullName: clientData.nombre_cliente });
     setShowClientOptions(!showClientOptions);
     setSelectedOption("añadirDeuda")
   };
@@ -101,25 +88,25 @@ function Home() {
               </button>
               <div className="column " style={{ display: showClientOptions ? "none" : "" }}>
                 <div className="title is-white">
-                  {clientList.length > 0 ? "Clientes con vencimientos" : "Al dia de la fecha no hay deudas por vencer"}
+                  {/* {clientList.length > 0 ? "Clientes con vencimientos" : "Al dia de la fecha no hay deudas por vencer"} */}
                 </div>
                 <div className="field">
                   <button className='button is-white' onClick={()=>refreshUserDebts()}>Refrescar</button>
-                  {showRetryAlert ? <Flex gap="4px 0" wrap>
+                  {/* {showRetryAlert ? <Flex gap="4px 0" wrap>
                   <Tag color='red' className='is-size-5 p-3 slide-component-alert'>Hubo un error al refrescar, por favor intente nuevamente</Tag>
-                  </Flex> : ""}
+                  </Flex> : ""} */}
                 </div>
-                <div className="custom-tableDebts" style={{ display: clientList.length > 0 ? "" : "none" }}>
-                  {clientList.length > 0 ?
-                    clientList.map((clientName, index) => (
-                      <div key={index} style={{ display: fetchingData ? "none" : "" }}>
+                <div className="custom-tableDebts" style={{ display: overdueClients.length > 0 ? "" : "none" }}>
+                  {overdueClients.length > 0 ?
+                    overdueClients.map((clientName, index) => (
+                      <div key={index} >
                         <div className='tabs is-medium'>
                           <ul>
                             <li className='is-active pr-3' style={{ textTransform: "capitalize" }}>
-                              <a className='subtitle is-size-4'>{clientName}</a>
+                              <a className='subtitle is-size-4'>{clientName.nombre_cliente}</a>
                             </li>
                             <li className='is-link pr-3'>
-                              <a className='subtitle is-size-4'>Días vencidos: {getOldestDebtDays(groupedClients[clientName])} días(A partir de la fecha más antigua)</a>
+                              <a className='subtitle is-size-4'>Días vencidos: {clientName.dias_vencido} días(A partir de la fecha más antigua)</a>
                             </li>
                             <li>
                               <a>

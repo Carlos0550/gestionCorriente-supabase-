@@ -224,6 +224,12 @@ export const AppContextProvider = ({ children }) => {
           .from('users')
           .select()
           .eq('dni', values.dni));
+      }else if(values.uuid){
+        message.info("Buscando por el uuid",2)
+        ({ data, error } = await supabase
+          .from('users')
+          .select()
+          .eq('uuid', values.uuid));
       } else {
         throw new Error("Debes proporcionar un nombre completo o un DNI.");
       }

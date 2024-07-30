@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Modal } from 'antd';
 import { useAppContext } from '../../../context';
 import "./muchUsers.css"
 const MuchUsers = ({ closeModal }) => {
-    const { clientData, setClientData } = useAppContext()
+    const { clientData,findUser } = useAppContext()
     const [confirmLoading, setConfirmLoading] = useState(false);
+    const [clientUuid, setClientUuid] = useState()
+
 
     const handleOk = () => {
         setConfirmLoading(true);
@@ -13,18 +15,25 @@ const MuchUsers = ({ closeModal }) => {
             closeModal();
         }, 1000);
     };
-
+    
     const selectedOption = (index) => {
-        setClientData([clientData[index]]) //mantenemos como array a clientData
-        handleOk()
-    }
+        setClientUuid(clientData[index].uuid);
+        if (clientUuid) {
+            const uuid = clientUuid;
+            findUser({ uuid });
+            // handleOk();
+        }
+    };
+
+
+
+ 
 
     return (
         <>
             <Modal
                 title=""
                 visible={true}
-                onOk={handleOk}
                 okText="Cancelar"
                 width={1000}
                 closeIcon={false}
