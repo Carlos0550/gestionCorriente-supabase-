@@ -16,7 +16,7 @@ const MuchUsers = ({ closeModal }) => {
     };
 
     const selectedOption = (index) => {
-        setClientUuid(clientData[index].uuid); // Suponiendo que clientData es un array y cada elemento tiene una propiedad uuid
+        setClientUuid(clientData[index].uuid); 
     };
     
     useEffect(() => {

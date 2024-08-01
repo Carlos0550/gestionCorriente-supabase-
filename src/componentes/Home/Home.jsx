@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../Navbar/Navbar';
-import { Flex, message, Tag } from 'antd';
+import { Select, message } from 'antd';
 import "./Home.css";
 import CreateClient from "./Forms/createClient/CreateClient";
 import FindClient from "./Forms/FindUsers/FindClient";
@@ -11,13 +11,13 @@ function Home() {
   const { setSelectedOption, selectedOption, findUser } = useAppContext();
   const [showClientOptions, setShowClientOptions] = useState(true);
   const { debtUsers, fetchDataUsers } = useFetchDebts();
-  const refreshUserDebts = async()=>{
-    const hideMessage = message.info("Actualizando...",0)
+  const refreshUserDebts = async () => {
+    const hideMessage = message.info("Actualizando...", 0)
     await fetchDataUsers()
     hideMessage()
   }
-  const handleChangeOptions = (event) => {
-    setSelectedOption(event.target.value);
+  const handleChangeOptions = (value) => {
+    setSelectedOption(value);
   };
 
   const handleChangeOption = () => {
@@ -36,19 +36,40 @@ function Home() {
   };
 
   const overdueClients = filterAndGroupOldDebts(debtUsers);
-  
+
   const renderClientsOptions = () => (
     <>
       <div className="columns ">
         <div className="column ">
           <section id="home__option-selector ">
-            <h1 className='title is-color-black'>Seleccione una opción</h1>
-            <div className="select is-normal is-rounded ">
-              <select value={selectedOption} onChange={handleChangeOptions} className='is-hovered'>
-                <option value="añadirDeuda">Buscar un cliente</option>
-                <option value="agregarCliente">Crear un Cliente</option>
-              </select>
-            </div>
+            <Select
+              showSearch
+              status='black'
+              style={{
+                width: 300,
+                height: 50,
+                border: '2px solid black',
+                borderRadius: "8px",
+                outline: "none"
+                
+              }}
+              placeholder="Buscá una de las opciones"
+              optionFilterProp="label"
+              filterSort={(optionA, optionB) =>
+                (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+              }
+              onChange={handleChangeOptions}
+              options={[
+                {
+                  value: 'añadirDeuda',
+                  label: 'Buscar clientes',
+                },
+                {
+                  value: 'agregarCliente',
+                  label: 'Crear cliente',
+                }
+              ]}
+            />
           </section>
         </div>
       </div>
@@ -91,7 +112,7 @@ function Home() {
                   {/* {clientList.length > 0 ? "Clientes con vencimientos" : "Al dia de la fecha no hay deudas por vencer"} */}
                 </div>
                 <div className="field">
-                  <button className='button is-white' onClick={()=>refreshUserDebts()}>Refrescar</button>
+                  <button className='button is-white' onClick={() => refreshUserDebts()}>Refrescar</button>
                   {/* {showRetryAlert ? <Flex gap="4px 0" wrap>
                   <Tag color='red' className='is-size-5 p-3 slide-component-alert'>Hubo un error al refrescar, por favor intente nuevamente</Tag>
                   </Flex> : ""} */}
@@ -106,7 +127,7 @@ function Home() {
                               <a className='subtitle is-size-4'>{clientName.nombre_cliente}</a>
                             </li>
                             <li className='is-link pr-3'>
-                              <a className='subtitle is-size-4'>Días vencidos: {clientName.dias_vencido} días(A partir de la fecha más antigua)</a>
+                              <a className='subtitle is-size-4'>Conteo de días a partir de la compra más antigua: {clientName.dias_vencido} días</a>
                             </li>
                             <li>
                               <a>
