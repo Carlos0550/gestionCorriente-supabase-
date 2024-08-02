@@ -49,6 +49,7 @@ const SettingsModal = ({ closeModal }) => {
       setFetchingSpace(true)
         try {
             const response = await axios.post("https://gestion-corriente-server.vercel.app/check-space")
+            // const response = await axios.post("http://localhost:4000/check-space")
             if (response) {
               console.log(response.data.space)
               setDbSize(response.data.space)
@@ -89,7 +90,7 @@ const SettingsModal = ({ closeModal }) => {
                 <Panel header="Configuración del Dólar" key="1">
                     <div className="container">
                         <div className="field">
-                            <div className="label is-color-black">Precio actual: ${usdPrice.map(el => el.value)}</div>
+                            <div className="label is-color-black">Valor actual: ${usdPrice.map(el => el.value)}</div>
                             <TextField
                                 id="outlined-basic"
                                 label="Ingresa el precio del dólar"
@@ -105,7 +106,7 @@ const SettingsModal = ({ closeModal }) => {
                     <div className="container">
                         <div className="field">
                             <div className="label is-color-black">Espacio usado: <Flex gap="small" wrap>
-                                <Progress type="circle" percent={dbSize} format={()=> `${dbSize} MB`} />
+                                <Progress type="circle" percent={dbSize} format={()=> `${dbSize > 0 ? dbSize : ""} MB`} />
                               </Flex>
                               </div>
                               <div className='label is-color-black'>Aún tiene disponible {500 - dbSize }MB de almacenamiento en el plan actual</div>
