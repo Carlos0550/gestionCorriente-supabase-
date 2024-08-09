@@ -47,7 +47,7 @@
 }
 
 .custom-tableDebts{
-  overflow:hidden;
+  overflow-x:scroll;
   height: 50vh;
   padding: 2rem;
 }
