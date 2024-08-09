@@ -85,7 +85,7 @@ const ClientHistory = ({ closeModal }) => {
                                         Cerrar sección
                                     </Button>
                                     {Object.keys(groupedHistory)
-                                        .reverse()
+                                        
                                         .map((date, index) => (
                                             <div key={index} className="table-container">
                                                 <table className="table is-fullwidth is-bordered is-hoverable">
