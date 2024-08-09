@@ -126,9 +126,9 @@ function Home() {
                             <li className='is-active pr-3' style={{ textTransform: "capitalize" }}>
                               <a className='subtitle is-size-4'>{clientName.nombre_cliente}</a>
                             </li>
-                            <li className='is-link pr-3'>
+                            {/* <li className='is-link pr-3'>
                               <a className='subtitle is-size-4'>Conteo de días a partir de la compra más antigua: {clientName.dias_vencido} días</a>
-                            </li>
+                            </li> */}
                             <li>
                               <a>
                                 <button className='button is-white' onClick={() => viewClient(clientName)}>
