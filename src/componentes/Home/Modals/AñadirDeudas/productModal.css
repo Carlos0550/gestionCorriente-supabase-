@@ -10,3 +10,13 @@
     padding: 1rem;
     border-radius: 15px;
 }
+
+.flex-container {
+    display: flex;
+    gap: 1rem; /* Espacio entre los elementos */
+  }
+  
+  .textarea-container, .input-container {
+    flex: auto; /* O ajusta el tamaño según sea necesario */
+  }
+  
