@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, message, Collapse, Flex,Progress, Skeleton} from 'antd';
+import { Modal, message, Collapse, Flex, Progress, Skeleton } from 'antd';
 import { Button, TextField } from '@mui/material';
 import { supabase } from "../../Auth/supabase";
 import { useAppContext } from '../context';
-import axios from "axios"
+import axios from "axios";
 const { Panel } = Collapse;
 
 const SettingsModal = ({ closeModal }) => {
     const { setUsdPrice, usdPrice } = useAppContext();
     const [usdValue, setUsdValue] = useState("");
     const [dbSize, setDbSize] = useState(null);
+    const [dbSizePercentage, setDbSizePercentage] = useState(null);
+    const [fetchingSpace, setFetchingSpace] = useState(false);
 
     const handleInput = (e) => {
         setUsdValue(e.target.value);
@@ -44,35 +46,38 @@ const SettingsModal = ({ closeModal }) => {
             message.error("Hubo un error, por favor intente nuevamente");
         }
     };
-    const [fetchingSpace, setFetchingSpace] = useState(false)
+
     const fetchDatabaseSize = async () => {
-      setFetchingSpace(true)
+        setFetchingSpace(true);
         try {
-            const response = await axios.post("https://gestion-corriente-server.vercel.app/check-space")
-            // const response = await axios.post("http://localhost:4000/check-space")
-            if (response) {
-              console.log(response.data.space)
-              setDbSize(response.data.space)
-              setFetchingSpace(false)
-            }else{
-              setFetchingSpace(false)
+            // const response = await axios.post("https://gestion-corriente-server.vercel.app/check-space")
+            const response = await axios.post("http://localhost:4000/check-space");
+            if (response.status === 200) {
+                setDbSize(response.data.space);
+            } else {
+                setDbSize("No se pudo obtener el tamaño de la base de datos");
             }
         } catch (error) {
             console.error("Error fetching database size:", error);
             setDbSize("No se pudo obtener el tamaño de la base de datos");
-            setFetchingSpace(false)
-
+        } finally {
+            setFetchingSpace(false);
         }
     };
 
-    React.useEffect(() => {
+    useEffect(() => {
         fetchDatabaseSize();
     }, []);
-    useEffect(()=>{
-      if (dbSize) {
-        setDbSize(dbSize.replace("MB", ""))
-      }
-    },[dbSize])
+
+    useEffect(() => {
+        if (dbSize && !isNaN(parseFloat(dbSize))) {
+            const dbSizeInMB = Math.round(parseFloat(dbSize.replace("MB", "")));
+            const percentageUsed = (dbSizeInMB / 500) * 100;
+            setDbSizePercentage(percentageUsed);
+        } else {
+            setDbSizePercentage(null);
+        }
+    }, [dbSize]);
 
     return (
         <Modal
@@ -81,39 +86,46 @@ const SettingsModal = ({ closeModal }) => {
             onCancel={closeModal}
             footer={[
                 <Button key="close" variant="contained" color="error" className='m-1' onClick={closeModal}>Cerrar</Button>,
-                <Button key="save" variant="contained" className='m-1' onClick={handleSaveConfig}>Guardar</Button>
             ]}
             width={450}
-            
         >
-            {fetchingSpace ? <Skeleton active/> : <Collapse defaultActiveKey={['1']}>
-                <Panel header="Configuración del Dólar" key="1">
-                    <div className="container">
-                        <div className="field">
-                            <div className="label is-color-black">Valor actual: ${usdPrice.map(el => el.value)}</div>
-                            <TextField
-                                id="outlined-basic"
-                                label="Ingresa el precio del dólar"
-                                variant="outlined"
-                                value={usdValue}
-                                onChange={handleInput}
-                                fullWidth
-                            />
+            {fetchingSpace ? <Skeleton active /> : (
+                <Collapse defaultActiveKey={['1']} accordion>
+                    <Panel header="Configuración del Dólar" key="1">
+                        <div className="container">
+                            <div className="field">
+                                <div className="label is-color-black">Valor actual: ${usdPrice.map(el => el.value)}</div>
+                                <TextField
+                                    id="outlined-basic"
+                                    label="Ingresa el precio del dólar"
+                                    variant="outlined"
+                                    value={usdValue}
+                                    onChange={handleInput}
+                                    fullWidth
+                                />
+                                <Button key="save" variant="contained" className='m-1' onClick={handleSaveConfig}>Guardar</Button>
+                            </div>
                         </div>
-                    </div>
-                </Panel>
-                <Panel header="Espacio en la Base de Datos" key="2">
-                    <div className="container">
-                        <div className="field">
-                            <div className="label is-color-black">Espacio usado: <Flex gap="small" wrap>
-                                <Progress type="circle" percent={dbSize} format={()=> `${dbSize > 0 ? dbSize : ""} MB`} />
-                              </Flex>
-                              </div>
-                              <div className='label is-color-black'>Aún tiene disponible {500 - dbSize }MB de almacenamiento en el plan actual</div>
+                    </Panel>
+                    <Panel header="Espacio en la Base de Datos" key="2">
+                        <div className="container">
+                            <div className="field">
+                                <div className="label is-color-black">
+                                    Espacio usado:
+                                    <Flex gap="small" wrap>
+                                        <Progress
+                                            type="circle"
+                                            status={dbSizePercentage > 85 ? "exception" : "success"}
+                                            percent={dbSizePercentage || 0}
+                                            format={() => `${dbSizePercentage !== null ? `${Math.round(dbSizePercentage)}%` : "N/A"}`}
+                                        />
+                                    </Flex>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </Panel>
-            </Collapse>}
+                    </Panel>
+                </Collapse>
+            )}
         </Modal>
     );
 };
