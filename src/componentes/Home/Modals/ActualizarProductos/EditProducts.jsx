@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react'
-import { Button, Modal, message } from 'antd';
-import "./editProducts.css"
+import React, { useState, useEffect } from 'react';
+import { Button, Modal, message, ConfigProvider, DatePicker } from 'antd';
+import { TextField, MenuItem } from '@mui/material';
+import "./editProducts.css";
 import { useAppContext } from '../../../context';
 import Loader from '../../..//Loaders/Loader';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../../../Auth/supabase';
+import esES from 'antd/es/locale/es_ES'; 
+import 'moment/locale/es';
 
 function EditProducts({ closeModal, idProduct }) {
 
@@ -40,7 +43,6 @@ function EditProducts({ closeModal, idProduct }) {
       } else if (data.length > 0) {
         setDataProduct(data[0]);
         hiddenMessage();
-        
       }
     } catch (error) {
       message.error("Hubo un problema al intentar editar el producto", 3);
@@ -69,13 +71,22 @@ function EditProducts({ closeModal, idProduct }) {
   }, [dataProduct]);
 
   const handleInputChange = (e) => {
-    const { value, name } = e.target;
-    setNewValues((prevState) => ({
-      ...prevState,
-      [name]: value
-    }));
+    if (e && e.target) {
+      const { value, name } = e.target;
+      setNewValues((prevState) => ({
+        ...prevState,
+        [name]: value
+      }));
+    } else if (e && e.format) {
+      setNewValues((prevState) => ({
+        ...prevState,
+        date: e.format('DD-MM-YYYY')
+      }));
+    }
   };
-
+  useEffect(()=>{
+    console.log(newValues.date)
+  },[newValues.date])
   const validateForm = async (ev) => {
     ev.preventDefault();
     if (!newValues.nameProduct || !newValues.price || !newValues.change || !newValues.quantity) {
@@ -115,7 +126,6 @@ function EditProducts({ closeModal, idProduct }) {
         onOk={handleOk}
         closeIcon={false}
         width={1000}
-
         footer={[
           <Button type="primary" danger onClick={handleOk} className='btn_closeModalEditProduct'>
             Cerrar
@@ -124,60 +134,83 @@ function EditProducts({ closeModal, idProduct }) {
       >
         <div className='EditProduct__wrapper'>
           <div className="columns">
-            {/*Antiguo producto*/}
-            {/* <div className="column">
-              <form className='form-addProduct' >
-                <h1 className='title is-color-white is-size-2 has-text-centered'>Antiguo producto</h1>
-                <ul >
-                  <li className='box is-background-white'>
-                    <h1 className='title is-color-black is-size-3'>- {hookProduct.nameProduct}</h1>
-                    {hookProduct.change === "ars" ? <h1 className='title is-color-black is-size-3'>- Precio unitario: ${hookProduct.price}</h1> : ""}
-                    {hookProduct.change === "usd" ? <h1 className='title is-color-black is-size-3'>- Código: x{hookProduct.price}</h1> : ""}
-                    <h1 className='title is-color-black is-size-3'>- Cantidad: {hookProduct.quantity} unidad/es</h1>
-                  </li>
-                </ul>
-              </form>
-            </div> */}
             <div className="column">
-              <form className='form-addProduct'>
-                <h1 className='title is-color-white is-size-2 has-text-centered'>Editar producto</h1>
-                <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Nombre producto:
-                  <input type="text" name='nameProduct' value={newValues.nameProduct} onChange={handleInputChange} className='input is-color-white is-background-black is-size-5' />
-                </label>
+              <form className='form-addProduct is-background-white'>
+                <h1 className=' is-color-black is-size-3'>Editar producto</h1>
+                <div className="flex-container">
 
-                <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Precio Unitario:
-                  <input type="text" name='price' value={newValues.price} onChange={handleInputChange} className='input is-color-white is-background-black is-size-5' />
-                </label>
+                  <TextField
+                    id="nameProduct"
+                    label="Nombre producto"
+                    name="nameProduct"
+                    value={newValues.nameProduct}
+                    onChange={handleInputChange}
+                    variant="standard"
+                    fullWidth
+                    margin="normal"
+                  />
 
-                <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Moneda:
-                  <div className="select is-hovered is-rounded is-normal ml-3">
-                    <select name="change" value={newValues.change} onChange={handleInputChange} className='is-rounded is-size-5'>
-                      <option value="">Seleccione la moneda</option>
-                      <option value="ars">Pesos</option>
-                      <option value="usd">Usd</option>
-                    </select>
-                  </div>
-                </label>
+                  <TextField
+                    id="price"
+                    label="Precio Unitario"
+                    name="price"
+                    value={newValues.price}
+                    onChange={handleInputChange}
+                    variant="standard"
+                    fullWidth
+                    margin="normal"
+                  />
+                </div>
 
-                <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Cantidad:
-                  <input type="text" name='quantity' value={newValues.quantity} onChange={handleInputChange} className='input is-color-white is-background-black is-size-5' />
-                </label>
+                <div className="flex-container">
+                <TextField
+                  id="change"
+                  label="Moneda"
+                  name="change"
+                  value={newValues.change}
+                  onChange={handleInputChange}
+                  variant="standard"
+                  select
+                  fullWidth
+                  margin="normal"
+                >
+                  <MenuItem value="">Seleccione la moneda</MenuItem>
+                  <MenuItem value="ars">Pesos</MenuItem>
+                  <MenuItem value="usd">USD</MenuItem>
+                </TextField>
 
-                <label className='label box is-color-black is-size-4' style={{ backgroundColor: "#ffffff" }}>Fecha de compra:
-                  <input type="text" name='date' value={newValues.date} onChange={handleInputChange} className='input is-color-white is-background-black is-size-5' />
-                </label>
+                <TextField
+                  id="quantity"
+                  label="Cantidad"
+                  name="quantity"
+                  value={newValues.quantity}
+                  onChange={handleInputChange}
+                  variant="standard"
+                  fullWidth
+                  margin="normal"
+                />
+                </div>
+
+                <div className="flex-container mt-5">
+                <ConfigProvider locale={esES}>
+                        <DatePicker 
+                        name='date'
+                        onChange={handleInputChange}
+                        format={"DD-MM-YYYY"}
+                        />
+                    </ConfigProvider>
+                </div>
 
                 <button className='button is-warning m-1' type='submit' onClick={validateForm}>
                   {isUpdatingProduct ? <Loader /> : "Actualizar"}
                 </button>
               </form>
             </div>
-
           </div>
         </div>
       </Modal>
     </>
-  )
+  );
 }
 
-export default EditProducts
+export default EditProducts;
