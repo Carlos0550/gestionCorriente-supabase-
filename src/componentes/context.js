@@ -795,7 +795,7 @@ const cancelDebt = async () => {
         fetchHistoryClient, clientHistory, fetchingHistory,
         usdPrice, setUsdPrice,
         setSelectedOption, selectedOption,
-        activateLoader, progress, fullDate,
+        activateLoader, progress, 
         deleteUser
       }}>
         {children}
