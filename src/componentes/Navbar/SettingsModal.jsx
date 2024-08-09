@@ -50,8 +50,8 @@ const SettingsModal = ({ closeModal }) => {
     const fetchDatabaseSize = async () => {
         setFetchingSpace(true);
         try {
-            // const response = await axios.post("https://gestion-corriente-server.vercel.app/check-space")
-            const response = await axios.post("http://localhost:4000/check-space");
+            const response = await axios.post("https://gestion-corriente-server.vercel.app/check-space")
+            // const response = await axios.post("http://localhost:4000/check-space");
             if (response.status === 200) {
                 setDbSize(response.data.space);
             } else {
