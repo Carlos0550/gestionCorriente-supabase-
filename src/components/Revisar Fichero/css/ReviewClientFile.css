@@ -1,0 +1,29 @@
+.tables__user-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+}
+.table__debts {
+  max-width: 100%;
+  width: 50%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.table__delivers {
+  width: 50%;
+  max-width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+@media(max-width:900px){
+    .tables__user-wrapper{
+        flex-direction: column;
+    }
+    .table__debts{
+        width: 100%;
+    }
+    .table__delivers{
+        width: 100%;
+    }
+}
