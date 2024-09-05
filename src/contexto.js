@@ -2,6 +2,8 @@ import { message } from "antd";
 import { createContext, useContext, useState } from "react";
 import axios from "axios";
 import { useRef } from "react";
+import { supabase } from "./Auth/supabase";
+import { useNavigate } from "react-router-dom";
 export const AppContext = createContext();
 
 export const useAppContext = () => {
@@ -21,6 +23,7 @@ export const AppContextProvider = ({ children }) => {
   const [clientHistory, setClientHistory] = useState([]);
   const [vencimientos, setVencimientos] = useState([]);
   const [clientSuccess, setClientSuccess] = useState(false);
+  const navigate = useNavigate()
   const createClients = async (values, hiddenMessage) => {
     try {
       const response = await axios.post(
@@ -282,6 +285,50 @@ export const AppContextProvider = ({ children }) => {
         hiddenMessage();
     }
   };
+
+  const login = async(values) =>{
+    const hiddenMessage = message.loading("Aguarde...")
+    try {
+      const {data,error} = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password
+      })
+      if (data.user === null) {
+        message.error("Correo o contraseña incorrectos")
+      }else{
+        message.info("Sesión iniciada!")
+        navigate("/home")
+      }
+    } catch (error) {
+      console.log(error)
+      message.error("Error de red: Verifique su conexión e intente nuevamente")
+    }finally{
+      hiddenMessage()
+    }
+  }
+  const alreadyGet = useRef(false)
+  const getSession = async() =>{
+    if (!alreadyGet.current) {
+      const hiddenMessage = message.loading("Aguarde...",0)
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+          hiddenMessage()
+          message.info("Sesión expirada o inválida")
+          navigate("/")
+        }else{
+          message.success("Bienvenido nuevamente!")
+          navigate("/home")
+        }
+      } catch (error) {
+        console.log(error)
+        message.error("Error de red: Verifique su conexión e intente nuevamente")
+      }finally{
+        hiddenMessage()
+        alreadyGet.current = true;
+      }
+    }
+  }
   return (
     <AppContext.Provider
       value={{
@@ -306,7 +353,7 @@ export const AppContextProvider = ({ children }) => {
         fetchHistory,
         getVencimientos,
         vencimientos,
-        deleteProduct,deleteDeliver
+        deleteProduct,deleteDeliver,login,getSession
       }}
     >
       {children}
