@@ -1,0 +1,42 @@
+.btns__action{
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    width: min-content;
+}
+
+.content__home-wrapper{
+    display: flex;
+    gap: .5rem;
+}
+
+.table__clients{
+    min-width: 60%;
+    border: 1px solid #ccc;
+    border-radius: 0 1rem 1rem 0;
+    padding: .5rem;
+
+}
+
+.form__client-container{
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 1rem 0 0 1rem;
+    padding: .5rem;
+    background-color: white;
+    height: min-content;
+}
+
+.form__add-clients{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+
+}
+
+@media(max-width:900px){
+    .content__home-wrapper{
+        flex-direction: column;
+    }
+}
