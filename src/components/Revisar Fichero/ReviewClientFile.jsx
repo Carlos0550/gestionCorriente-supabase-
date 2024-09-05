@@ -10,6 +10,8 @@ import {
   Flex,
   Skeleton,
   Card,
+  message,
+  Popconfirm,
 } from "antd";
 import {
   DeleteOutlined,
@@ -35,6 +37,8 @@ function ReviewClientFile() {
     clientDebts,
     clientDelivers,
     clientData,
+    deleteProduct,
+    deleteDeliver
   } = useAppContext();
 
   const location = useLocation();
@@ -63,6 +67,24 @@ function ReviewClientFile() {
       setClientName(nombre);
     }
   }, [clientData]);
+
+  const [deleting, setDeleting] = useState(false)
+  const confirmDelete = async(id) =>{
+    setDeleting(true)
+    await deleteProduct(id,clientID)
+    setDeleting(false)
+    
+  }
+
+  const confirmDeleteDeliver = async(id) =>{
+      console.log(id)
+  
+      setDeleting(true)
+      await deleteDeliver(id,clientID)
+      setDeleting(false)
+      
+    }
+    
 
   let dataDebts = clientDebts || [];
   let dataDelivers = clientDelivers || [];
@@ -98,9 +120,18 @@ function ReviewClientFile() {
       render: (_, record) => (
         <>
           <Flex gap="small">
-            <Button type="primary" danger>
-              <DeleteOutlined />
-            </Button>
+            <Popconfirm
+            title="¿Seguro que quiere eliminar esta entrega?"
+            description="Esto eliminara del fichero esta entrega, y es posible que el saldo total quede en negativo"
+            onConfirm={()=>confirmDeleteDeliver(record.id)}
+            okButtonProps={{
+              loading: deleting
+            }}
+            >
+              <Button type="primary" danger>
+                <DeleteOutlined />
+              </Button>
+            </Popconfirm>
           </Flex>
         </>
       ),
@@ -139,6 +170,23 @@ function ReviewClientFile() {
                       })
                     : ` x ${product.price}`}
                 </span>
+                <Flex  gap="small">
+            {/* <Button type="primary">
+              <EditOutlined />
+            </Button> */}
+            <Popconfirm
+            title="¿Eliminar este producto?"
+            description="Esto eliminará definitivamente este producto del fichero"
+            onConfirm={()=> confirmDelete(product.idProduct)}
+            okButtonProps={{
+              loading: deleting
+            }}
+            >
+              <Button type="primary" danger disabled={dataDelivers && dataDelivers.length > 0}>
+                <DeleteOutlined />
+              </Button>
+            </Popconfirm>
+          </Flex>
               </div>
             ))}
           </p>
@@ -167,14 +215,7 @@ function ReviewClientFile() {
       key: "actions",
       render: (_, record) => (
         <>
-          <Flex vertical gap="small">
-            <Button type="primary">
-              <EditOutlined />
-            </Button>
-            <Button type="primary" danger>
-              <DeleteOutlined />
-            </Button>
-          </Flex>
+          
         </>
       ),
     },
@@ -211,6 +252,10 @@ function ReviewClientFile() {
     }
   }, [cancelDebts]);
 
+  const handleRedirectClientHistory = (link) => {
+    navigate(`/${link}`);
+  };
+
   return (
     <ConfigProvider>
       <Layout>
@@ -236,7 +281,7 @@ function ReviewClientFile() {
               )}
             </strong>
             {" "}
-            <Button danger>Ver historial de deudas</Button>
+            <Button danger onClick={()=>handleRedirectClientHistory(`ver-historial?clientID=${clientID}`)}>Ver historial de deudas</Button>
           </Card>
           <div className="forms__container">
             <div className="addProduct__component">
