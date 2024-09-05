@@ -1,0 +1,12 @@
+.form__login-wrapper{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vw;
+}
+.form__login{
+    border: 2px solid #ccc;
+    padding: 2rem;
+    border-radius: 1rem;
+}
