@@ -10,6 +10,9 @@ import {
   Flex,
   message,
   Form,
+  Modal,
+  Card,Divider , Switch,
+  Spin
 } from "antd";
 import {
   UserOutlined,
@@ -24,10 +27,10 @@ import { useNavigate } from "react-router-dom";
 
 const { Header, Content } = Layout;
 const { Search } = Input;
-const { Title } = Typography;
+const { Title,Text } = Typography;
 
 export function Home() {
-  const { fetchClients, clients, getVencimientos, vencimientos,createClients,getSession } =
+  const { fetchClients, clients, getVencimientos, vencimientos,createClients,getSession,SwitchChange } =
     useAppContext();
   const alreadyFetch = useRef(false);
 
@@ -57,7 +60,9 @@ export function Home() {
     }
   }, []);
 
-  const filteredClientes = clients.filter(
+  const filteredClientes = clients
+  .sort((a,b) => a.id - b.id)
+  .filter(
     (cliente) =>
       cliente.nombre_completo
         .toLowerCase()
@@ -87,12 +92,18 @@ export function Home() {
       exp.apodo?.toLowerCase().includes(searchText.toLowerCase())
   );
 
+  const [openModalUserData, setOpenModalUserData] = useState(false)
+  const [selectedUser, setSelectedUser] = useState(false)
+  const handleOpenModalUserData = (client) => {
+    setSelectedUser(clients.find(clt => clt.uuid === client))
+    setOpenModalUserData(true)
+  }
   function ViewClients({ formatNames }) {
     const columns = [
       {
         title: "Nombre",
         render: (_, record) =>
-          <strong>{formatNames(record.nombre_completo)}</strong> || "N/A",
+          <strong style={{color: record.buen_pagador ? "green" : "red"}}>{formatNames(record.nombre_completo)}</strong> || "N/A",
         key: "nombre",
       },
       {
@@ -133,7 +144,7 @@ export function Home() {
               >
                 Revisar Historial
               </Button>
-              <Button type="primary">
+              <Button type="primary" onClick={()=>handleOpenModalUserData(record.uuid)}>
                 <UserOutlined />
                 Ver datos
               </Button>
@@ -221,6 +232,21 @@ useEffect(()=>{
   })()
 },[])
 
+const [buenPagador, setBuenPagador] = useState();
+useEffect(()=>{
+  if (selectedUser && selectedUser !== null) {
+    setBuenPagador(selectedUser.buen_pagador)
+  }
+},[selectedUser])
+
+  const [isSwitching, setIsSwitching] = useState(false)
+  const handleSwitchChange = async(checked) => {
+    const hiddenMessage = message.loading("Espere...",0)
+    setIsSwitching(true)
+    await SwitchChange(checked, selectedUser.uuid,hiddenMessage)
+    setIsSwitching(false)
+    setOpenModalUserData(false)
+  };
   return (
     <ConfigProvider>
       <Layout>
@@ -320,6 +346,33 @@ useEffect(()=>{
               </div>
             </div>
           </div>
+          {openModalUserData && <Modal
+          open={true}
+          onCancel={()=> setOpenModalUserData(false)}
+          footer={[
+            <Button onClick={()=> setOpenModalUserData(false)} type="primary" danger>Cerrar</Button>
+          ]}
+          >
+            <Card
+              title=<Title level={3}>{formatNames(selectedUser.nombre_completo)}</Title>
+              style={{width:"100%"}}
+            >
+            <Text><strong>ID:</strong> {selectedUser.id}</Text><br />
+            <Text><strong>Apodo:</strong> {selectedUser.apodo || 'No disponible'}</Text><br />
+            <Text><strong>DNI:</strong> {selectedUser.dni || 'No disponible'}</Text><br />
+            <Text><strong>Teléfono:</strong> {selectedUser.telefono || 'No disponible'}</Text><br />
+            <Text><strong>Dirección:</strong> {selectedUser.direccion || 'No disponible'}</Text><br />
+            <Text><strong>UUID:</strong> {selectedUser.uuid || 'No disponible'}</Text><br />
+            <Divider />
+            <Text><strong>Buen Pagador:</strong></Text>
+            {" "}
+            {isSwitching ? <Spin/> : <Switch
+              checked={buenPagador}
+              onChange={handleSwitchChange}
+              disabled={isSwitching}
+            />}
+            </Card>
+            </Modal>}
         </Content>
       </Layout>
     </ConfigProvider>
