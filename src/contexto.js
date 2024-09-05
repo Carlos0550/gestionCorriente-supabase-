@@ -329,6 +329,26 @@ export const AppContextProvider = ({ children }) => {
       }
     }
   }
+
+  const SwitchChange = async (checked,uuid,hiddenMessage) => {
+    
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ buen_pagador: checked })
+        .match({ uuid: uuid });
+
+      if (error) {
+        throw error;
+      }
+
+      message.success('Cliente Actualizado correctamente!');
+      fetchClients(hiddenMessage)
+    } catch (error) {
+      console.error('Error al actualizar buen_pagador:', error);
+      message.error('Error al actualizar el estado de buen_pagador');
+    }
+  };
   return (
     <AppContext.Provider
       value={{
@@ -353,7 +373,7 @@ export const AppContextProvider = ({ children }) => {
         fetchHistory,
         getVencimientos,
         vencimientos,
-        deleteProduct,deleteDeliver,login,getSession
+        deleteProduct,deleteDeliver,login,getSession,SwitchChange
       }}
     >
       {children}
