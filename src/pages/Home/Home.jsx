@@ -27,7 +27,7 @@ const { Search } = Input;
 const { Title } = Typography;
 
 export function Home() {
-  const { fetchClients, clients, getVencimientos, vencimientos,createClients,clientSuccess } =
+  const { fetchClients, clients, getVencimientos, vencimientos,createClients,getSession } =
     useAppContext();
   const alreadyFetch = useRef(false);
 
@@ -214,6 +214,12 @@ export function Home() {
 const pageConfig = {
   pageSize: 6
 } 
+
+useEffect(()=>{
+  (async()=>{
+      await getSession()
+  })()
+},[])
 
   return (
     <ConfigProvider>

@@ -264,7 +264,7 @@ function ReviewClientFile() {
             title={
               <Title level={2}>
                 {fetching ? <Skeleton active /> : formatNames(clientName)}{" "}
-                <Button onClick={() => navigate("/")}>
+                <Button onClick={() => navigate("/home")}>
                   <RollbackOutlined />
                   Volver Atras
                 </Button>
