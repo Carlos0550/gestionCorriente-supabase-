@@ -16,7 +16,7 @@ const { Title } = Typography;
 const { Content } = Layout;
 
 function ViewHistory() {
-  const { fetchHistory, clientHistory } = useAppContext();
+  const { fetchHistory, clientHistory,getSession } = useAppContext();
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
@@ -138,6 +138,12 @@ function ViewHistory() {
 
     processHistory();
   }, [clientHistory]);
+  
+  useEffect(()=>{
+    (async()=>{
+        await getSession()
+    })()
+  },[])
 
   return (
     <ConfigProvider>
@@ -152,7 +158,7 @@ function ViewHistory() {
             bordered={false}
             style={{ width: "100%" }}
           >
-            <Button onClick={() => navigate("/")}>
+            <Button onClick={() => navigate("/home")}>
               <RollbackOutlined />
               Volver Atras
             </Button>
