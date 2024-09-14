@@ -4,6 +4,7 @@ import axios from "axios";
 import { useRef } from "react";
 import { supabase } from "./Auth/supabase";
 import { useNavigate } from "react-router-dom";
+import { config } from "./config";
 export const AppContext = createContext();
 
 export const useAppContext = () => {
@@ -23,11 +24,12 @@ export const AppContextProvider = ({ children }) => {
   const [clientHistory, setClientHistory] = useState([]);
   const [vencimientos, setVencimientos] = useState([]);
   const [clientSuccess, setClientSuccess] = useState(false);
+  console.log("Tipo de entorno: ", config.apiBaseUrl)
   const navigate = useNavigate()
   const createClients = async (values, hiddenMessage) => {
     try {
       const response = await axios.post(
-        "https://gestion-corriente-server.vercel.app/create-clients",
+        `${config.apiBaseUrl}/create-clients`,
         { values }
       );
       if (response.status === 200) {
@@ -52,7 +54,7 @@ export const AppContextProvider = ({ children }) => {
   };
   const fetchClients = async (hiddenMessage) => {
     try {
-      const response = await axios.get("https://gestion-corriente-server.vercel.app/get-all-clients");
+      const response = await axios.get(`${config.apiBaseUrl}/get-all-clients`);
       if (response.status === 200) {
         setClients(response.data);
       } else {
@@ -77,7 +79,7 @@ export const AppContextProvider = ({ children }) => {
     setClientData([]);
     try {
       const response = await axios.get(
-        `https://gestion-corriente-server.vercel.app/get-debts-client?clientID=${clientID}`
+        `${config.apiBaseUrl}/get-debts-client?clientID=${clientID}`
       );
       if (response.status === 200) {
         setClientData(response.data.clientData);
@@ -103,7 +105,7 @@ export const AppContextProvider = ({ children }) => {
     const hiddenMessage = message.loading("Aguarde...", 0);
     try {
       const response = await axios.post(
-        `https://gestion-corriente-server.vercel.app/add-debts?clientID=${clientID}&clientName=${clientName}`,
+        `${config.apiBaseUrl}/add-debts?clientID=${clientID}&clientName=${clientName}`,
         products
       );
       if (response.status === 200) {
@@ -131,7 +133,7 @@ export const AppContextProvider = ({ children }) => {
     const hiddenMessage = message.loading("Aguarde...", 0);
     try {
       const response = await axios.post(
-        `https://gestion-corriente-server.vercel.app/make-deliver?clientID=${clientID}&clientName=${clientName}`,
+        `${config.apiBaseUrl}/make-deliver?clientID=${clientID}&clientName=${clientName}`,
         entrega
       );
       if (response.status === 200) {
@@ -159,7 +161,7 @@ export const AppContextProvider = ({ children }) => {
 
     try {
       const response = await axios.post(
-        "https://gestion-corriente-server.vercel.app/cancel-debts",
+        `${config.apiBaseUrl}/cancel-debts`,
         values
       );
       if (response.status === 200) {
@@ -188,7 +190,7 @@ export const AppContextProvider = ({ children }) => {
     const hiddenMessage = message.loading("Espere...");
     try {
       const response = await axios.get(
-        `https://gestion-corriente-server.vercel.app/get-history?clientID=${clientID}`
+        `${config.apiBaseUrl}/get-history?clientID=${clientID}`
       );
       if (response.status === 200) {
         setClientHistory(response.data);
@@ -213,7 +215,7 @@ export const AppContextProvider = ({ children }) => {
     setVencimientos([]);
     try {
       const response = await axios.get(
-        "https://gestion-corriente-server.vercel.app/get-view-vencimientos"
+        `${config.apiBaseUrl}/get-view-vencimientos`
       );
       if (response.status === 200) {
         setVencimientos(response.data);
@@ -237,7 +239,7 @@ export const AppContextProvider = ({ children }) => {
   const deleteProduct = async (idProduct,clientID) => {
     const hiddenMessage = message.loading("Eliminando...", 0);
     try {
-      const response = await axios.delete(`https://gestion-corriente-server.vercel.app/delete-product?idProduct=${idProduct}`);
+      const response = await axios.delete(`${config.apiBaseUrl}/delete-product?idProduct=${idProduct}`);
       if (response.status === 200) {
         hiddenMessage();
         message.success("Producto Eliminado!");
@@ -263,7 +265,7 @@ export const AppContextProvider = ({ children }) => {
   const deleteDeliver = async (idDeliver,clientID) => {
     const hiddenMessage = message.loading("Eliminando...", 0);
     try {
-      const response = await axios.delete(`https://gestion-corriente-server.vercel.app/delete-deliver?idDeliver=${idDeliver}`);
+      const response = await axios.delete(`${config.apiBaseUrl}/delete-deliver?idDeliver=${idDeliver}`);
       if (response.status === 200) {
         hiddenMessage();
         message.success("Entrega Eliminada!");
