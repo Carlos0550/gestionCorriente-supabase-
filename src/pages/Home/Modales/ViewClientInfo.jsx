@@ -9,14 +9,18 @@ import {
   Spin,
   Switch,
   Flex,
+  Popconfirm,
 } from "antd";
 import { useAppContext } from "../../../contexto";
 import { DeleteFilled, EditFilled } from "@ant-design/icons";
+import EditClientForm from "../../../components/EditarClientes/EditClientForm";
 const { Title, Text } = Typography;
 
 function ViewClientInfo({ closeModal, selectedUser }) {
-  const { SwitchChange } = useAppContext();
+  const { SwitchChange,deleteClient,deletingUser } = useAppContext();
   const [isSwitching, setIsSwitching] = useState(false);
+  const [editClient, setEditClient] = useState(false)
+  
   const handleSwitchChange = async (checked) => {
     const hiddenMessage = message.loading("Espere...", 0);
     setIsSwitching(true);
@@ -38,6 +42,11 @@ function ViewClientInfo({ closeModal, selectedUser }) {
     });
     return capitalizedParts.join(" ");
   };
+
+  const handleEditClient = () => {
+    setEditClient(!editClient)
+    
+  }
   return (
     <div>
       <Modal
@@ -52,6 +61,24 @@ function ViewClientInfo({ closeModal, selectedUser }) {
         <Card
           title=<Title level={3}>
             {formatNames(selectedUser.nombre_completo)}
+            <Flex style={{ marginTop: "1rem" }} wrap gap="small">
+            <Button type="primary" danger={editClient} onClick={handleEditClient}>
+              {editClient ? "Cancelar" : <EditFilled />}
+            </Button>
+            <Popconfirm
+            title = "¿Está seguro que desea eliminar este cliente?"
+            description = "Esta acción no tiene vuelta atras y eliminará todo lo relacionado a este cliente como entregas, historial, deudas, etc..."
+            onConfirm={()=>deleteClient(selectedUser.uuid)}
+            okButtonProps={{
+              loading: deletingUser
+            }}
+            onCancel={()=> message.warning("Eliminación cancelada",3)}
+            >
+            <Button type="primary" danger >
+              <DeleteFilled />
+            </Button>
+            </Popconfirm>
+          </Flex>
           </Title>
           style={{ width: "100%" }}
         >
@@ -81,6 +108,7 @@ function ViewClientInfo({ closeModal, selectedUser }) {
             <strong>UUID:</strong> {selectedUser.uuid || "No disponible"}
           </Text>
           <br />
+          {editClient && <EditClientForm selectedClient={selectedUser} closeForm={handleEditClient} closeModal={closeModal}/>}
           <Divider />
           <Text>
             <strong>Buen Pagador:</strong>
@@ -94,14 +122,7 @@ function ViewClientInfo({ closeModal, selectedUser }) {
               disabled={isSwitching}
             />
           )}
-          <Flex style={{ marginTop: "1rem" }} wrap gap="small">
-            <Button type="primary">
-              <EditFilled />
-            </Button>
-            <Button type="primary" danger>
-              <DeleteFilled />
-            </Button>
-          </Flex>
+          
         </Card>
       </Modal>
     </div>
