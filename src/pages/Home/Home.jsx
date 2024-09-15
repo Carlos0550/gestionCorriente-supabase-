@@ -7,30 +7,29 @@ import {
   Table,
   Input,
   Typography,
-  Flex,
   message,
   Form,
-  Modal,
-  Card,Divider , Switch,
-  Spin
+ 
 } from "antd";
 import {
   UserOutlined,
   SearchOutlined,
   ClockCircleOutlined,
   HistoryOutlined,
+
 } from "@ant-design/icons";
 import { useAppContext } from "../../contexto";
 import { Button } from "antd";
 import { FileSearchOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import ViewClientInfo from "./Modales/ViewClientInfo";
 
 const { Header, Content } = Layout;
 const { Search } = Input;
-const { Title,Text } = Typography;
+const { Title } = Typography;
 
 export function Home() {
-  const { fetchClients, clients, getVencimientos, vencimientos,createClients,getSession,SwitchChange } =
+  const { fetchClients, clients, getVencimientos, vencimientos,createClients,getSession,errorGettingExpirations, getExpirations,errorStarting } =
     useAppContext();
   const alreadyFetch = useRef(false);
 
@@ -49,9 +48,9 @@ export function Home() {
 
   useEffect(() => {
     if (!alreadyFetch.current) {
+      alreadyFetch.current = true;
       (async () => {
         const hiddenMessage = message.loading("Aguarde...");
-        alreadyFetch.current = true;
         Promise.all([
           fetchClients(hiddenMessage),
           getVencimientos(hiddenMessage),
@@ -59,6 +58,15 @@ export function Home() {
       })();
     }
   }, []);
+
+  const retryOperations = async () => {
+    const hiddenMessage = message.loading("Aguarde...");
+        alreadyFetch.current = true;
+        Promise.all([
+          fetchClients(hiddenMessage),
+          getVencimientos(hiddenMessage),
+        ]);
+  }
 
   const filteredClientes = clients
   .sort((a,b) => a.id - b.id)
@@ -119,7 +127,8 @@ export function Home() {
         key: "apodo",
       },
       {
-        title: "Acciones",
+        title:errorStarting ? 
+        <Button type="primary" danger onClick={retryOperations}>Reintentar</Button> : "",
         key: "acciones",
         render: (_, record) => (
           <>
@@ -169,7 +178,9 @@ export function Home() {
         ),
       },
       {
-        title: "",
+        title: errorGettingExpirations ? 
+        <Button style={{margin: ".5rem"}} type="primary" danger onClick={getExpirations}>Reintentar Vencimientos</Button>
+        : "",
         key: "actions",
         render: (_, record) => (
           <Button
@@ -232,21 +243,9 @@ useEffect(()=>{
   })()
 },[])
 
-const [buenPagador, setBuenPagador] = useState();
-useEffect(()=>{
-  if (selectedUser && selectedUser !== null) {
-    setBuenPagador(selectedUser.buen_pagador)
-  }
-},[selectedUser])
 
-  const [isSwitching, setIsSwitching] = useState(false)
-  const handleSwitchChange = async(checked) => {
-    const hiddenMessage = message.loading("Espere...",0)
-    setIsSwitching(true)
-    await SwitchChange(checked, selectedUser.uuid,hiddenMessage)
-    setIsSwitching(false)
-    setOpenModalUserData(false)
-  };
+
+ 
   return (
     <ConfigProvider>
       <Layout>
@@ -346,33 +345,7 @@ useEffect(()=>{
               </div>
             </div>
           </div>
-          {openModalUserData && <Modal
-          open={true}
-          onCancel={()=> setOpenModalUserData(false)}
-          footer={[
-            <Button onClick={()=> setOpenModalUserData(false)} type="primary" danger>Cerrar</Button>
-          ]}
-          >
-            <Card
-              title=<Title level={3}>{formatNames(selectedUser.nombre_completo)}</Title>
-              style={{width:"100%"}}
-            >
-            <Text><strong>ID:</strong> {selectedUser.id}</Text><br />
-            <Text><strong>Apodo:</strong> {selectedUser.apodo || 'No disponible'}</Text><br />
-            <Text><strong>DNI:</strong> {selectedUser.dni || 'No disponible'}</Text><br />
-            <Text><strong>Teléfono:</strong> {selectedUser.telefono || 'No disponible'}</Text><br />
-            <Text><strong>Dirección:</strong> {selectedUser.direccion || 'No disponible'}</Text><br />
-            <Text><strong>UUID:</strong> {selectedUser.uuid || 'No disponible'}</Text><br />
-            <Divider />
-            <Text><strong>Buen Pagador:</strong></Text>
-            {" "}
-            {isSwitching ? <Spin/> : <Switch
-              checked={buenPagador}
-              onChange={handleSwitchChange}
-              disabled={isSwitching}
-            />}
-            </Card>
-            </Modal>}
+          {openModalUserData && <ViewClientInfo closeModal={()=> setOpenModalUserData(false)} selectedUser={selectedUser}/>}
         </Content>
       </Layout>
     </ConfigProvider>
