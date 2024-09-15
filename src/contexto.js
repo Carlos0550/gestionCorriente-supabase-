@@ -384,6 +384,58 @@ export const AppContextProvider = ({ children }) => {
       }
     }
   }
+
+  const editClientData = async(values) => {
+    const hiddenMessage = message.loading("Aguarde...",0)
+    try {
+      const response = await axios.put(`${config.apiBaseUrl}/edit-client`, values)
+      hiddenMessage()
+      if (response.status === 200) {
+        message.success(`${response.data.message}`)
+        fetchClients(hiddenMessage)
+      }else{
+        message.error(`${response.data.message}`,3)
+      }
+    } catch (error) {
+      console.log(error)
+      hiddenMessage()
+      if (error.response) {
+        message.error(`${error.response.data.message}`,3)
+      }else{
+        message.error("Error de conexión, verifique su conexión e intente nuevamente")
+      }
+    }
+  }
+
+  const [deletingUser, setDeletingUser] = useState(false)
+  const deleteClient = async (uuid) => {
+    const hiddenMessage = message.loading("Eliminando...",0)
+    setDeletingUser(true)
+    try {
+      const response = await axios.delete(`${config.apiBaseUrl}/delete-client?uuid=${uuid}`);
+      hiddenMessage()
+      setDeletingUser(false)
+      if (response.status === 200) {
+        setDeletingUser(false)
+        console.log("Cliente eliminado exitosamente.");
+        message.success("Cliente eliminado exitosamente.");
+        fetchClients(hiddenMessage)
+      } else {
+        console.error("Error en la eliminación del cliente.");
+        message.error("Error en la eliminación del cliente.");
+      }
+    } catch (error) {
+      hiddenMessage()
+      setDeletingUser(false)
+      console.error("Error al intentar eliminar el cliente:", error);
+      if (error.response) {
+        message.error(`Error: ${error.response.data.message || "Error en el servidor."}`);
+      } else {
+        message.error("Error de conexión. Por favor, intente nuevamente más tarde.");
+      }
+    }
+  };
+  
   return (
     <AppContext.Provider
       value={{
@@ -410,7 +462,9 @@ export const AppContextProvider = ({ children }) => {
         vencimientos,
         deleteProduct,deleteDeliver,login,getSession,SwitchChange,
         errorGettingExpirations, getExpirations,
-        errorStarting
+        errorStarting,
+        editClientData,
+        deleteClient,deletingUser
       }}
     >
       {children}
