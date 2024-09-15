@@ -27,6 +27,7 @@ import ProductForm from "./CargarProductos/AddDebts";
 import AddDeliver from "./AñadirEntregas/AddDeliver";
 import { calculateSubtotal } from "./Utils/ProcessDebts";
 import dayjs from "dayjs";
+import Swal from "sweetalert2"
 const { Content } = Layout;
 const { Title } = Typography;
 
@@ -137,6 +138,29 @@ function ReviewClientFile() {
       ),
     },
   ];
+
+  const confirmDeleteAlert = async (idProduct) => {
+    const result = await Swal.fire({
+      title: "¡Atención!",
+      text: "Si ya existen entregas, es posible que el saldo quede en negativo y no sea posible cancelar una deuda, ¿continuar?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      cancelButtonText: "No, cancelar",
+      confirmButtonText: "Sí, eliminar!"
+    });
+  
+    if (result.isConfirmed) {
+      await confirmDelete(idProduct);
+      Swal.fire({
+        title: "Producto eliminado",
+        text: "El producto fue eliminado con éxito",
+        icon: "success"
+      });
+    }
+  }
+  
   const getColumnasDeudas = () => [
     {
       title: "Fecha de compra",
@@ -171,18 +195,16 @@ function ReviewClientFile() {
                     : ` x ${product.price}`}
                 </span>
                 <Flex  gap="small">
-            {/* <Button type="primary">
-              <EditOutlined />
-            </Button> */}
             <Popconfirm
             title="¿Eliminar este producto?"
             description="Esto eliminará definitivamente este producto del fichero"
-            onConfirm={()=> confirmDelete(product.idProduct)}
+            // onConfirm={()=> confirmDelete(product.idProduct)}
+            onConfirm={() => confirmDeleteAlert(product.idProduct)}
             okButtonProps={{
               loading: deleting
             }}
             >
-              <Button type="primary" danger disabled={dataDelivers && dataDelivers.length > 0}>
+              <Button type="primary" danger >
                 <DeleteOutlined />
               </Button>
             </Popconfirm>
@@ -281,6 +303,9 @@ function ReviewClientFile() {
               )}
             </strong>
             {" "}
+            {calculateSubtotal(clientDebts, dataDelivers) < 0 
+            ? <h3 style={{color: "red"}}>El saldo total está en negativo, para solucionar esto puede eliminar entregas, o añadir cualquier producto para compensar la diferencia!</h3>
+            : ""}
             <Button danger onClick={()=>handleRedirectClientHistory(`ver-historial?clientID=${clientID}`)}>Ver historial de deudas</Button>
           </Card>
           <div className="forms__container">
@@ -308,6 +333,9 @@ function ReviewClientFile() {
                 { style: "currency", currency: "ARS" }
               )}
             </strong>
+            {calculateSubtotal(clientDebts, dataDelivers) < 0 
+            ? <h3 style={{color: "red"}}>El saldo total está en negativo, para solucionar esto puede eliminar entregas, o añadir cualquier producto para compensar la diferencia!</h3>
+            : ""}
           </Card>
           <div className="tables__user-wrapper">
             {fetching ? (
