@@ -24,7 +24,7 @@ export const AppContextProvider = ({ children }) => {
   const [clientHistory, setClientHistory] = useState([]);
   const [vencimientos, setVencimientos] = useState([]);
   const [clientSuccess, setClientSuccess] = useState(false);
-  console.log("Tipo de entorno: ", config.apiBaseUrl)
+  const [errorStarting, setErrorStarting] = useState(false)
   const navigate = useNavigate()
   const createClients = async (values, hiddenMessage) => {
     try {
@@ -56,11 +56,14 @@ export const AppContextProvider = ({ children }) => {
     try {
       const response = await axios.get(`${config.apiBaseUrl}/get-all-clients`);
       if (response.status === 200) {
+        setErrorStarting(false)
         setClients(response.data);
       } else {
+      setErrorStarting(true)
         message.error(`${response.data.message}`);
       }
     } catch (error) {
+    setErrorStarting(true)
       console.log(error);
       if (error.response) {
         message.error(`${error.response.data.message}`);
@@ -214,15 +217,17 @@ export const AppContextProvider = ({ children }) => {
   const getVencimientos = async (hiddenMessage) => {
     setVencimientos([]);
     try {
-      const response = await axios.get(
-        `${config.apiBaseUrl}/get-view-vencimientos`
-      );
+      await getExpirations()
+      const response = await axios.get(`${config.apiBaseUrl}/get-view-vencimientos`);
       if (response.status === 200) {
+        setErrorStarting(false)
         setVencimientos(response.data);
       } else {
+        setErrorStarting(true)
         message.error(`${response.data.message}`);
       }
     } catch (error) {
+      setErrorStarting(true)
       console.log(error);
       if (error.response) {
         message.error(`${error.response.data.message}`);
@@ -311,6 +316,7 @@ export const AppContextProvider = ({ children }) => {
   const alreadyGet = useRef(false)
   const getSession = async() =>{
     if (!alreadyGet.current) {
+      alreadyGet.current = true;
       const hiddenMessage = message.loading("Aguarde...",0)
       try {
         const { data: { user } } = await supabase.auth.getUser()
@@ -327,7 +333,7 @@ export const AppContextProvider = ({ children }) => {
         message.error("Error de red: Verifique su conexión e intente nuevamente")
       }finally{
         hiddenMessage()
-        alreadyGet.current = true;
+       
       }
     }
   }
@@ -351,6 +357,33 @@ export const AppContextProvider = ({ children }) => {
       message.error('Error al actualizar el estado de buen_pagador');
     }
   };
+
+  const [errorGettingExpirations, setErrorGettingExpirations] = useState(false)
+  const getExpirations = async() => {
+    const hiddenMessage = message.loading("Aguarde...",0) 
+    try {
+      const response = await axios.put(`${config.apiBaseUrl}/get-expirations`)
+      if (response.status === 200) {
+        hiddenMessage()
+        setErrorGettingExpirations(false)
+        message.success("Vencimientos obtenidos")
+      }else{
+        hiddenMessage()
+        message.error(`${response.data.message}`)
+        setErrorGettingExpirations(true)
+      }
+    } catch (error) {
+      hiddenMessage()
+      if (error.response) {
+        message.error(`${error.response.data.message}`)
+        setErrorGettingExpirations(true)
+      }
+      else{
+        message.error("Error de conexión, verifique su internet e intente nuevamente")
+        setErrorGettingExpirations(true)
+      }
+    }
+  }
   return (
     <AppContext.Provider
       value={{
@@ -375,7 +408,9 @@ export const AppContextProvider = ({ children }) => {
         fetchHistory,
         getVencimientos,
         vencimientos,
-        deleteProduct,deleteDeliver,login,getSession,SwitchChange
+        deleteProduct,deleteDeliver,login,getSession,SwitchChange,
+        errorGettingExpirations, getExpirations,
+        errorStarting
       }}
     >
       {children}
