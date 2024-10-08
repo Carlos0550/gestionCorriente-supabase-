@@ -69,15 +69,16 @@ export function Home() {
   }
 
   const filteredClientes = clients
-  .sort((a,b) => a.id - b.id)
-  .filter(
-    (cliente) =>
-      cliente.nombre_completo
-        .toLowerCase()
-        .includes(searchText.toLowerCase()) ||
-      cliente.dni.includes(searchText) ||
-      cliente.apodo.toLowerCase().includes(searchText.toLowerCase())
+  .sort((a, b) => a.id - b.id)
+  .filter((cliente) =>
+    (cliente.nombre_completo && cliente.nombre_completo.toLowerCase().includes(searchText.toLowerCase())) ||
+    (cliente.dni && cliente.dni.toLowerCase().includes(searchText.toLowerCase())) || // Verifica si existe
+    (cliente.apodo && cliente.apodo.toLowerCase().includes(searchText.toLowerCase())) // Verifica si existe
   );
+
+
+
+  console.log(filteredClientes)
 
   const removeDuplicateClients = (expirations) => {
     const uniqueClients = expirations.reduce((acc, item) => {
